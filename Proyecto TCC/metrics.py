@@ -25,7 +25,7 @@ def calculate_growth_metrics(df):
         return {}
     
     # Calcular crecimiento mes a mes
-    monthly_data = df.set_index('Date').resample('M')['Revenue'].sum()
+    monthly_data = df.set_index('Date').resample('ME')['Revenue'].sum()
     mom_growth = 0
     if len(monthly_data) > 1:
         mom_growth = ((monthly_data.iloc[-1] - monthly_data.iloc[-2]) / monthly_data.iloc[-2] * 100)
