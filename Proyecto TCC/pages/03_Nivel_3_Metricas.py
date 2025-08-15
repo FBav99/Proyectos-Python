@@ -56,8 +56,29 @@ st.markdown("""
         margin: 0.5rem 0;
         text-align: center;
     }
+    .completion-checkbox {
+        background: #e8f5e8;
+        border: 2px solid #28a745;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+def get_level_progress():
+    """Get current progress across all levels"""
+    progress = {
+        'nivel1': st.session_state.get('nivel1_completed', False),
+        'nivel2': st.session_state.get('nivel2_completed', False),
+        'nivel3': st.session_state.get('nivel3_completed', False),
+        'nivel4': st.session_state.get('nivel4_completed', False)
+    }
+    
+    completed_count = sum(progress.values())
+    total_progress = (completed_count / 4) * 100
+    
+    return total_progress, completed_count, progress
 
 def create_sample_data():
     """Create sample data for demonstration"""
@@ -102,11 +123,49 @@ def main():
     st.markdown('<h1 class="level-header">📊 Nivel 3: Métricas</h1>', unsafe_allow_html=True)
     st.markdown('<h2 style="text-align: center; color: #666;">KPIs y Análisis de Rendimiento</h2>', unsafe_allow_html=True)
     
-    # Progress indicator
+    # Dynamic Progress indicator
+    total_progress, completed_count, progress = get_level_progress()
+    
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.progress(0.75)
-        st.caption("Progreso: 75% - Nivel 3 de 4")
+        st.progress(total_progress / 100)
+        st.caption(f"Progreso: {total_progress:.0f}% - {completed_count} de 4 niveles completados")
+        
+        # Show completion status for each level
+        st.markdown("**Estado de Niveles:**")
+        col_a, col_b, col_c, col_d = st.columns(4)
+        with col_a:
+            status = "✅" if progress['nivel1'] else "⏳"
+            st.markdown(f"{status} Nivel 1")
+        with col_b:
+            status = "✅" if progress['nivel2'] else "⏳"
+            st.markdown(f"{status} Nivel 2")
+        with col_c:
+            status = "✅" if progress['nivel3'] else "⏳"
+            st.markdown(f"{status} Nivel 3")
+        with col_d:
+            status = "✅" if progress['nivel4'] else "⏳"
+            st.markdown(f"{status} Nivel 4")
+    
+    # Level Completion Checkbox - At the top
+    st.markdown('<div class="completion-checkbox">', unsafe_allow_html=True)
+    st.markdown("## 🎯 Marcar Nivel como Completado")
+    
+    # Check if this is the first time completing the level
+    was_completed = st.session_state.get('nivel3_completed', False)
+    
+    if st.checkbox("✅ Click aquí para marcar este nivel como Completado", 
+                  value=was_completed,
+                  key='nivel3_completion_checkbox'):
+        # Only show balloons if this is the first time completing
+        if not was_completed:
+            st.balloons()
+            st.success("🎉 ¡Felicidades! Has completado el Nivel 3. ¡Continúa con el siguiente nivel!")
+        st.session_state['nivel3_completed'] = True
+    else:
+        st.session_state['nivel3_completed'] = False
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     st.divider()
     

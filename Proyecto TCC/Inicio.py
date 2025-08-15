@@ -45,17 +45,38 @@ def main():
         <p style="color: white; text-align: center; margin-bottom: 1.5rem; font-size: 1.1rem;">
             ¿Eres nuevo en análisis de datos? Completa nuestros niveles paso a paso para dominar todas las funcionalidades
         </p>
-        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-            <a href="Inicio.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">🏠 Inicio</a>
-            <a href="pages/01_Nivel_1_Basico.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">📚 Nivel 1: Básico</a>
-            <a href="pages/02_Nivel_2_Filtros.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">🔍 Nivel 2: Filtros</a>
-            <a href="pages/03_Nivel_3_Metricas.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">📊 Nivel 3: Métricas</a>
-            <a href="pages/04_Nivel_4_Avanzado.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">🚀 Nivel 4: Avanzado</a>
-            <a href="pages/00_Ayuda.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">❓ Ayuda</a>
-        </div>
+    """, unsafe_allow_html=True)
+    
+    # Navigation buttons inside the card
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        if st.button("📚 Nivel 1: Básico", type="primary", use_container_width=True):
+            st.switch_page("pages/01_Nivel_1_Basico.py")
+    
+    with col2:
+        if st.button("🔍 Nivel 2: Filtros", use_container_width=True):
+            st.switch_page("pages/02_Nivel_2_Filtros.py")
+    
+    with col3:
+        if st.button("📊 Nivel 3: Métricas", use_container_width=True):
+            st.switch_page("pages/03_Nivel_3_Metricas.py")
+    
+    with col4:
+        if st.button("🚀 Nivel 4: Avanzado", use_container_width=True):
+            st.switch_page("pages/04_Nivel_4_Avanzado.py")
+    
+    with col5:
+        if st.button("❓ Ayuda", use_container_width=True):
+            st.switch_page("pages/00_Ayuda.py")
+    
+    st.markdown("""
         <div style="text-align: center; margin-top: 1rem;">
             <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin: 0;">
                 💡 <strong>Consejo:</strong> Si ya completaste los niveles, ¡este es tu dashboard principal para análisis avanzado!
+            </p>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin: 0.5rem 0 0 0;">
+                📖 <strong>Ayuda:</strong> Información detallada, guías paso a paso y solución de problemas
             </p>
         </div>
     </div>
@@ -202,17 +223,36 @@ def main():
     st.markdown("""
     <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; text-align: center;">
         <p style="margin-bottom: 0.5rem;"><strong>💡 ¿Necesitas ayuda?</strong></p>
-        <p style="margin-bottom: 1rem;">Si no estás familiarizado con estas funcionalidades, te recomendamos completar nuestros <a href="pages/01_Nivel_1_Basico.py">niveles de aprendizaje</a> primero.</p>
-        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-            <a href="Inicio.py" style="color: #667eea; text-decoration: none;">🏠 Inicio</a> |
-            <a href="pages/01_Nivel_1_Basico.py" style="color: #667eea; text-decoration: none;">📚 Nivel 1</a> |
-            <a href="pages/02_Nivel_2_Filtros.py" style="color: #667eea; text-decoration: none;">🔍 Nivel 2</a> |
-            <a href="pages/03_Nivel_3_Metricas.py" style="color: #667eea; text-decoration: none;">📊 Nivel 3</a> |
-            <a href="pages/04_Nivel_4_Avanzado.py" style="color: #667eea; text-decoration: none;">🚀 Nivel 4</a> |
-            <a href="pages/00_Ayuda.py" style="color: #667eea; text-decoration: none;">❓ Ayuda</a>
-        </div>
+        <p style="margin-bottom: 1rem;">Si no estás familiarizado con estas funcionalidades, te recomendamos completar nuestros niveles de aprendizaje primero.</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Footer navigation buttons
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    
+    with col1:
+        if st.button("🏠 Inicio", use_container_width=True):
+            st.switch_page("Inicio.py")
+    
+    with col2:
+        if st.button("📚 Nivel 1", use_container_width=True):
+            st.switch_page("pages/01_Nivel_1_Basico.py")
+    
+    with col3:
+        if st.button("🔍 Nivel 2", use_container_width=True):
+            st.switch_page("pages/02_Nivel_2_Filtros.py")
+    
+    with col4:
+        if st.button("📊 Nivel 3", use_container_width=True):
+            st.switch_page("pages/03_Nivel_3_Metricas.py")
+    
+    with col5:
+        if st.button("🚀 Nivel 4", use_container_width=True):
+            st.switch_page("pages/04_Nivel_4_Avanzado.py")
+    
+    with col6:
+        if st.button("❓ Ayuda", use_container_width=True):
+            st.switch_page("pages/00_Ayuda.py")
 
 if __name__ == "__main__":
     main() 
