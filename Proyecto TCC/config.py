@@ -4,7 +4,7 @@ import streamlit as st
 def setup_page_config():
     """Configurar la página de Streamlit"""
     st.set_page_config(
-        page_title="Panel de Análisis de Datos",
+        page_title="Dashboard Principal",
         page_icon="📊",
         layout="wide",
         initial_sidebar_state="expanded"

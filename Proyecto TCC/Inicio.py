@@ -26,8 +26,13 @@ from ui_components import (
 
 def main():
     """Función principal de la aplicación"""
-    # Configurar página
-    setup_page_config()
+    # Configurar página específica para Inicio
+    st.set_page_config(
+        page_title="Inicio - Dashboard Principal",
+        page_icon="🏠",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
     apply_custom_css()
     
     # Título principal
@@ -79,9 +84,25 @@ def main():
     
     # Dashboard description for advanced users
     st.markdown("""
-    <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 2rem;">
-        <h3 style="color: #28a745; margin-bottom: 0.5rem;">🎯 Dashboard Principal - Funcionalidades Avanzadas</h3>
-        <p style="margin-bottom: 0.5rem;"><strong>Este dashboard incluye:</strong></p>
+    <style>
+        .dashboard-card {
+            background: rgba(40, 167, 69, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 2rem;
+        }
+        .dashboard-card h3 {
+            color: #28a745 !important;
+            margin-bottom: 0.5rem;
+        }
+        .dashboard-card p, .dashboard-card li {
+            color: inherit !important;
+        }
+    </style>
+    <div class="dashboard-card">
+        <h3>🎯 Dashboard Principal - Funcionalidades Avanzadas</h3>
+        <p><strong>Este dashboard incluye:</strong></p>
         <ul style="margin-bottom: 0;">
             <li>📊 <strong>Análisis completo de métricas y KPIs</strong></li>
             <li>🔍 <strong>Filtros avanzados y cálculos personalizados</strong></li>
@@ -207,25 +228,29 @@ def main():
     """, unsafe_allow_html=True)
     
     # Footer navigation buttons
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
+        if st.button("🏠 Inicio", use_container_width=True):
+            st.switch_page("Inicio.py")
+    
+    with col2:
         if st.button("📚 Nivel 1", use_container_width=True):
             st.switch_page("pages/01_Nivel_1_Basico.py")
     
-    with col2:
+    with col3:
         if st.button("🔍 Nivel 2", use_container_width=True):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
-    with col3:
+    with col4:
         if st.button("📊 Nivel 3", use_container_width=True):
             st.switch_page("pages/03_Nivel_3_Metricas.py")
     
-    with col4:
+    with col5:
         if st.button("🚀 Nivel 4", use_container_width=True):
             st.switch_page("pages/04_Nivel_4_Avanzado.py")
     
-    with col5:
+    with col6:
         if st.button("❓ Ayuda", use_container_width=True):
             st.switch_page("pages/00_Ayuda.py")
 
