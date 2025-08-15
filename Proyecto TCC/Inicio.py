@@ -26,8 +26,13 @@ from ui_components import (
 
 def main():
     """Función principal de la aplicación"""
-    # Configurar página
-    setup_page_config()
+    # Configurar página específica para Inicio
+    st.set_page_config(
+        page_title="Inicio - Dashboard Principal",
+        page_icon="🏠",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
     apply_custom_css()
     
     # Título principal
@@ -41,6 +46,7 @@ def main():
             ¿Eres nuevo en análisis de datos? Completa nuestros niveles paso a paso para dominar todas las funcionalidades
         </p>
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a href="Inicio.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">🏠 Inicio</a>
             <a href="pages/01_Nivel_1_Basico.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">📚 Nivel 1: Básico</a>
             <a href="pages/02_Nivel_2_Filtros.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">🔍 Nivel 2: Filtros</a>
             <a href="pages/03_Nivel_3_Metricas.py" style="background: rgba(255,255,255,0.9); color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">📊 Nivel 3: Métricas</a>
@@ -182,6 +188,7 @@ def main():
         <p style="margin-bottom: 0.5rem;"><strong>💡 ¿Necesitas ayuda?</strong></p>
         <p style="margin-bottom: 1rem;">Si no estás familiarizado con estas funcionalidades, te recomendamos completar nuestros <a href="pages/01_Nivel_1_Basico.py">niveles de aprendizaje</a> primero.</p>
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a href="Inicio.py" style="color: #667eea; text-decoration: none;">🏠 Inicio</a> |
             <a href="pages/01_Nivel_1_Basico.py" style="color: #667eea; text-decoration: none;">📚 Nivel 1</a> |
             <a href="pages/02_Nivel_2_Filtros.py" style="color: #667eea; text-decoration: none;">🔍 Nivel 2</a> |
             <a href="pages/03_Nivel_3_Metricas.py" style="color: #667eea; text-decoration: none;">📊 Nivel 3</a> |
