@@ -63,9 +63,25 @@ def main():
     
     # Dashboard description for advanced users
     st.markdown("""
-    <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 2rem;">
-        <h3 style="color: #28a745; margin-bottom: 0.5rem;">🎯 Dashboard Principal - Funcionalidades Avanzadas</h3>
-        <p style="margin-bottom: 0.5rem;"><strong>Este dashboard incluye:</strong></p>
+    <style>
+        .dashboard-card {
+            background: rgba(40, 167, 69, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 2rem;
+        }
+        .dashboard-card h3 {
+            color: #28a745 !important;
+            margin-bottom: 0.5rem;
+        }
+        .dashboard-card p, .dashboard-card li {
+            color: inherit !important;
+        }
+    </style>
+    <div class="dashboard-card">
+        <h3>🎯 Dashboard Principal - Funcionalidades Avanzadas</h3>
+        <p><strong>Este dashboard incluye:</strong></p>
         <ul style="margin-bottom: 0;">
             <li>📊 <strong>Análisis completo de métricas y KPIs</strong></li>
             <li>🔍 <strong>Filtros avanzados y cálculos personalizados</strong></li>
