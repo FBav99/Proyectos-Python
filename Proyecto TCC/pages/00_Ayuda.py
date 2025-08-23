@@ -464,19 +464,19 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        if st.button("📚 Comenzar Nivel 1", type="primary"):
+        if st.button("📚 Comenzar Nivel 1", type="primary", key="ayuda_nivel1"):
             st.switch_page("pages/01_Nivel_1_Basico.py")
     
     with col2:
-        if st.button("🏠 Dashboard Principal"):
+        if st.button("🏠 Dashboard Principal", key="ayuda_dashboard"):
             st.switch_page("Inicio.py")
     
     with col3:
-        if st.button("📊 Nivel 4 Avanzado"):
+        if st.button("📊 Nivel 4 Avanzado", key="ayuda_nivel4"):
             st.switch_page("pages/04_Nivel_4_Avanzado.py")
     
     with col4:
-        if st.button("🔍 Nivel 2 Filtros"):
+        if st.button("🔍 Nivel 2 Filtros", key="ayuda_nivel2"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
     # Additional Learning Resources

@@ -584,15 +584,15 @@ def main():
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     
     with col1:
-        if st.button("🏠 Dashboard Principal"):
+        if st.button("🏠 Dashboard Principal", key="nivel3_dashboard"):
             st.switch_page("Inicio.py")
     
     with col2:
-        if st.button("⬅️ Nivel Anterior"):
+        if st.button("⬅️ Nivel Anterior", key="nivel3_anterior"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
     with col4:
-        if st.button("➡️ Siguiente Nivel"):
+        if st.button("➡️ Siguiente Nivel", key="nivel3_siguiente"):
             st.switch_page("pages/04_Nivel_4_Avanzado.py")
     
     # Tips section
