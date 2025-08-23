@@ -231,7 +231,9 @@ $RECYCLE.BIN/
 .nfs*
 
 # Streamlit specific
-.streamlit/
+.streamlit/secrets.toml
+.streamlit/secrets.yaml
+.streamlit/secrets.json
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/

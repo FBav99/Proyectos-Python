@@ -7,6 +7,7 @@ import base64
 import hashlib
 import secrets
 from core.auth_config import init_authentication, load_auth_config
+from core.security import security_manager, secure_oauth_callback
 import yaml
 
 def generate_state():
@@ -237,9 +238,12 @@ def handle_oauth_callback():
         code = query_params['code']
         state = query_params['state']
         
-        # Verify state
-        if state != st.session_state.get('oauth_state'):
-            st.error("❌ Estado OAuth inválido")
+        # Secure OAuth callback validation
+        stored_state = st.session_state.get('oauth_state')
+        callback_valid, callback_msg = secure_oauth_callback(code, state, stored_state)
+        
+        if not callback_valid:
+            st.error(f"❌ {callback_msg}")
             return
         
         provider = st.session_state.get('oauth_provider')

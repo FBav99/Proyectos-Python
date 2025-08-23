@@ -3,6 +3,7 @@ import yaml
 from yaml.loader import SafeLoader
 import os
 from core.auth_config import init_authentication, load_auth_config
+from core.security import security_manager, secure_user_registration
 
 def main():
     """Página de registro de usuarios"""
