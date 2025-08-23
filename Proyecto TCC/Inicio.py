@@ -68,9 +68,37 @@ def main():
         authenticator.logout('Cerrar Sesión', 'main')
     elif st.session_state.get('authentication_status') == False:
         st.error('Usuario/contraseña incorrectos')
+        
+        # Add registration option for failed login
+        st.markdown("---")
+        st.markdown("### 🔐 ¿No tienes cuenta?")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📝 Crear Nueva Cuenta", type="primary", use_container_width=True):
+                st.switch_page("pages/05_Registro.py")
+        with col2:
+            if st.button("🔑 ¿Olvidaste tu contraseña?", use_container_width=True):
+                st.switch_page("pages/06_Recuperar_Password.py")
+        with col3:
+            if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
+                st.switch_page("pages/07_OAuth_Login.py")
         return
     elif st.session_state.get('authentication_status') is None:
         st.warning('Por favor ingresa tu usuario y contraseña')
+        
+        # Add registration option for new users
+        st.markdown("---")
+        st.markdown("### 🔐 ¿Eres nuevo aquí?")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📝 Crear Nueva Cuenta", type="primary", use_container_width=True):
+                st.switch_page("pages/05_Registro.py")
+        with col2:
+            if st.button("🔑 ¿Olvidaste tu contraseña?", use_container_width=True):
+                st.switch_page("pages/06_Recuperar_Password.py")
+        with col3:
+            if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
+                st.switch_page("pages/07_OAuth_Login.py")
         return
     
     # User is authenticated
