@@ -1,0 +1,24 @@
+[global]
+# Hide file paths in error messages
+showErrorDetails = false
+
+# Disable showing the hamburger menu
+showWarningOnDirectExecution = false
+
+# Disable showing the "Deploy" button
+showDeployButton = false
+
+[server]
+# Configure session state
+enableSessionState = true
+
+[browser]
+# Disable showing the "Rerun" button
+showRerunButton = false
+
+# Disable showing the "Settings" button
+showSettingsButton = false
+
+[logger]
+# Configure logging level
+level = "warning"

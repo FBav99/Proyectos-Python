@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from gif_utils import display_level_gif
+from utils.gif_utils import display_level_gif
 
 # Page config
 st.set_page_config(
@@ -209,9 +209,6 @@ def main():
     3. Verifica que se muestre correctamente en la tabla
     """)
     
-    # Display GIF demonstration for file upload
-    display_level_gif("nivel1", "carga_archivo")
-    
     # File upload for practice
     uploaded_file = st.file_uploader(
         "📁 Sube tu archivo de práctica",
@@ -293,15 +290,15 @@ def main():
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     
     with col1:
-        if st.button("🏠 Dashboard Principal"):
+        if st.button("🏠 Dashboard Principal", key="nivel1_dashboard"):
             st.switch_page("Inicio.py")
     
     with col2:
-        if st.button("⬅️ Volver al Inicio"):
+        if st.button("⬅️ Volver al Inicio", key="nivel1_volver"):
             st.switch_page("Inicio.py")
     
     with col4:
-        if st.button("➡️ Siguiente Nivel"):
+        if st.button("➡️ Siguiente Nivel", key="nivel1_siguiente"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
     # Tips section

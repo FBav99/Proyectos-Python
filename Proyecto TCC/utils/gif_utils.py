@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from pathlib import Path
 
-def display_gif(gif_path, caption="", width=None, use_column_width=True):
+def display_gif(gif_path, caption="", width=None, use_container_width=True):
     """
     Display a GIF in Streamlit with proper error handling
     
@@ -10,20 +10,20 @@ def display_gif(gif_path, caption="", width=None, use_column_width=True):
         gif_path (str): Path to the GIF file
         caption (str): Caption to display below the GIF
         width (int): Width of the GIF in pixels (optional)
-        use_column_width (bool): Whether to use column width
+        use_container_width (bool): Whether to use container width
     """
     try:
         # Check if file exists
         if not os.path.exists(gif_path):
             st.warning(f"⚠️ GIF no encontrado: {gif_path}")
-            st.info("📹 Este es un placeholder para el GIF. Sube el archivo GIF correspondiente.")
+            st.info("📹 Si estas viendo esto, significa que el GIF no esta disponible.")
             return False
         
         # Display the GIF
         if width:
             st.image(gif_path, caption=caption, width=width)
         else:
-            st.image(gif_path, caption=caption, use_column_width=use_column_width)
+            st.image(gif_path, caption=caption, use_container_width=use_container_width)
         
         return True
         
@@ -55,20 +55,54 @@ def create_gif_placeholder(nivel, gif_name, description=""):
         gif_name (str): Name of the GIF
         description (str): Description of what the GIF should show
     """
-    st.markdown("""
-    <div style="background: #f0f2f6; border: 2px dashed #ccc; border-radius: 10px; padding: 2rem; text-align: center; margin: 1rem 0;">
-        <h3 style="color: #666; margin-bottom: 1rem;">📹 GIF Demostración</h3>
-        <p style="color: #888; margin-bottom: 1rem;">
-            <strong>Archivo:</strong> {}/{}.gif
-        </p>
-        <p style="color: #666; font-style: italic;">
-            {description}
-        </p>
-        <p style="color: #999; font-size: 0.9rem; margin-top: 1rem;">
-            💡 Sube el archivo GIF correspondiente en assets/gifs/{}/ para ver la demostración
-        </p>
-    </div>
-    """.format(nivel, gif_name, description, nivel), unsafe_allow_html=True)
+    # Try to display a placeholder GIF using Streamlit's image function
+    try:
+        # Using a reliable placeholder GIF
+        placeholder_url = "https://media1.tenor.com/m/Ta7yC7OAADkAAAAd/fernet-branca.gif"
+        
+        # Create a styled container with the GIF inside
+        st.markdown(f"""
+        <div style="background: #f0f2f6; border: 2px dashed #ccc; border-radius: 10px; padding: 1.5rem; margin: 1rem 0;">
+            <h3 style="color: #666; margin-bottom: 0.5rem; text-align: center;">📹 GIF Demostración</h3>
+            <p style="color: #888; margin-bottom: 0.5rem; text-align: center; font-size: 0.9rem;">
+                <strong>Archivo:</strong> {nivel}/{gif_name}.gif
+            </p>
+            <p style="color: #666; font-style: italic; text-align: center; margin-bottom: 1rem; font-size: 0.9rem;">
+                {description}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display the GIF inside the container
+        st.image(placeholder_url, caption="🎬 Placeholder GIF - Demostración", use_container_width=True)
+        
+        # Add footer note
+        st.markdown(f"""
+        <div style="text-align: center; margin-top: 0.5rem;">
+            <p style="color: #999; font-size: 0.8rem;">
+                💡 Si estas viendo esto, significa que el GIF correspondiente no esta disponible.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    except Exception as e:
+        # Fallback if GIF fails to load
+        st.markdown(f"""
+        <div style="background: #f0f2f6; border: 2px dashed #ccc; border-radius: 10px; padding: 2rem; text-align: center; margin: 1rem 0;">
+            <h3 style="color: #666; margin-bottom: 1rem;">📹 GIF Demostración</h3>
+            <p style="color: #888; margin-bottom: 1rem;">
+                <strong>Archivo:</strong> {nivel}/{gif_name}.gif
+            </p>
+            <p style="color: #666; font-style: italic;">
+                {description}
+            </p>
+            <p style="color: #999; font-size: 0.9rem; margin-top: 1rem;">
+                💡 Sube el archivo GIF correspondiente en assets/gifs/{nivel}/ para ver la demostración real
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.info("📹 Placeholder para GIF de demostración")
+        st.caption("El GIF real se mostrará cuando subas el archivo correspondiente")
 
 def display_gif_with_fallback(nivel, gif_name, description="", caption="", width=None):
     """

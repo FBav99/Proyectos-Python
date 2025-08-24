@@ -4,19 +4,19 @@ import numpy as np
 from datetime import datetime
 
 # Importar módulos personalizados
-from config import setup_page_config, apply_custom_css
-from data_loader import get_data
-from metrics import calculate_metrics, calculate_growth_metrics, calculate_performance_insights
-from visualizations import (
+from core.config import setup_page_config, apply_custom_css
+from core.data_loader import get_data
+from utils.metrics import calculate_metrics, calculate_growth_metrics, calculate_performance_insights
+from utils.visualizations import (
     create_time_series_chart, 
     create_category_analysis, 
     create_regional_analysis,
     create_correlation_matrix,
     create_custom_calculation_charts
 )
-from calculations import apply_custom_calculations
-from filters import apply_all_filters
-from ui_components import (
+from utils.calculations import apply_custom_calculations
+from utils.filters import apply_all_filters
+from utils.ui_components import (
     create_sidebar_controls,
     create_custom_calculations_ui,
     display_metrics_dashboard,
@@ -46,23 +46,23 @@ def main():
     col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
-        if st.button("📚 Nivel 1: Básico", type="primary", use_container_width=True):
+        if st.button("📚 Nivel 1: Básico", type="primary", use_container_width=True, key="main_nivel1_header"):
             st.switch_page("pages/01_Nivel_1_Basico.py")
     
     with col2:
-        if st.button("🔍 Nivel 2: Filtros", use_container_width=True):
+        if st.button("🔍 Nivel 2: Filtros", use_container_width=True, key="main_nivel2_header"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
     with col3:
-        if st.button("📊 Nivel 3: Métricas", use_container_width=True):
+        if st.button("📊 Nivel 3: Métricas", use_container_width=True, key="main_nivel3_header"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")
     
     with col4:
-        if st.button("🚀 Nivel 4: Avanzado", use_container_width=True):
+        if st.button("🚀 Nivel 4: Avanzado", use_container_width=True, key="main_nivel4_header"):
             st.switch_page("pages/04_Nivel_4_Avanzado.py")
     
     with col5:
-        if st.button("❓ Ayuda", use_container_width=True):
+        if st.button("❓ Ayuda", use_container_width=True, key="main_ayuda_header"):
             st.switch_page("pages/00_Ayuda.py")
     
     st.markdown("""
@@ -210,23 +210,23 @@ def main():
     col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
-        if st.button("📚 Nivel 1", use_container_width=True):
+        if st.button("📚 Nivel 1", use_container_width=True, key="main_nivel1_footer"):
             st.switch_page("pages/01_Nivel_1_Basico.py")
     
     with col2:
-        if st.button("🔍 Nivel 2", use_container_width=True):
+        if st.button("🔍 Nivel 2", use_container_width=True, key="main_nivel2_footer"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
     with col3:
-        if st.button("📊 Nivel 3", use_container_width=True):
+        if st.button("📊 Nivel 3", use_container_width=True, key="main_nivel3_footer"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")
     
     with col4:
-        if st.button("🚀 Nivel 4", use_container_width=True):
+        if st.button("🚀 Nivel 4", use_container_width=True, key="main_nivel4_footer"):
             st.switch_page("pages/04_Nivel_4_Avanzado.py")
     
     with col5:
-        if st.button("❓ Ayuda", use_container_width=True):
+        if st.button("❓ Ayuda", use_container_width=True, key="main_ayuda_footer"):
             st.switch_page("pages/00_Ayuda.py")
 
 if __name__ == "__main__":
