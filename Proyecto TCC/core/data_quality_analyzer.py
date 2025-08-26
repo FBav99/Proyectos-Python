@@ -20,7 +20,7 @@ def analyze_data_quality(df):
             'missing_percentages': (df.isnull().sum() / len(df) * 100).to_dict(),
             'columns_with_missing': df.columns[df.isnull().any()].tolist()
         },
-        'data_types': df.dtypes.to_dict(),
+        'data_types': df.dtypes.astype(str).to_dict(),
         'numeric_analysis': {},
         'categorical_analysis': {},
         'date_analysis': {},
@@ -32,13 +32,13 @@ def analyze_data_quality(df):
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     for col in numeric_cols:
         analysis['numeric_analysis'][col] = {
-            'min': df[col].min(),
-            'max': df[col].max(),
-            'mean': df[col].mean(),
-            'median': df[col].median(),
-            'std': df[col].std(),
-            'zeros': (df[col] == 0).sum(),
-            'negatives': (df[col] < 0).sum()
+            'min': float(df[col].min()),
+            'max': float(df[col].max()),
+            'mean': float(df[col].mean()),
+            'median': float(df[col].median()),
+            'std': float(df[col].std()),
+            'zeros': int((df[col] == 0).sum()),
+            'negatives': int((df[col] < 0).sum())
         }
         
         # Detect outliers using IQR method
@@ -52,7 +52,7 @@ def analyze_data_quality(df):
         analysis['outliers'][col] = {
             'count': len(outliers),
             'percentage': len(outliers) / len(df) * 100,
-            'values': outliers.tolist()
+            'values': outliers.astype(str).tolist()
         }
     
     # Analyze categorical columns
@@ -61,7 +61,7 @@ def analyze_data_quality(df):
         unique_values = df[col].nunique()
         analysis['categorical_analysis'][col] = {
             'unique_values': unique_values,
-            'most_common': df[col].mode().iloc[0] if not df[col].mode().empty else None,
+            'most_common': str(df[col].mode().iloc[0]) if not df[col].mode().empty else None,
             'most_common_count': df[col].value_counts().iloc[0] if not df[col].value_counts().empty else 0,
             'empty_strings': (df[col] == '').sum(),
             'whitespace_only': (df[col].str.strip() == '').sum() if df[col].dtype == 'object' else 0
@@ -71,8 +71,8 @@ def analyze_data_quality(df):
     date_cols = df.select_dtypes(include=['datetime64']).columns
     for col in date_cols:
         analysis['date_analysis'][col] = {
-            'min_date': df[col].min(),
-            'max_date': df[col].max(),
+            'min_date': str(df[col].min()),
+            'max_date': str(df[col].max()),
             'date_range': (df[col].max() - df[col].min()).days,
             'future_dates': (df[col] > pd.Timestamp.now()).sum()
         }

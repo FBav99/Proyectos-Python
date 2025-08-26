@@ -72,6 +72,37 @@ def main():
     
     st.info("💡 **Consejo**: Si eres nuevo, comienza con el Nivel 1. Si ya tienes experiencia, puedes saltar al nivel que necesites.")
     
+    # Dashboard en Blanco Section
+    st.markdown("## 🎨 Dashboard en Blanco - Herramienta Avanzada")
+    
+    st.markdown("""
+    **El Dashboard en Blanco** es una herramienta especial que te permite crear dashboards completamente personalizados 
+    desde cero, sin restricciones de plantillas predefinidas.
+    """)
+    
+    st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+    st.markdown("### 🎯 ¿Cuándo usar el Dashboard en Blanco?")
+    st.markdown("""
+    - **Tienes experiencia** con análisis de datos y visualizaciones
+    - **Necesitas control total** sobre cada componente de tu dashboard
+    - **Quieres crear visualizaciones específicas** para tu negocio
+    - **Las plantillas predefinidas** no cubren tus necesidades
+    - **Deseas experimentar** con diferentes tipos de gráficos y métricas
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+    st.markdown("### 🚀 Características Principales:")
+    st.markdown("""
+    - **📈 Métricas personalizadas**: Crea KPIs específicos para tu análisis
+    - **📊 Gráficos básicos**: Líneas, barras, circulares, áreas
+    - **🔬 Gráficos avanzados**: Dispersión, histogramas, box plots, violín
+    - **🔍 Análisis estadístico**: Matrices de correlación, tablas de datos
+    - **⚙️ Configuración completa**: Control total sobre colores, títulos, datos
+    - **💾 Guardar y exportar**: Guarda tus dashboards y expórtalos
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     # Quick Start Guide
     st.markdown("## 🚀 Guía de Inicio Rápido")
     
@@ -355,6 +386,143 @@ def main():
         - ¿Qué más necesito saber?
         """)
     
+    # Dashboard en Blanco - Guía Detallada
+    st.markdown("## 🎨 Guía Completa del Dashboard en Blanco")
+    
+    with st.expander("🚀 ¿Cómo comenzar con el Dashboard en Blanco?"):
+        st.markdown("""
+        **Pasos para crear tu primer dashboard personalizado:**
+        
+        #### 1️⃣ **Preparación**
+        - Asegúrate de tener datos cargados (desde Nivel 1 o subiendo archivos)
+        - Familiarízate con la estructura de tus datos
+        - Define qué métricas y visualizaciones necesitas
+        
+        #### 2️⃣ **Acceso al Dashboard en Blanco**
+        - Ve al **Dashboard Principal** (página de inicio)
+        - Selecciona **"Dashboard en Blanco"** en las opciones de plantilla
+        - O navega directamente a la página desde el menú
+        
+        #### 3️⃣ **Construcción del Dashboard**
+        - Usa el **panel lateral** para agregar componentes
+        - Comienza con **métricas básicas** para tener KPIs clave
+        - Agrega **gráficos** para visualizar tendencias y patrones
+        - **Configura cada componente** según tus necesidades
+        
+        #### 4️⃣ **Organización y Refinamiento**
+        - **Titula cada componente** de manera descriptiva
+        - **Reorganiza** arrastrando componentes si es necesario
+        - **Prueba diferentes configuraciones** hasta encontrar la ideal
+        """)
+    
+    with st.expander("📊 Tipos de Componentes Disponibles"):
+        st.markdown("""
+        **Categorías de componentes que puedes agregar:**
+        
+        #### 📈 **Métricas y KPIs**
+        - **Count**: Número total de registros
+        - **Sum**: Suma de valores numéricos
+        - **Mean/Median**: Promedios y medianas
+        - **Min/Max**: Valores extremos
+        - **Personalizadas**: Cálculos específicos
+        
+        #### 📊 **Gráficos Básicos**
+        - **Líneas**: Para tendencias temporales
+        - **Barras**: Para comparaciones entre categorías
+        - **Circular**: Para proporciones y distribuciones
+        - **Área**: Para mostrar volúmenes a lo largo del tiempo
+        
+        #### 🔬 **Gráficos Avanzados**
+        - **Dispersión**: Para relaciones entre variables
+        - **Histograma**: Para distribución de frecuencias
+        - **Box Plot**: Para estadísticas descriptivas
+        - **Violín**: Para distribución de densidad
+        
+        #### 🔍 **Análisis de Datos**
+        - **Matriz de Correlación**: Para relaciones entre variables numéricas
+        - **Tabla de Datos**: Para ver datos crudos
+        """)
+    
+    with st.expander("⚙️ Configuración Avanzada de Componentes"):
+        st.markdown("""
+        **Cómo personalizar cada componente:**
+        
+        #### 🎯 **Configuración de Métricas**
+        - **Tipo de métrica**: Elige entre count, sum, mean, etc.
+        - **Columna de datos**: Selecciona qué datos analizar
+        - **Agregación**: Define cómo combinar los valores
+        
+        #### 📊 **Configuración de Gráficos**
+        - **Columnas X e Y**: Define qué datos mostrar en cada eje
+        - **Columna de color**: Agrega dimensión adicional con colores
+        - **Orientación**: Vertical u horizontal para barras
+        - **Número de bins**: Para histogramas
+        
+        #### 🎨 **Personalización Visual**
+        - **Títulos**: Describe claramente qué muestra cada componente
+        - **Colores**: Usa paletas que faciliten la interpretación
+        - **Tamaños**: Ajusta para mejor legibilidad
+        
+        #### 📋 **Configuración de Tablas**
+        - **Columnas a mostrar**: Selecciona solo las relevantes
+        - **Número de filas**: Controla cuántos datos mostrar
+        - **Ordenamiento**: Organiza por columnas importantes
+        """)
+    
+    with st.expander("💡 Mejores Prácticas para Dashboards Efectivos"):
+        st.markdown("""
+        **Consejos para crear dashboards profesionales:**
+        
+        #### 🎯 **Diseño y Organización**
+        - **Jerarquía visual**: Métricas importantes arriba, detalles abajo
+        - **Agrupación lógica**: Componentes relacionados juntos
+        - **Espaciado consistente**: Usa márgenes uniformes
+        - **Títulos descriptivos**: Que expliquen claramente el contenido
+        
+        #### 📊 **Selección de Gráficos**
+        - **Líneas para tendencias**: Tiempo, evolución, progresión
+        - **Barras para comparaciones**: Categorías, rankings, diferencias
+        - **Circular para proporciones**: Distribuciones, participación
+        - **Dispersión para correlaciones**: Relaciones entre variables
+        
+        #### 🎨 **Principios de Visualización**
+        - **Menos es más**: No sobrecargues con demasiados elementos
+        - **Colores significativos**: Usa colores para transmitir información
+        - **Consistencia**: Mantén el mismo estilo en todo el dashboard
+        - **Accesibilidad**: Considera usuarios con daltonismo
+        
+        #### 📈 **Storytelling con Datos**
+        - **Flujo lógico**: Guía al usuario de lo general a lo específico
+        - **Insights destacados**: Resalta hallazgos importantes
+        - **Contexto**: Proporciona información de fondo cuando sea necesario
+        - **Acciones**: ¿Qué debe hacer el usuario con esta información?
+        """)
+    
+    with st.expander("🔧 Solución de Problemas Comunes"):
+        st.markdown("""
+        **Problemas frecuentes y cómo solucionarlos:**
+        
+        #### ❌ **"No se pueden mostrar los datos"**
+        - **Causa**: Columnas no seleccionadas o tipos de datos incorrectos
+        - **Solución**: Verifica que las columnas existan y sean del tipo correcto
+        - **Ejemplo**: Para gráficos de líneas, asegúrate de tener fechas en X
+        
+        #### 📊 **"Los gráficos se ven confusos"**
+        - **Causa**: Demasiados datos o configuraciones inapropiadas
+        - **Solución**: Filtra datos o agrupa categorías
+        - **Ejemplo**: Para gráficos circulares, agrupa categorías pequeñas en "Otros"
+        
+        #### 🔄 **"Los cambios no se aplican"**
+        - **Causa**: Configuración no guardada o cache del navegador
+        - **Solución**: Haz clic en "Actualizar" o recarga la página
+        - **Ejemplo**: Después de cambiar configuraciones, siempre actualiza
+        
+        #### 💾 **"No puedo guardar el dashboard"**
+        - **Causa**: Problemas de sesión o permisos
+        - **Solución**: Verifica que estés autenticado y con permisos
+        - **Ejemplo**: Inicia sesión nuevamente si es necesario
+        """)
+    
     # Tips and Best Practices
     st.markdown("## 💡 Consejos y Mejores Prácticas")
     
@@ -461,7 +629,7 @@ def main():
     
     st.markdown("## 🎯 ¿Listo para Comenzar?")
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
         if st.button("📚 Comenzar Nivel 1", type="primary", key="ayuda_nivel1"):
@@ -478,6 +646,44 @@ def main():
     with col4:
         if st.button("🔍 Nivel 2 Filtros", key="ayuda_nivel2"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
+    
+    with col5:
+        if st.button("🎨 Dashboard en Blanco", key="ayuda_dashboard_blanco"):
+            st.switch_page("pages/08_Dashboard_Blanco.py")
+    
+    # Quick Reference for Dashboard en Blanco
+    st.markdown("""
+    ---
+    ### 🎨 Referencia Rápida - Dashboard en Blanco
+    
+    **Comandos y atajos útiles:**
+    
+    #### ⚡ **Acceso Rápido:**
+    - **Desde el inicio**: Selecciona "Dashboard en Blanco" en las plantillas
+    - **Navegación directa**: Usa el menú lateral o el botón de arriba
+    - **Requisito**: Debes tener datos cargados previamente
+    
+    #### 🔧 **Controles Principales:**
+    - **Agregar componente**: Usa los botones en el panel lateral
+    - **Configurar**: Haz clic en "⚙️ Configurar" en cada componente
+    - **Actualizar**: Usa "🔄 Actualizar" para aplicar cambios
+    - **Eliminar**: "🗑️ Eliminar" para quitar componentes
+    - **Guardar**: "💾 Guardar" para conservar tu trabajo
+    
+    #### 📊 **Tipos de Gráficos por Uso:**
+    - **Tendencias**: Gráficos de líneas y área
+    - **Comparaciones**: Gráficos de barras (vertical/horizontal)
+    - **Proporciones**: Gráficos circulares
+    - **Relaciones**: Gráficos de dispersión
+    - **Distribuciones**: Histogramas, box plots, violín
+    - **Correlaciones**: Matriz de correlación
+    
+    #### 💡 **Consejos de Productividad:**
+    - Comienza con métricas básicas para tener KPIs
+    - Usa títulos descriptivos para cada componente
+    - Prueba diferentes configuraciones antes de decidir
+    - Guarda tu trabajo regularmente
+    """)
     
     # Additional Learning Resources
     st.markdown("""
