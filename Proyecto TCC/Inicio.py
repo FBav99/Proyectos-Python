@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Importar módulos personalizados
 from core.config import setup_page_config, apply_custom_css
-from core.auth_config import init_authentication, get_user_progress, update_user_progress
+from core.auth_service import auth_service, login_user, logout_user, get_current_user, require_auth
 from core.data_loader import get_data
 from core.data_quality_analyzer import data_quality_page
 from data.sample_datasets import get_sample_datasets
@@ -28,19 +28,24 @@ from utils.ui_components import (
     display_export_section
 )
 
-def get_level_progress():
-    """Get current progress across all levels"""
-    progress = {
-        'nivel1': st.session_state.get('nivel1_completed', False),
-        'nivel2': st.session_state.get('nivel2_completed', False),
-        'nivel3': st.session_state.get('nivel3_completed', False),
-        'nivel4': st.session_state.get('nivel4_completed', False)
-    }
-    
-    completed_count = sum(progress.values())
-    total_progress = (completed_count / 4) * 100
-    
-    return total_progress, completed_count, progress
+def get_level_progress(user_id):
+    """Get current progress across all levels from database"""
+    try:
+        progress = auth_service.get_user_progress(user_id)
+        level_progress = {
+            'nivel1': progress.get('nivel1_completed', False),
+            'nivel2': progress.get('nivel2_completed', False),
+            'nivel3': progress.get('nivel3_completed', False),
+            'nivel4': progress.get('nivel4_completed', False)
+        }
+        
+        completed_count = sum(level_progress.values())
+        total_progress = (completed_count / 4) * 100
+        
+        return total_progress, completed_count, level_progress
+    except Exception as e:
+        st.error(f"Error getting progress: {e}")
+        return 0, 0, {'nivel1': False, 'nivel2': False, 'nivel3': False, 'nivel4': False}
 
 def main():
     """Función principal de la aplicación"""
@@ -53,26 +58,40 @@ def main():
     )
     apply_custom_css()
     
-    # Initialize authentication
-    authenticator = init_authentication()
+    # Check if user is already authenticated
+    current_user = get_current_user()
     
-    # Login using the correct method from the official documentation
-    authenticator.login()
-    
-    # Check authentication status using session state
-    if st.session_state.get('authentication_status'):
-        # User is authenticated
-        username = st.session_state.get('username')
-        name = st.session_state.get('name')
+    if not current_user:
+        # Show login form
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
+            <h1 style="color: white; margin-bottom: 1rem;">🔐 Iniciar Sesión</h1>
+            <p style="color: white; font-size: 1.1rem;">Accede a tu cuenta para continuar</p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Add logout button
-        authenticator.logout('Cerrar Sesión', 'main')
-    elif st.session_state.get('authentication_status') == False:
-        st.error('Usuario/contraseña incorrectos')
+        with st.form("login_form"):
+            username = st.text_input("👤 Usuario", placeholder="Tu nombre de usuario")
+            password = st.text_input("🔒 Contraseña", type="password", placeholder="Tu contraseña")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                login_submitted = st.form_submit_button("🚀 Iniciar Sesión", type="primary", use_container_width=True)
+            with col2:
+                if st.form_submit_button("📝 Registrarse", use_container_width=True):
+                    st.switch_page("pages/05_Registro.py")
         
-        # Add registration option for failed login
+        if login_submitted and username and password:
+            success, message = login_user(username, password)
+            if success:
+                st.success("✅ ¡Inicio de sesión exitoso!")
+                st.rerun()
+            else:
+                st.error(f"❌ {message}")
+        
+        # Add additional options
         st.markdown("---")
-        st.markdown("### 🔐 ¿No tienes cuenta?")
+        st.markdown("### 🔐 ¿Necesitas ayuda?")
         col1, col2, col3 = st.columns(3)
         with col1:
             if st.button("📝 Crear Nueva Cuenta", type="primary", use_container_width=True):
@@ -84,23 +103,20 @@ def main():
             if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
                 st.switch_page("pages/07_OAuth_Login.py")
         return
-    elif st.session_state.get('authentication_status') is None:
-        st.warning('Por favor ingresa tu usuario y contraseña')
+    
+    # User is authenticated - show logout button
+    username = current_user['username']
+    name = f"{current_user['first_name']} {current_user['last_name']}"
+    
+    # Logout button in sidebar
+    with st.sidebar:
+        st.markdown("### 👤 Usuario")
+        st.write(f"**{name}**")
+        st.write(f"@{username}")
         
-        # Add registration option for new users
-        st.markdown("---")
-        st.markdown("### 🔐 ¿Eres nuevo aquí?")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("📝 Crear Nueva Cuenta", type="primary", use_container_width=True):
-                st.switch_page("pages/05_Registro.py")
-        with col2:
-            if st.button("🔑 ¿Olvidaste tu contraseña?", use_container_width=True):
-                st.switch_page("pages/06_Recuperar_Password.py")
-        with col3:
-            if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
-                st.switch_page("pages/07_OAuth_Login.py")
-        return
+        if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
+            logout_user()
+            st.rerun()
     
     # ============================================================================
     # HEADER SECTION - Welcome and User Info
@@ -108,9 +124,8 @@ def main():
     st.markdown(f'<h1 class="main-header">📊 Panel de Análisis de Datos</h1>', unsafe_allow_html=True)
     st.markdown(f'<p style="text-align: center; color: #666; font-size: 1.2rem;">Bienvenido, <strong>{name}</strong>! 👋</p>', unsafe_allow_html=True)
     
-    # Get user progress
-    user_progress = get_user_progress(username)
-    total_progress, completed_count, progress = get_level_progress()
+    # Get user progress from database
+    total_progress, completed_count, progress = get_level_progress(current_user['id'])
     
     # ============================================================================
     # QUICK START SECTION - Main Action Buttons
