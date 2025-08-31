@@ -285,6 +285,36 @@ def main():
     """)
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # Official Sources Section
+    st.markdown('<div class="step-box">', unsafe_allow_html=True)
+    st.markdown("## 🏛️ Fuentes Oficiales")
+    
+    st.markdown("""
+    ### 📚 Respaldos Oficiales para este Nivel:
+    
+    **Estándares de Calidad de Datos:**
+    - **DAMA International (DMBOK)**: [Estándar internacional de gestión de datos](https://www.dama.org/cpages/body-of-knowledge)
+    
+    **Formatos de Datos Estándar:**
+    - **RFC 4180 (CSV)**: [Formato estándar para archivos CSV](https://tools.ietf.org/html/rfc4180)
+    
+    **Mejores Prácticas:**
+    - **Google Data Studio**: [Mejores prácticas de preparación](https://support.google.com/datastudio/answer/6283323)
+    
+    **Validación de Datos:**
+    - **Data Quality Assessment Framework (DQAF)**: [Verificación de calidad](https://www.imf.org/external/pubs/ft/dqrs/dqrs01.pdf)
+    
+    ### 📖 Certificaciones Relacionadas:
+    - **DAMA CDMP Foundation**: [Certificación en gestión de datos](https://www.dama.org/cpages/cdmp)
+    - **Google Data Analytics Professional Certificate**: [Certificación de Google](https://www.coursera.org/professional-certificates/google-data-analytics)
+    
+    ### 🔗 Recursos Adicionales:
+    - **DataCamp Data Cleaning**: [Curso de limpieza de datos](https://www.datacamp.com/courses/data-cleaning-with-python)
+    - **OpenRefine**: [Herramienta de limpieza gratuita](https://openrefine.org/)
+    - **Pandas Documentation**: [Documentación oficial](https://pandas.pydata.org/docs/)
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     # Navigation
     st.divider()
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])

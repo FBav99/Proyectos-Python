@@ -159,8 +159,8 @@ def create_category_chart(df):
 
 def main():
     # Header
-    st.markdown('<h1 class="level-header">🚀 Nivel 4: Avanzado</h1>', unsafe_allow_html=True)
-    st.markdown('<h2 style="text-align: center; color: #666;">Cálculos Personalizados y Visualizaciones</h2>', unsafe_allow_html=True)
+    st.markdown('<h1 class="level-header">📊 Nivel 4: Reportes y Gráficos</h1>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #666;">Crear Reportes y Visualizaciones para tu Negocio</h2>', unsafe_allow_html=True)
     
     # Dynamic Progress indicator
     total_progress, completed_count, progress = get_level_progress()
@@ -199,7 +199,7 @@ def main():
         # Only show balloons if this is the first time completing
         if not was_completed:
             st.balloons()
-            st.success("🎉 ¡Felicidades! Has completado el Nivel 4. ¡Has terminado todos los niveles!")
+            st.success("🎉 ¡Felicidades! Has completado el Nivel 4. ¡Ya puedes crear reportes profesionales!")
         st.session_state['nivel4_completed'] = True
     else:
         st.session_state['nivel4_completed'] = False
@@ -213,11 +213,11 @@ def main():
     ## 🎯 Objetivo de este Nivel
     
     En este nivel aprenderás a:
-    - Crear cálculos personalizados avanzados
-    - Generar visualizaciones interactivas
-    - Analizar tendencias temporales
-    - Crear dashboards completos
-    - Exportar resultados y reportes
+    - Crear cálculos útiles para tu negocio (como márgenes y promedios)
+    - Generar gráficos que expliquen tus datos
+    - Analizar tendencias en el tiempo
+    - Crear reportes completos para presentar
+    - Exportar resultados para compartir con otros
     """)
     
     # Load sample data
@@ -674,6 +674,37 @@ def main():
     - Explora funcionalidades avanzadas
     - Comparte insights con tu equipo
     - Continúa aprendiendo nuevas técnicas
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Official Sources Section
+    st.markdown('<div class="step-box">', unsafe_allow_html=True)
+    st.markdown("## 🏛️ Fuentes Oficiales")
+    
+    st.markdown("""
+    ### 📚 Respaldos Oficiales para este Nivel:
+    
+    **Cálculos y Estadística Básica:**
+    - **Khan Academy Statistics**: [Conceptos básicos de estadística](https://www.khanacademy.org/math/statistics-probability)
+    
+    **Visualización de Datos:**
+    - **Stephen Few - Perceptual Edge**: [Principios de visualización efectiva](https://www.perceptualedge.com/)
+    
+    **Análisis de Tendencias:**
+    - **Google Trends**: [Análisis de tendencias y patrones](https://trends.google.com/)
+    
+    **Herramientas de Reportes:**
+    - **Microsoft Excel Training**: [Creación de reportes y cálculos](https://support.microsoft.com/en-us/office/excel-training-9bc05390-e94c-46af-a5b3-d7c22f6990bb)
+    
+    ### 📖 Certificaciones Relacionadas:
+    - **Microsoft Office Specialist**: [Certificación de Microsoft Office](https://www.microsoft.com/en-us/learning/certification-office-specialist.aspx)
+    - **Google Workspace Certification**: [Certificación de Google Workspace](https://cloud.google.com/certification/workspace)
+    - **Tableau Desktop Specialist**: [Certificación de Tableau](https://www.tableau.com/learn/certification)
+    
+    ### 🔗 Recursos Adicionales:
+    - **Microsoft Excel**: [Herramienta de análisis](https://www.microsoft.com/en-us/microsoft-365/excel)
+    - **Google Sheets**: [Análisis colaborativo](https://www.google.com/sheets/about/)
+    - **LibreOffice Calc**: [Alternativa gratuita](https://www.libreoffice.org/discover/calc/)
     """)
     st.markdown('</div>', unsafe_allow_html=True)
     

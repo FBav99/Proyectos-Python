@@ -8,7 +8,7 @@ import json
 
 # Importar módulos personalizados
 from core.config import setup_page_config, apply_custom_css
-from core.auth_config import init_authentication, get_user_progress, update_user_progress
+from core.auth_service import get_current_user, require_auth
 from utils.metrics import calculate_metrics, calculate_growth_metrics, calculate_performance_insights
 from utils.visualizations import (
     create_time_series_chart, 
@@ -39,16 +39,22 @@ def main():
     )
     apply_custom_css()
     
-    # Initialize authentication
-    authenticator = init_authentication()
-    
-    # Check authentication
-    if not st.session_state.get('authentication_status'):
+    # Check authentication using new system
+    current_user = get_current_user()
+    if not current_user:
         st.error("Por favor inicia sesión para acceder a esta página.")
+        st.markdown("---")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🏠 Volver al Inicio", use_container_width=True):
+                st.switch_page("Inicio.py")
+        with col2:
+            if st.button("🔐 Iniciar Sesión", use_container_width=True):
+                st.switch_page("Inicio.py")
         st.stop()
     
-    username = st.session_state.get('username')
-    name = st.session_state.get('name')
+    username = current_user['username']
+    name = f"{current_user['first_name']} {current_user['last_name']}"
     
     # Header
     st.markdown(f'<h1 class="main-header">🎨 Dashboard en Blanco</h1>', unsafe_allow_html=True)

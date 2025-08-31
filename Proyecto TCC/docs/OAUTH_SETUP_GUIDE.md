@@ -1,281 +1,198 @@
-# 🌐 Guía de Configuración OAuth - Google y Microsoft
+# Guía de Configuración OAuth - Google y Microsoft
 
-## 📋 Índice
-1. [Configuración de Google OAuth](#configuración-de-google-oauth)
-2. [Configuración de Microsoft OAuth](#configuración-de-microsoft-oauth)
-3. [Configuración Local](#configuración-local)
-4. [Pruebas y Verificación](#pruebas-y-verificación)
-5. [Solución de Problemas](#solución-de-problemas)
+Esta guía te ayudará a configurar la autenticación OAuth con Google y Microsoft para tu aplicación Streamlit.
 
----
+## 📋 Prerrequisitos
 
-## 🔵 Configuración de Google OAuth
+- Una cuenta de Google (para Google OAuth)
+- Una cuenta de Microsoft/Azure (para Microsoft OAuth)
+- Tu aplicación Streamlit funcionando
 
-### Paso 1: Crear Proyecto en Google Cloud Console
+## 🔧 Configuración de Google OAuth
 
-1. **Accede** a [Google Cloud Console](https://console.cloud.google.com/)
-2. **Crea un nuevo proyecto** o selecciona uno existente
-3. **Habilita las APIs necesarias:**
-   - Google+ API
-   - Google OAuth2 API
+### 1. Crear Proyecto en Google Cloud Console
 
-### Paso 2: Configurar Credenciales OAuth 2.0
+1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
+2. Crea un nuevo proyecto o selecciona uno existente
+3. Habilita la API de Google+ (si no está habilitada)
 
-1. **Ve a** "APIs & Services" > "Credentials"
-2. **Haz clic en** "Create Credentials" > "OAuth 2.0 Client IDs"
-3. **Selecciona** "Web application"
-4. **Configura los URIs autorizados:**
+### 2. Configurar Credenciales OAuth
 
-#### Para Desarrollo Local:
-```
-Authorized JavaScript origins:
-- http://localhost:8501
-- http://127.0.0.1:8501
+1. Ve a **APIs & Services** > **Credentials**
+2. Haz clic en **Create Credentials** > **OAuth 2.0 Client IDs**
+3. Selecciona **Web application**
+4. Configura los URIs de redirección:
+   - Para desarrollo local: `http://localhost:8501/oauth_callback`
+   - Para producción: `https://tu-dominio.com/oauth_callback`
 
-Authorized redirect URIs:
-- http://localhost:8501/oauth_callback
-- http://127.0.0.1:8501/oauth_callback
-```
+### 3. Obtener Credenciales
 
-#### Para Producción:
-```
-Authorized JavaScript origins:
-- https://tu-dominio.com
-- https://app.tu-dominio.com
+Anota el **Client ID** y **Client Secret** que te proporciona Google.
 
-Authorized redirect URIs:
-- https://tu-dominio.com/oauth_callback
-- https://app.tu-dominio.com/oauth_callback
-```
+## 🔧 Configuración de Microsoft OAuth
 
-### Paso 3: Obtener Credenciales
+### 1. Registrar Aplicación en Azure Portal
 
-1. **Copia el Client ID** (formato: `xxx.apps.googleusercontent.com`)
-2. **Copia el Client Secret**
-3. **Guarda estas credenciales** de forma segura
+1. Ve a [Azure Portal](https://portal.azure.com/)
+2. Ve a **Azure Active Directory** > **App registrations**
+3. Haz clic en **New registration**
+4. Completa el formulario:
+   - **Name**: Nombre de tu aplicación
+   - **Supported account types**: Accounts in any organizational directory and personal Microsoft accounts
+   - **Redirect URI**: 
+     - Para desarrollo: `http://localhost:8501/oauth_callback`
+     - Para producción: `https://tu-dominio.com/oauth_callback`
 
----
+### 2. Configurar Permisos
 
-## 🔴 Configuración de Microsoft OAuth
-
-### Paso 1: Registrar Aplicación en Azure Portal
-
-1. **Accede** a [Azure Portal](https://portal.azure.com/)
-2. **Ve a** "Azure Active Directory" > "App registrations"
-3. **Haz clic en** "New registration"
-4. **Configura la aplicación:**
-   - **Name:** Tu aplicación (ej: "TCC Data Analysis App")
-   - **Supported account types:** "Accounts in any organizational directory and personal Microsoft accounts"
-   - **Redirect URI:** Web > `http://localhost:8501/oauth_callback`
-
-### Paso 2: Configurar Permisos
-
-1. **Ve a** "API permissions"
-2. **Haz clic en** "Add a permission"
-3. **Selecciona** "Microsoft Graph"
-4. **Elige** "Delegated permissions"
-5. **Selecciona:**
+1. Ve a **API permissions**
+2. Haz clic en **Add a permission**
+3. Selecciona **Microsoft Graph** > **Delegated permissions**
+4. Agrega estos permisos:
    - `openid`
    - `email`
    - `profile`
    - `User.Read`
 
-### Paso 3: Crear Client Secret
+### 3. Crear Client Secret
 
-1. **Ve a** "Certificates & secrets"
-2. **Haz clic en** "New client secret"
-3. **Agrega descripción** y selecciona expiración
-4. **Copia el valor** del secret (solo se muestra una vez)
+1. Ve a **Certificates & secrets**
+2. Haz clic en **New client secret**
+3. Anota el **Value** del secret (solo se muestra una vez)
 
-### Paso 4: Obtener Credenciales
+### 4. Obtener Credenciales
 
-1. **Copia el Application (client) ID**
-2. **Copia el Client Secret** (del paso anterior)
-3. **Guarda estas credenciales** de forma segura
+Anota el **Application (client) ID** y el **Client Secret** que creaste.
 
----
+## 📝 Configuración en Streamlit
 
-## ⚙️ Configuración Local
+### 1. Crear Archivo Secrets
 
-### Paso 1: Crear Archivo de Secretos
-
-1. **Crea el directorio** `.streamlit` en tu proyecto:
-```bash
-mkdir .streamlit
-```
-
-2. **Copia el archivo de ejemplo:**
-```bash
-cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-```
-
-3. **Edita** `.streamlit/secrets.toml` con tus credenciales:
+Crea el archivo `.streamlit/secrets.toml` en la raíz de tu proyecto:
 
 ```toml
-# OAuth Configuration
+# Configuración OAuth
 oauth_configured = true
 
-# Google OAuth Configuration
+# Google OAuth
 [google_oauth]
-client_id = "tu-google-client-id.apps.googleusercontent.com"
+client_id = "tu-google-client-id"
 client_secret = "tu-google-client-secret"
 redirect_uri = "http://localhost:8501/oauth_callback"
 
-# Microsoft OAuth Configuration
+# Microsoft OAuth
 [microsoft_oauth]
 client_id = "tu-microsoft-client-id"
 client_secret = "tu-microsoft-client-secret"
 redirect_uri = "http://localhost:8501/oauth_callback"
 ```
 
-### Paso 2: Instalar Dependencias
+### 2. Configuración para Producción
 
-```bash
-pip install requests
-```
+Para producción, actualiza los URIs de redirección:
 
-### Paso 3: Verificar Configuración
-
-1. **Ejecuta** tu aplicación:
-```bash
-streamlit run Inicio.py
-```
-
-2. **Accede** a `http://localhost:8501`
-3. **Haz clic en** "🌐 Login con Google/Microsoft"
-4. **Verifica** que aparezcan los botones de OAuth
-
----
-
-## 🧪 Pruebas y Verificación
-
-### Prueba de Google OAuth
-
-1. **Haz clic en** "🔵 Iniciar sesión con Google"
-2. **Deberías ser redirigido** a Google
-3. **Inicia sesión** con tu cuenta de Google
-4. **Autoriza** la aplicación
-5. **Deberías regresar** a tu app y estar logueado
-
-### Prueba de Microsoft OAuth
-
-1. **Haz clic en** "🔴 Iniciar sesión con Microsoft"
-2. **Deberías ser redirigido** a Microsoft
-3. **Inicia sesión** con tu cuenta de Microsoft
-4. **Autoriza** la aplicación
-5. **Deberías regresar** a tu app y estar logueado
-
-### Verificación de Usuario Creado
-
-1. **Después del login OAuth**, verifica que se creó el usuario:
-2. **Revisa** `config/config.yaml`
-3. **Deberías ver** un nuevo usuario con:
-   - `oauth_provider: "google"` o `oauth_provider: "microsoft"`
-   - `oauth_id: "..."` (ID único del proveedor)
-
----
-
-## 🔧 Solución de Problemas
-
-### Error: "OAuth no está configurado"
-
-**Solución:**
-1. Verifica que `oauth_configured = true` en `secrets.toml`
-2. Verifica que las credenciales estén correctas
-3. Reinicia la aplicación
-
-### Error: "redirect_uri_mismatch"
-
-**Solución:**
-1. Verifica que el redirect URI en `secrets.toml` coincida con el configurado en Google/Microsoft
-2. Para desarrollo: `http://localhost:8501/oauth_callback`
-3. Para producción: `https://tu-dominio.com/oauth_callback`
-
-### Error: "invalid_client"
-
-**Solución:**
-1. Verifica que el Client ID y Client Secret sean correctos
-2. Copia exactamente las credenciales de Google Cloud Console/Azure Portal
-3. No incluyas espacios extra
-
-### Error: "state parameter mismatch"
-
-**Solución:**
-1. Limpia el caché del navegador
-2. Reinicia la aplicación
-3. Intenta el login nuevamente
-
-### Error: "scope not allowed"
-
-**Solución:**
-1. Verifica que los scopes estén configurados correctamente
-2. Para Google: `openid email profile`
-3. Para Microsoft: `openid email profile User.Read`
-
----
-
-## 🚀 Configuración para Producción
-
-### Cambios Necesarios
-
-1. **Actualiza URIs** en Google Cloud Console/Azure Portal
-2. **Cambia redirect_uri** en `secrets.toml`:
 ```toml
+# Google OAuth (Producción)
+[google_oauth]
+client_id = "tu-google-client-id"
+client_secret = "tu-google-client-secret"
+redirect_uri = "https://tu-dominio.com/oauth_callback"
+
+# Microsoft OAuth (Producción)
+[microsoft_oauth]
+client_id = "tu-microsoft-client-id"
+client_secret = "tu-microsoft-client-secret"
 redirect_uri = "https://tu-dominio.com/oauth_callback"
 ```
 
-3. **Configura HTTPS** en tu servidor
-4. **Usa variables de entorno** para las credenciales
+## 🔒 Consideraciones de Seguridad
 
-### Variables de Entorno (Recomendado)
+### 1. Protección de Credenciales
 
-```bash
-# En tu servidor
-export GOOGLE_CLIENT_ID="tu-client-id"
-export GOOGLE_CLIENT_SECRET="tu-client-secret"
-export MICROSOFT_CLIENT_ID="tu-client-id"
-export MICROSOFT_CLIENT_SECRET="tu-client-secret"
-```
+- **NUNCA** subas el archivo `secrets.toml` a Git
+- Agrega `.streamlit/secrets.toml` a tu `.gitignore`
+- Usa variables de entorno en producción
 
-Y en `secrets.toml`:
-```toml
-[google_oauth]
-client_id = "${GOOGLE_CLIENT_ID}"
-client_secret = "${GOOGLE_CLIENT_SECRET}"
+### 2. URIs de Redirección
 
-[microsoft_oauth]
-client_id = "${MICROSOFT_CLIENT_ID}"
-client_secret = "${MICROSOFT_CLIENT_SECRET}"
-```
+- Configura URIs específicos para cada entorno
+- No uses URIs genéricos como `http://localhost:8501`
+- Verifica que los URIs coincidan exactamente
 
----
+### 3. Permisos Mínimos
+
+- Solicita solo los permisos necesarios
+- Revisa regularmente los permisos de tu aplicación
+- Considera usar permisos de solo lectura cuando sea posible
+
+## 🚀 Pruebas
+
+### 1. Probar Configuración
+
+1. Ejecuta tu aplicación: `streamlit run Inicio.py`
+2. Ve a la página de OAuth Login
+3. Haz clic en "Iniciar sesión con Google" o "Iniciar sesión con Microsoft"
+4. Completa el flujo de autorización
+
+### 2. Verificar Funcionamiento
+
+- Deberías ser redirigido de vuelta a tu aplicación
+- Tu información de usuario debería mostrarse
+- Deberías poder acceder a todas las funcionalidades
+
+## 🐛 Solución de Problemas
+
+### Error: "OAuth no está configurado"
+
+**Causa**: El archivo `secrets.toml` no existe o `oauth_configured = false`
+
+**Solución**:
+1. Verifica que el archivo `.streamlit/secrets.toml` existe
+2. Asegúrate de que `oauth_configured = true`
+3. Reinicia la aplicación
+
+### Error: "Invalid redirect URI"
+
+**Causa**: Los URIs de redirección no coinciden
+
+**Solución**:
+1. Verifica que los URIs en Google/Microsoft coincidan con los de `secrets.toml`
+2. Asegúrate de que no haya espacios extra o caracteres especiales
+3. Verifica que el protocolo (http/https) sea correcto
+
+### Error: "Client ID not found"
+
+**Causa**: Credenciales incorrectas o no configuradas
+
+**Solución**:
+1. Verifica que el Client ID y Client Secret sean correctos
+2. Asegúrate de que la aplicación esté habilitada en Google/Microsoft
+3. Verifica que las APIs necesarias estén habilitadas
+
+### Error: "Access denied"
+
+**Causa**: Permisos insuficientes o aplicación no autorizada
+
+**Solución**:
+1. Verifica que todos los permisos necesarios estén configurados
+2. Asegúrate de que la aplicación esté autorizada
+3. Revisa los logs de Google/Microsoft para más detalles
 
 ## 📚 Recursos Adicionales
 
 - [Google OAuth 2.0 Documentation](https://developers.google.com/identity/protocols/oauth2)
-- [Microsoft OAuth Documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
+- [Microsoft OAuth 2.0 Documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
 - [Streamlit Secrets Management](https://docs.streamlit.io/library/advanced-features/secrets-management)
-- [OAuth 2.0 Security Best Practices](https://tools.ietf.org/html/rfc6819)
 
----
+## 🔄 Actualizaciones
 
-## 🔒 Consideraciones de Seguridad
+### Versión 1.0
+- Configuración inicial de Google y Microsoft OAuth
+- Soporte para desarrollo y producción
+- Manejo de errores básico
 
-### Mejores Prácticas
-
-1. **Nunca subas** `secrets.toml` a Git
-2. **Usa variables de entorno** en producción
-3. **Rota las credenciales** regularmente
-4. **Configura URIs específicos** (no wildcards)
-5. **Usa HTTPS** en producción
-6. **Implementa rate limiting** si es necesario
-
-### Monitoreo
-
-1. **Revisa logs** de Google Cloud Console/Azure Portal
-2. **Monitorea** intentos de login fallidos
-3. **Configura alertas** para actividad sospechosa
-
----
-
-*Esta guía se actualiza regularmente. Última actualización: Diciembre 2024*
+### Próximas Mejoras
+- Integración completa con base de datos
+- Persistencia de sesiones OAuth
+- Soporte para más proveedores OAuth
+- Mejoras en la seguridad y validación

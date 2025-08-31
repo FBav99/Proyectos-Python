@@ -120,8 +120,8 @@ def calculate_basic_metrics(df):
 
 def main():
     # Header
-    st.markdown('<h1 class="level-header">📊 Nivel 3: Métricas</h1>', unsafe_allow_html=True)
-    st.markdown('<h2 style="text-align: center; color: #666;">KPIs y Análisis de Rendimiento</h2>', unsafe_allow_html=True)
+    st.markdown('<h1 class="level-header">📊 Nivel 3: Números Importantes</h1>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #666;">Entender los Números Clave de tu Negocio</h2>', unsafe_allow_html=True)
     
     # Dynamic Progress indicator
     total_progress, completed_count, progress = get_level_progress()
@@ -160,7 +160,7 @@ def main():
         # Only show balloons if this is the first time completing
         if not was_completed:
             st.balloons()
-            st.success("🎉 ¡Felicidades! Has completado el Nivel 3. ¡Continúa con el siguiente nivel!")
+            st.success("🎉 ¡Felicidades! Has completado el Nivel 3. ¡Ya entiendes los números importantes!")
         st.session_state['nivel3_completed'] = True
     else:
         st.session_state['nivel3_completed'] = False
@@ -174,11 +174,11 @@ def main():
     ## 🎯 Objetivo de este Nivel
     
     En este nivel aprenderás a:
-    - Entender qué son las métricas y KPIs
-    - Interpretar métricas clave de negocio
-    - Analizar tendencias y patrones
-    - Usar métricas para tomar decisiones
-    - Crear dashboards de rendimiento
+    - Entender qué son los números importantes (métricas y KPIs)
+    - Interpretar números clave de tu negocio (ventas, ganancias, etc.)
+    - Analizar tendencias y patrones en tus datos
+    - Usar estos números para tomar mejores decisiones
+    - Crear resúmenes visuales de tu información
     """)
     
     # Load sample data
@@ -576,6 +576,37 @@ def main():
     - ✅ Sabes cómo los filtros afectan las métricas
     - ✅ Puedes identificar insights clave
     - ✅ Entiendes la importancia del análisis de datos
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Official Sources Section
+    st.markdown('<div class="step-box">', unsafe_allow_html=True)
+    st.markdown("## 🏛️ Fuentes Oficiales")
+    
+    st.markdown("""
+    ### 📚 Respaldos Oficiales para este Nivel:
+    
+    **Framework de Métricas Empresariales:**
+    - **Balanced Scorecard Institute**: [Framework de métricas empresariales](https://balancedscorecard.org/)
+    
+    **Métricas de Analytics:**
+    - **Google Analytics Academy**: [Métricas web y de negocio](https://analytics.google.com/analytics/academy/)
+    
+    **Visualización de Métricas:**
+    - **Tableau Training**: [Creación de dashboards](https://www.tableau.com/learn/training)
+    
+    **Power BI Métricas:**
+    - **Microsoft Power BI Learning Path**: [Métricas empresariales](https://docs.microsoft.com/en-us/learn/powerplatform/power-bi)
+    
+    ### 📖 Certificaciones Relacionadas:
+    - **Google Analytics Individual Qualification (GAIQ)**: [Certificación de Google Analytics](https://analytics.google.com/analytics/academy/)
+    - **Tableau Desktop Specialist**: [Certificación de Tableau](https://www.tableau.com/learn/certification)
+    - **Microsoft Power BI Data Analyst**: [Certificación de Microsoft](https://docs.microsoft.com/en-us/certifications/power-bi-data-analyst-associate/)
+    
+    ### 🔗 Recursos Adicionales:
+    - **Google Data Studio**: [Visualización gratuita](https://datastudio.google.com/)
+    - **Tableau Public**: [Análisis avanzado](https://public.tableau.com/)
+    - **Power BI**: [Integración empresarial](https://powerbi.microsoft.com/)
     """)
     st.markdown('</div>', unsafe_allow_html=True)
     

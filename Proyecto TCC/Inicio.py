@@ -5,7 +5,7 @@ from core.config import setup_page_config, apply_custom_css
 from core.data_quality_analyzer import data_quality_page
 
 # Import new modular components
-from utils.auth_ui import handle_authentication
+from utils.auth_ui import handle_authentication, get_current_user
 from utils.main_ui import show_header, show_quick_start_section, should_show_main_content, clear_selected_template
 from utils.data_handling import show_upload_section, show_examples_section, get_current_data
 from utils.learning_progress import get_level_progress, show_learning_section, show_user_profile_section
@@ -33,8 +33,14 @@ def main():
     # ============================================================================
     show_header(name)
     
-    # Get user progress from database
-    total_progress, completed_count, progress = get_level_progress(current_user['id'])
+    # Get user progress from database (only for database users, not OAuth users)
+    if 'oauth_provider' not in current_user:
+        total_progress, completed_count, progress = get_level_progress(current_user['id'])
+    else:
+        # For OAuth users, use default values
+        total_progress = 0
+        completed_count = 0
+        progress = {}
     
     # ============================================================================
     # QUICK START SECTION - Main Action Buttons

@@ -95,8 +95,8 @@ def create_sample_data():
 
 def main():
     # Header
-    st.markdown('<h1 class="level-header">🔍 Nivel 2: Filtros</h1>', unsafe_allow_html=True)
-    st.markdown('<h2 style="text-align: center; color: #666;">Análisis y Filtrado de Datos</h2>', unsafe_allow_html=True)
+    st.markdown('<h1 class="level-header">🔍 Nivel 2: Organizar Información</h1>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #666;">Encontrar y Organizar los Datos que Necesitas</h2>', unsafe_allow_html=True)
     
     # Dynamic Progress indicator
     total_progress, completed_count, progress = get_level_progress()
@@ -135,7 +135,7 @@ def main():
         # Only show balloons if this is the first time completing
         if not was_completed:
             st.balloons()
-            st.success("🎉 ¡Felicidades! Has completado el Nivel 2. ¡Continúa con el siguiente nivel!")
+            st.success("🎉 ¡Felicidades! Has completado el Nivel 2. ¡Ya puedes organizar tu información!")
         st.session_state['nivel2_completed'] = True
     else:
         st.session_state['nivel2_completed'] = False
@@ -149,11 +149,11 @@ def main():
     ## 🎯 Objetivo de este Nivel
     
     En este nivel aprenderás a:
-    - Usar filtros de fecha para analizar períodos específicos
-    - Filtrar por categorías y regiones
-    - Aplicar filtros numéricos con deslizadores
-    - Combinar múltiples filtros para análisis detallado
-    - Entender cómo los filtros afectan tus métricas
+    - Encontrar información de fechas específicas (como ventas de un mes)
+    - Organizar datos por categorías (productos, regiones, etc.)
+    - Usar deslizadores para rangos de precios o cantidades
+    - Combinar diferentes filtros para análisis más específicos
+    - Ver cómo cambian los números cuando filtras la información
     """)
     
     # Load sample data for demonstration
@@ -488,6 +488,36 @@ def main():
     - ✅ Entiendes cómo funcionan los filtros numéricos
     - ✅ Puedes combinar múltiples filtros
     - ✅ Observas cómo los filtros afectan las métricas
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Official Sources Section
+    st.markdown('<div class="step-box">', unsafe_allow_html=True)
+    st.markdown("## 🏛️ Fuentes Oficiales")
+    
+    st.markdown("""
+    ### 📚 Respaldos Oficiales para este Nivel:
+    
+    **Metodología de Análisis Exploratorio:**
+    - **CRISP-DM Methodology**: [Metodología estándar de ciencia de datos](https://www.datascience-pm.com/crisp-dm-2/)
+    
+    **Filtrado y Segmentación:**
+    - **IBM Data Science Methodology**: [Técnicas de filtrado y segmentación](https://www.ibm.com/cloud/learn/data-science-methodology)
+    
+    **Análisis de Datos Interactivo:**
+    - **Kaggle Learn**: [Análisis exploratorio de datos](https://www.kaggle.com/learn/intro-to-data-science)
+    
+    **Herramientas de Filtrado:**
+    - **Tableau Data Preparation**: [Filtrado avanzado de datos](https://help.tableau.com/current/prep/en-us/prep.htm)
+    
+    ### 📖 Certificaciones Relacionadas:
+    - **IBM Data Science Professional Certificate**: [Certificación de IBM](https://www.coursera.org/professional-certificates/ibm-data-science)
+    - **Microsoft Data Analyst Associate**: [Certificación de Microsoft](https://docs.microsoft.com/en-us/certifications/data-analyst-associate/)
+    
+    ### 🔗 Recursos Adicionales:
+    - **DataCamp Data Analysis**: [Track de análisis de datos](https://www.datacamp.com/tracks/data-analyst-with-python)
+    - **R for Data Science**: [Libro de referencia](https://r4ds.had.co.nz/)
+    - **Python Data Science Handbook**: [Manual de Python](https://jakevdp.github.io/PythonDataScienceHandbook/)
     """)
     st.markdown('</div>', unsafe_allow_html=True)
     

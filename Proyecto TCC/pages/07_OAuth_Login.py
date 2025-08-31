@@ -6,7 +6,7 @@ from urllib.parse import urlencode, parse_qs, urlparse
 import base64
 import hashlib
 import secrets
-from core.auth_config import init_authentication, load_auth_config
+from core.auth_service import get_current_user, login_user
 from core.security import security_manager, secure_oauth_callback
 import yaml
 
@@ -30,6 +30,14 @@ def main():
         layout="wide"
     )
     
+    # Check if user is already authenticated
+    current_user = get_current_user()
+    if current_user:
+        st.success(f"✅ Ya estás autenticado como {current_user['username']}")
+        st.info("Redirigiendo al inicio...")
+        st.switch_page("Inicio.py")
+        return
+    
     st.markdown("""
     <div style="background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc05 75%, #ea4335 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
         <h1 style="color: white; margin-bottom: 1rem;">🌐 Iniciar Sesión con Proveedores Externos</h1>
@@ -37,8 +45,9 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize authentication
-    authenticator = init_authentication()
+    # Handle OAuth callback first
+    if handle_oauth_callback():
+        return  # If callback was handled, stop here
     
     # OAuth Configuration
     st.markdown("### 🔐 Opciones de Inicio de Sesión")
@@ -63,13 +72,7 @@ def main():
         # Fallback to local login
         st.markdown("---")
         st.markdown("### 🔑 Login Local")
-        authenticator.login()
-        
-        if st.session_state.get('authentication_status'):
-            st.success("✅ Login exitoso!")
-            st.rerun()
-        elif st.session_state.get('authentication_status') == False:
-            st.error('❌ Usuario/contraseña incorrectos')
+        show_local_login()
     
     else:
         # OAuth is configured - show OAuth options
@@ -88,16 +91,7 @@ def main():
         # Also show local login as option
         st.markdown("---")
         st.markdown("### 🔑 O usar login local")
-        authenticator.login()
-        
-        if st.session_state.get('authentication_status'):
-            st.success("✅ Login exitoso!")
-            st.rerun()
-        elif st.session_state.get('authentication_status') == False:
-            st.error('❌ Usuario/contraseña incorrectos')
-    
-    # Handle OAuth callback
-    handle_oauth_callback()
+        show_local_login()
     
     # Navigation
     st.markdown("---")
@@ -120,6 +114,27 @@ def main():
     with col4:
         if st.button("❓ Ayuda", use_container_width=True):
             st.switch_page("pages/00_Ayuda.py")
+
+def show_local_login():
+    """Show local login form"""
+    with st.form("local_login_form"):
+        username = st.text_input("👤 Usuario", placeholder="Tu nombre de usuario")
+        password = st.text_input("🔒 Contraseña", type="password", placeholder="Tu contraseña")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            login_submitted = st.form_submit_button("🚀 Iniciar Sesión", type="primary", use_container_width=True)
+        with col2:
+            if st.form_submit_button("📝 Registrarse", use_container_width=True):
+                st.switch_page("pages/05_Registro.py")
+    
+    if login_submitted and username and password:
+        success, message = login_user(username, password)
+        if success:
+            st.success("✅ ¡Inicio de sesión exitoso!")
+            st.rerun()
+        else:
+            st.error(f"❌ {message}")
 
 def handle_google_oauth():
     """Handle Google OAuth flow"""
@@ -163,14 +178,20 @@ def handle_google_oauth():
         
         auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(auth_params)}"
         
-        # Redirect to Google
+        # Show the URL for manual navigation instead of auto-redirect
+        st.info("🔄 Para continuar con Google OAuth:")
         st.markdown(f"""
-        <script>
-            window.open('{auth_url}', '_self');
-        </script>
+        <div style="background: #f0f2f6; padding: 1rem; border-radius: 8px; border-left: 4px solid #4285f4;">
+            <p><strong>1.</strong> Copia y pega este enlace en tu navegador:</p>
+            <p style="word-break: break-all; font-family: monospace; background: white; padding: 0.5rem; border-radius: 4px;">
+                {auth_url}
+            </p>
+            <p><strong>2.</strong> Después de autorizar, serás redirigido de vuelta a esta aplicación.</p>
+        </div>
         """, unsafe_allow_html=True)
         
-        st.info("🔄 Redirigiendo a Google...")
+        # Alternative: Create a clickable link
+        st.markdown(f"[🔗 **Hacer clic aquí para abrir Google OAuth**]({auth_url})")
         
     except Exception as e:
         st.error(f"❌ Error en Google OAuth: {str(e)}")
@@ -217,14 +238,20 @@ def handle_microsoft_oauth():
         
         auth_url = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?{urlencode(auth_params)}"
         
-        # Redirect to Microsoft
+        # Show the URL for manual navigation instead of auto-redirect
+        st.info("🔄 Para continuar con Microsoft OAuth:")
         st.markdown(f"""
-        <script>
-            window.open('{auth_url}', '_self');
-        </script>
+        <div style="background: #f0f2f6; padding: 1rem; border-radius: 8px; border-left: 4px solid #ea4335;">
+            <p><strong>1.</strong> Copia y pega este enlace en tu navegador:</p>
+            <p style="word-break: break-all; font-family: monospace; background: white; padding: 0.5rem; border-radius: 4px;">
+                {auth_url}
+            </p>
+            <p><strong>2.</strong> Después de autorizar, serás redirigido de vuelta a esta aplicación.</p>
+        </div>
         """, unsafe_allow_html=True)
         
-        st.info("🔄 Redirigiendo a Microsoft...")
+        # Alternative: Create a clickable link
+        st.markdown(f"[🔗 **Hacer clic aquí para abrir Microsoft OAuth**]({auth_url})")
         
     except Exception as e:
         st.error(f"❌ Error en Microsoft OAuth: {str(e)}")
@@ -244,19 +271,31 @@ def handle_oauth_callback():
         
         if not callback_valid:
             st.error(f"❌ {callback_msg}")
-            return
+            return True  # Indicate callback was handled
         
         provider = st.session_state.get('oauth_provider')
         
         if provider == "google":
-            handle_google_callback(code)
+            success = handle_google_callback(code)
         elif provider == "microsoft":
-            handle_microsoft_callback(code)
+            success = handle_microsoft_callback(code)
+        else:
+            st.error("❌ Proveedor OAuth no reconocido")
+            return True
         
         # Clear OAuth session state
         for key in ['oauth_state', 'oauth_code_verifier', 'oauth_provider']:
             if key in st.session_state:
                 del st.session_state[key]
+        
+        if success:
+            st.success("✅ ¡Inicio de sesión exitoso!")
+            st.info("Redirigiendo al inicio...")
+            st.switch_page("Inicio.py")
+        
+        return True  # Indicate callback was handled
+    
+    return False  # No callback to handle
 
 def handle_google_callback(code):
     """Handle Google OAuth callback"""
@@ -265,7 +304,7 @@ def handle_google_callback(code):
             google_config = st.secrets.get("google_oauth", {})
         except Exception:
             st.error("❌ Error al acceder a la configuración de OAuth")
-            return
+            return False
             
         client_id = google_config.get("client_id")
         client_secret = google_config.get("client_secret")
@@ -291,18 +330,22 @@ def handle_google_callback(code):
             user_info = get_google_user_info(token_info['access_token'])
             
             # Create or update user in local config
-            create_oauth_user(user_info, "google")
+            username = create_oauth_user(user_info, "google")
             
-            st.success(f"✅ ¡Bienvenido, {user_info.get('name', 'Usuario')}!")
-            st.info("🔐 Sesión iniciada con Google")
-            
-            # Redirect to main page
-            st.switch_page("Inicio.py")
+            if username:
+                st.success(f"✅ ¡Bienvenido, {user_info.get('name', 'Usuario')}!")
+                st.info("🔐 Sesión iniciada con Google")
+                return True
+            else:
+                st.error("❌ Error al crear usuario OAuth")
+                return False
         else:
             st.error("❌ Error al obtener token de acceso")
+            return False
             
     except Exception as e:
         st.error(f"❌ Error en callback de Google: {str(e)}")
+        return False
 
 def handle_microsoft_callback(code):
     """Handle Microsoft OAuth callback"""
@@ -311,7 +354,7 @@ def handle_microsoft_callback(code):
             microsoft_config = st.secrets.get("microsoft_oauth", {})
         except Exception:
             st.error("❌ Error al acceder a la configuración de OAuth")
-            return
+            return False
             
         client_id = microsoft_config.get("client_id")
         client_secret = microsoft_config.get("client_secret")
@@ -337,18 +380,22 @@ def handle_microsoft_callback(code):
             user_info = get_microsoft_user_info(token_info['access_token'])
             
             # Create or update user in local config
-            create_oauth_user(user_info, "microsoft")
+            username = create_oauth_user(user_info, "microsoft")
             
-            st.success(f"✅ ¡Bienvenido, {user_info.get('displayName', 'Usuario')}!")
-            st.info("🔐 Sesión iniciada con Microsoft")
-            
-            # Redirect to main page
-            st.switch_page("Inicio.py")
+            if username:
+                st.success(f"✅ ¡Bienvenido, {user_info.get('displayName', 'Usuario')}!")
+                st.info("🔐 Sesión iniciada con Microsoft")
+                return True
+            else:
+                st.error("❌ Error al crear usuario OAuth")
+                return False
         else:
             st.error("❌ Error al obtener token de acceso")
+            return False
             
     except Exception as e:
         st.error(f"❌ Error en callback de Microsoft: {str(e)}")
+        return False
 
 def get_google_user_info(access_token):
     """Get user info from Google"""
@@ -365,41 +412,28 @@ def get_microsoft_user_info(access_token):
 def create_oauth_user(user_info, provider):
     """Create or update user in local config from OAuth info"""
     try:
-        config = load_auth_config()
+        # For now, we'll create a simple user entry
+        # In a real implementation, you'd want to save this to your database
         
         # Generate username from email
         email = user_info.get('email', user_info.get('mail', ''))
         username = email.split('@')[0] if email else f"{provider}_user_{secrets.token_hex(4)}"
         
-        # Ensure unique username
-        counter = 1
-        original_username = username
-        while username in config['credentials']['usernames']:
-            username = f"{original_username}_{counter}"
-            counter += 1
-        
-        # Create user entry
-        user_entry = {
+        # Create a simple user entry for OAuth
+        # This is a temporary solution - in production you'd want proper database integration
+        oauth_user = {
+            'username': username,
             'email': email,
             'first_name': user_info.get('given_name', user_info.get('name', '').split()[0] if user_info.get('name') else ''),
             'last_name': user_info.get('family_name', user_info.get('name', '').split()[-1] if user_info.get('name') else ''),
-            'password': secrets.token_hex(16),  # Random password for OAuth users
-            'failed_login_attempts': 0,
-            'logged_in': False,
             'oauth_provider': provider,
             'oauth_id': user_info.get('id', '')
         }
         
-        config['credentials']['usernames'][username] = user_entry
-        
-        # Save updated config
-        with open('config/config.yaml', 'w') as file:
-            yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
-        
-        # Set session state for login
-        st.session_state.authentication_status = True
-        st.session_state.username = username
-        st.session_state.name = f"{user_entry['first_name']} {user_entry['last_name']}".strip()
+        # Store in session state for now (temporary solution)
+        st.session_state.oauth_user = oauth_user
+        st.session_state.authenticated = True
+        st.session_state.user = oauth_user
         
         return username
         

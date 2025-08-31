@@ -1,5 +1,5 @@
 import streamlit as st
-from core.auth_service import login_user, logout_user, get_current_user
+from core.auth_service import login_user, logout_user, get_current_user as db_get_current_user
 
 def show_login_form():
     """Display the login form for unauthenticated users"""
@@ -47,15 +47,34 @@ def show_user_sidebar(current_user):
     """Display user information and logout button in sidebar"""
     with st.sidebar:
         st.markdown("### 👤 Usuario")
-        name = f"{current_user['first_name']} {current_user['last_name']}"
-        st.write(f"**{name}**")
-        st.write(f"@{current_user['username']}")
+        
+        # Handle both database users and OAuth users
+        if 'oauth_provider' in current_user:
+            # OAuth user
+            name = f"{current_user['first_name']} {current_user['last_name']}"
+            st.write(f"**{name}**")
+            st.write(f"@{current_user['username']}")
+            st.write(f"🔐 {current_user['oauth_provider'].title()}")
+        else:
+            # Database user
+            name = f"{current_user['first_name']} {current_user['last_name']}"
+            st.write(f"**{name}**")
+            st.write(f"@{current_user['username']}")
         
         if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
             logout_user()
             st.rerun()
     
     return name
+
+def get_current_user():
+    """Get current authenticated user (handles both database and OAuth users)"""
+    # First check for OAuth user in session state
+    if st.session_state.get('authenticated') and st.session_state.get('oauth_user'):
+        return st.session_state.oauth_user
+    
+    # Then check for database user
+    return db_get_current_user()
 
 def handle_authentication():
     """Handle authentication flow and return user info if authenticated"""
