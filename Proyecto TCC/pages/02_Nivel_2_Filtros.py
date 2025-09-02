@@ -20,40 +20,74 @@ st.markdown("""
         text-align: center;
         margin-bottom: 1rem;
     }
+    
     .step-box {
-        background: linear-gradient(90deg, #f0f2f6, #ffffff);
+        background: linear-gradient(90deg, #f8f9fa, #ffffff);
         padding: 1.5rem;
         border-radius: 10px;
         border-left: 4px solid #28a745;
         margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
     .warning-box {
         background: #fff3cd;
         border: 1px solid #ffeaa7;
         border-radius: 8px;
         padding: 1rem;
         margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
     .success-box {
         background: #d4edda;
         border: 1px solid #c3e6cb;
         border-radius: 8px;
         padding: 1rem;
         margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
     .filter-demo {
         background: #e3f2fd;
         border: 1px solid #bbdefb;
         border-radius: 8px;
         padding: 1rem;
         margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
     .completion-checkbox {
         background: #e8f5e8;
         border: 2px solid #28a745;
         border-radius: 10px;
         padding: 1rem;
         margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .info-box {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Ensure all text elements have proper contrast */
+    .step-box h3, .step-box h4, .step-box p, .step-box ul, .step-box li,
+    .warning-box h3, .warning-box ul, .warning-box li,
+    .success-box h3, .success-box ul, .success-box li,
+    .filter-demo h3, .filter-demo p,
+    .completion-checkbox h3, .completion-checkbox p,
+    .info-box h3, .info-box p {
+        color: inherit !important;
+    }
+    
+    /* Force light backgrounds for all elements */
+    .step-box, .warning-box, .success-box, .filter-demo, .completion-checkbox, .info-box {
+        background-color: inherit !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -104,449 +138,336 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso: {total_progress:.0f}% - {completed_count} de 4 niveles completados")
-        
-        # Show completion status for each level
-        st.markdown("**Estado de Niveles:**")
-        col_a, col_b, col_c, col_d = st.columns(4)
-        with col_a:
-            status = "✅" if progress['nivel1'] else "⏳"
-            st.markdown(f"{status} Nivel 1")
-        with col_b:
-            status = "✅" if progress['nivel2'] else "⏳"
-            st.markdown(f"{status} Nivel 2")
-        with col_c:
-            status = "✅" if progress['nivel3'] else "⏳"
-            st.markdown(f"{status} Nivel 3")
-        with col_d:
-            status = "✅" if progress['nivel4'] else "⏳"
-            st.markdown(f"{status} Nivel 4")
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
     
-    # Level Completion Checkbox - At the top
-    st.markdown('<div class="completion-checkbox">', unsafe_allow_html=True)
-    st.markdown("## 🎯 Marcar Nivel como Completado")
+    # Verificar que el nivel anterior esté completado
+    if not progress['nivel1']:
+        st.warning("⚠️ Primero debes completar el Nivel 1 antes de continuar con este nivel.")
+        if st.button("Ir al Nivel 1", type="primary"):
+            st.switch_page("pages/01_Nivel_1_Basico.py")
+        return
     
-    # Check if this is the first time completing the level
-    was_completed = st.session_state.get('nivel2_completed', False)
-    
-    if st.checkbox("✅ Click aquí para marcar este nivel como Completado", 
-                  value=was_completed,
-                  key='nivel2_completion_checkbox'):
-        # Only show balloons if this is the first time completing
-        if not was_completed:
-            st.balloons()
-            st.success("🎉 ¡Felicidades! Has completado el Nivel 2. ¡Ya puedes organizar tu información!")
-        st.session_state['nivel2_completed'] = True
-    else:
-        st.session_state['nivel2_completed'] = False
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.divider()
-    
-    # Introduction
+    # Información introductoria
     st.markdown("""
-    ## 🎯 Objetivo de este Nivel
+    <div class="info-box">
+        <h3>🎯 ¿Qué aprenderás en este nivel?</h3>
+        <p>En este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. 
+        Los filtros te ayudan a organizar y analizar datos de manera más efectiva.</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    En este nivel aprenderás a:
-    - Encontrar información de fechas específicas (como ventas de un mes)
-    - Organizar datos por categorías (productos, regiones, etc.)
-    - Usar deslizadores para rangos de precios o cantidades
-    - Combinar diferentes filtros para análisis más específicos
-    - Ver cómo cambian los números cuando filtras la información
+    # Pasos del nivel
+    st.markdown("## 📋 Pasos para Organizar y Filtrar Datos")
+    
+    # Paso 1
+    st.markdown("""
+    <div class="step-box">
+        <h3>1️⃣ Usar filtros de fecha para analizar períodos específicos</h3>
+        <p><strong>¿Por qué es útil?</strong> Los filtros de fecha te permiten ver información de un período específico, 
+        como las ventas del último mes o de un trimestre particular.</p>
+        
+        <h4>📅 Tipos de filtros de fecha:</h4>
+        <ul>
+            <li><strong>Rango de fechas:</strong> Desde una fecha hasta otra</li>
+            <li><strong>Período específico:</strong> Último mes, este año, etc.</li>
+            <li><strong>Fecha única:</strong> Un día específico</li>
+        </ul>
+        
+        <h4>✅ Ejemplos de uso:</h4>
+        <ul>
+            <li>Ver ventas del último trimestre</li>
+            <li>Comparar resultados entre dos meses</li>
+            <li>Analizar tendencias por estación</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Paso 2
+    st.markdown("""
+    <div class="step-box">
+        <h3>2️⃣ Filtrar por categorías y regiones</h3>
+        <p><strong>¿Qué significa?</strong> Los filtros por categoría te permiten ver solo los productos o servicios 
+        que te interesan, y los filtros por región te muestran resultados de áreas geográficas específicas.</p>
+        
+        <h4>🏷️ Filtros por categoría:</h4>
+        <ul>
+            <li><strong>Productos:</strong> Solo electrónicos, solo ropa, etc.</li>
+            <li><strong>Servicios:</strong> Solo consultoría, solo mantenimiento, etc.</li>
+            <li><strong>Tipos de cliente:</strong> Solo empresas, solo particulares, etc.</li>
+        </ul>
+        
+        <h4>🌍 Filtros por región:</h4>
+        <ul>
+            <li><strong>Países o estados:</strong> Solo México, solo California, etc.</li>
+            <li><strong>Ciudades:</strong> Solo Ciudad de México, solo Los Ángeles, etc.</li>
+            <li><strong>Zonas:</strong> Solo norte, solo sur, solo este, solo oeste</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Paso 3
+    st.markdown("""
+    <div class="step-box">
+        <h3>3️⃣ Aplicar filtros numéricos con deslizadores</h3>
+        <p><strong>¿Cómo funcionan?</strong> Los filtros numéricos te permiten establecer rangos de valores, 
+        como ver solo productos entre ciertos precios o ventas por encima de un monto mínimo.</p>
+        
+        <h4>🔢 Tipos de filtros numéricos:</h4>
+        <ul>
+            <li><strong>Rango de precios:</strong> Desde $100 hasta $500</li>
+            <li><strong>Ventas mínimas:</strong> Solo productos que vendieron más de 50 unidades</li>
+            <li><strong>Calificaciones:</strong> Solo productos con 4 estrellas o más</li>
+            <li><strong>Edad o antigüedad:</strong> Solo clientes entre 25 y 45 años</li>
+        </ul>
+        
+        <h4>🎛️ Cómo usar deslizadores:</h4>
+        <ol>
+            <li>Mueve el deslizador izquierdo para establecer el valor mínimo</li>
+            <li>Mueve el deslizador derecho para establecer el valor máximo</li>
+            <li>Los resultados se actualizan automáticamente</li>
+        </ol>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Paso 4
+    st.markdown('<div class="step-box">', unsafe_allow_html=True)
+    st.markdown("### 4️⃣ Combinar múltiples filtros para análisis detallado")
+    st.markdown("**¿Por qué combinar filtros?** Al usar varios filtros juntos, puedes obtener información muy específica y relevante para tu análisis.")
+    
+    st.markdown("#### 🔗 Ejemplos de combinaciones:")
+    st.markdown("""
+    - **Fecha + Categoría:** Ventas de electrónicos en diciembre
+    - **Región + Precio:** Productos caros en el norte
+    - **Categoría + Calificación:** Ropa con 5 estrellas
+    - **Fecha + Región + Precio:** Ventas altas en el sur este mes
     """)
     
-    # Load sample data for demonstration
+    st.markdown("#### 💡 Consejos para combinar filtros:")
+    st.markdown("""
+    - Empieza con un filtro y ve agregando más gradualmente
+    - Verifica que no estés filtrando demasiado (pocos resultados)
+    - Usa filtros que tengan sentido juntos
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Paso 5
+    st.markdown('<div class="step-box">', unsafe_allow_html=True)
+    st.markdown("### 5️⃣ Entender cómo los filtros afectan las métricas")
+    st.markdown("**¿Qué significa?** Cuando aplicas filtros, los totales, promedios y otras métricas cambian para mostrar solo la información filtrada.")
+    
+    st.markdown("#### 📊 Métricas que cambian con filtros:")
+    st.markdown("""
+    - **Total de ventas:** Solo suma los productos filtrados
+    - **Promedio de precios:** Solo considera los productos visibles
+    - **Número de registros:** Solo cuenta los resultados filtrados
+    - **Porcentajes:** Se recalculan con la nueva base de datos
+    """)
+    
+    st.markdown("#### ⚠️ Importante recordar:")
+    st.markdown("""
+    - Los filtros no cambian tus datos originales
+    - Siempre puedes quitar filtros para ver todo nuevamente
+    - Los filtros se aplican en tiempo real
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Ejemplo práctico
+    st.markdown("## 🎯 Ejemplo Práctico")
+    
+    st.markdown('<div class="info-box">', unsafe_allow_html=True)
+    st.markdown("### 📊 Vamos a practicar con filtros usando datos de ventas")
+    st.markdown("Te mostraré cómo aplicar diferentes tipos de filtros y ver cómo cambian los resultados.")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Crear datos de ejemplo
     df = create_sample_data()
     
-    # Step 1: Understanding Filters
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🎛️ Paso 1: Entender los Filtros")
+    st.markdown("### 📁 Datos de ejemplo (Ventas de una tienda)")
+    st.dataframe(df.head(10), use_container_width=True)
     
-    st.markdown("""
-    ### 📊 ¿Qué son los Filtros?
+    # Filtros interactivos
+    st.markdown("### 🔍 Aplicar Filtros")
     
-    Los filtros te permiten:
-    - **Reducir** la cantidad de datos que analizas
-    - **Enfocarte** en información específica
-    - **Comparar** diferentes segmentos
-    - **Identificar** patrones y tendencias
-    
-    ### 🔧 Tipos de Filtros Disponibles:
-    """)
-    
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("""
-        **📅 Filtros de Fecha**
-        - Rango de fechas
-        - Períodos específicos
-        - Comparaciones temporales
-        """)
+        st.markdown("**📅 Filtro por fecha:**")
+        fecha_inicio = st.date_input(
+            "Fecha de inicio",
+            value=df['Fecha'].min().date(),
+            min_value=df['Fecha'].min().date(),
+            max_value=df['Fecha'].max().date()
+        )
+        fecha_fin = st.date_input(
+            "Fecha de fin",
+            value=df['Fecha'].max().date(),
+            min_value=df['Fecha'].min().date(),
+            max_value=df['Fecha'].max().date()
+        )
+        
+        st.markdown("**🏷️ Filtro por categoría:**")
+        categorias = ['Todas'] + list(df['Categoria'].unique())
+        categoria_seleccionada = st.selectbox("Seleccionar categoría", categorias)
+        
+        st.markdown("**🌍 Filtro por región:**")
+        regiones = ['Todas'] + list(df['Region'].unique())
+        region_seleccionada = st.selectbox("Seleccionar región", regiones)
     
     with col2:
-        st.markdown("""
-        **🏷️ Filtros de Categoría**
-        - Selección múltiple
-        - Análisis por grupos
-        - Comparación entre categorías
-        """)
-    
-    with col3:
-        st.markdown("""
-        **📊 Filtros Numéricos**
-        - Rangos con deslizadores
-        - Valores mínimos y máximos
-        - Filtros dinámicos
-        """)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Step 2: Date Filters Demo
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 📅 Paso 2: Filtros de Fecha")
-    
-    st.markdown("""
-    ### 🎯 Cómo Usar Filtros de Fecha:
-    1. Ve a la barra lateral
-    2. Busca "Seleccionar Rango de Fechas"
-    3. Elige fechas de inicio y fin
-    4. Observa cómo cambian los datos
-    """)
-    
-    # Interactive date filter demo
-    st.markdown('<div class="filter-demo">', unsafe_allow_html=True)
-    st.markdown("### 🎮 Demostración Interactiva:")
-    
-    # Date range selector
-    date_range = st.date_input(
-        "📅 Selecciona un rango de fechas para ver el efecto:",
-        value=(df['Fecha'].min(), df['Fecha'].max()),
-        min_value=df['Fecha'].min(),
-        max_value=df['Fecha'].max()
-    )
-    
-    if len(date_range) == 2:
-        # Filter data based on selection
-        filtered_df = df[(df['Fecha'] >= pd.to_datetime(date_range[0])) & 
-                        (df['Fecha'] <= pd.to_datetime(date_range[1]))]
+        st.markdown("**🔢 Filtros numéricos:**")
         
-        col1, col2 = st.columns(2)
+        st.markdown("**💰 Rango de ventas:**")
+        ventas_min = st.slider(
+            "Ventas mínimas",
+            min_value=float(df['Ventas'].min()),
+            max_value=float(df['Ventas'].max()),
+            value=float(df['Ventas'].min()),
+            step=50.0
+        )
+        ventas_max = st.slider(
+            "Ventas máximas",
+            min_value=float(df['Ventas'].min()),
+            max_value=float(df['Ventas'].max()),
+            value=float(df['Ventas'].max()),
+            step=50.0
+        )
         
-        with col1:
-            st.metric("📊 Datos Originales", len(df))
-            st.metric("💰 Ingresos Totales", f"${df['Ingresos'].sum():,.2f}")
-        
-        with col2:
-            st.metric("📊 Datos Filtrados", len(filtered_df))
-            st.metric("💰 Ingresos Filtrados", f"${filtered_df['Ingresos'].sum():,.2f}")
-        
-        # Show filtered data
-        st.markdown("### 📋 Datos Filtrados:")
-        st.dataframe(filtered_df.head(10), use_container_width=True)
-        
-        # Show the effect
-        reduction = ((len(df) - len(filtered_df)) / len(df)) * 100
-        st.info(f"📉 El filtro redujo los datos en un {reduction:.1f}%")
+        st.markdown("**⭐ Calificación mínima:**")
+        calificacion_min = st.slider(
+            "Calificación mínima",
+            min_value=1,
+            max_value=5,
+            value=1
+        )
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Aplicar filtros
+    df_filtrado = df.copy()
     
-    # Step 3: Category Filters Demo
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🏷️ Paso 3: Filtros de Categoría")
-    
-    st.markdown("""
-    ### 🎯 Cómo Usar Filtros de Categoría:
-    1. Busca "Seleccionar Categorías" en la barra lateral
-    2. Marca/desmarca las categorías que quieres analizar
-    3. Observa cómo cambian las métricas
-    """)
-    
-    # Interactive category filter demo
-    st.markdown('<div class="filter-demo">', unsafe_allow_html=True)
-    st.markdown("### 🎮 Demostración Interactiva:")
-    
-    # Category selector
-    categories = st.multiselect(
-        "🏷️ Selecciona categorías para filtrar:",
-        options=df['Categoria'].unique(),
-        default=df['Categoria'].unique()
-    )
-    
-    if categories:
-        # Filter data based on selection
-        cat_filtered_df = df[df['Categoria'].isin(categories)]
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.metric("📊 Datos Originales", len(df))
-            st.metric("🏷️ Categorías Totales", len(df['Categoria'].unique()))
-        
-        with col2:
-            st.metric("📊 Datos Filtrados", len(cat_filtered_df))
-            st.metric("🏷️ Categorías Seleccionadas", len(categories))
-        
-        # Show category breakdown
-        st.markdown("### 📊 Desglose por Categoría:")
-        cat_summary = cat_filtered_df.groupby('Categoria').agg({
-            'Ingresos': 'sum',
-            'Cantidad': 'sum'
-        }).round(2)
-        st.dataframe(cat_summary, use_container_width=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Step 4: Numeric Filters Demo
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 📊 Paso 4: Filtros Numéricos")
-    
-    st.markdown("""
-    ### 🎯 Cómo Usar Filtros Numéricos:
-    1. Busca los deslizadores en la barra lateral
-    2. Ajusta los valores mínimos y máximos
-    3. Observa cómo se filtran los datos automáticamente
-    """)
-    
-    # Interactive numeric filter demo
-    st.markdown('<div class="filter-demo">', unsafe_allow_html=True)
-    st.markdown("### 🎮 Demostración Interactiva:")
-    
-    # Sales range slider
-    sales_range = st.slider(
-        "💰 Rango de Ventas:",
-        min_value=float(df['Ventas'].min()),
-        max_value=float(df['Ventas'].max()),
-        value=(float(df['Ventas'].min()), float(df['Ventas'].max())),
-        step=10.0
-    )
-    
-    # Rating range slider
-    rating_range = st.slider(
-        "⭐ Rango de Calificación:",
-        min_value=int(df['Calificacion'].min()),
-        max_value=int(df['Calificacion'].max()),
-        value=(int(df['Calificacion'].min()), int(df['Calificacion'].max())),
-        step=1
-    )
-    
-    # Filter data based on selections
-    num_filtered_df = df[
-        (df['Ventas'] >= sales_range[0]) & 
-        (df['Ventas'] <= sales_range[1]) &
-        (df['Calificacion'] >= rating_range[0]) & 
-        (df['Calificacion'] <= rating_range[1])
+    # Filtro de fechas
+    df_filtrado = df_filtrado[
+        (df_filtrado['Fecha'].dt.date >= fecha_inicio) &
+        (df_filtrado['Fecha'].dt.date <= fecha_fin)
     ]
     
-    col1, col2 = st.columns(2)
+    # Filtro de categoría
+    if categoria_seleccionada != 'Todas':
+        df_filtrado = df_filtrado[df_filtrado['Categoria'] == categoria_seleccionada]
+    
+    # Filtro de región
+    if region_seleccionada != 'Todas':
+        df_filtrado = df_filtrado[df_filtrado['Region'] == region_seleccionada]
+    
+    # Filtros numéricos
+    df_filtrado = df_filtrado[
+        (df_filtrado['Ventas'] >= ventas_min) &
+        (df_filtrado['Ventas'] <= ventas_max) &
+        (df_filtrado['Calificacion'] >= calificacion_min)
+    ]
+    
+    # Mostrar resultados filtrados
+    st.markdown("### 📊 Resultados Filtrados")
+    
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("📊 Datos Originales", len(df))
-        st.metric("💰 Ventas Promedio", f"${df['Ventas'].mean():.2f}")
+        st.metric("Registros originales", len(df))
+        st.metric("Registros filtrados", len(df_filtrado))
     
     with col2:
-        st.metric("📊 Datos Filtrados", len(num_filtered_df))
-        st.metric("💰 Ventas Promedio Filtradas", f"${num_filtered_df['Ventas'].mean():.2f}")
-    
-    # Show filtered data
-    st.markdown("### 📋 Datos Filtrados por Rangos:")
-    st.dataframe(num_filtered_df.head(10), use_container_width=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Step 5: Practice Section
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🎯 Paso 5: Práctica - ¡Tu Turno!")
-    
-    st.markdown("""
-    ### 📝 Ejercicio Práctico:
-    
-    **Objetivo**: Analizar las ventas de "Electronica" en el primer trimestre de 2023
-    
-    **Pasos**:
-    1. Aplica un filtro de fecha para Q1 2023 (Enero-Marzo)
-    2. Aplica un filtro de categoría para "Electronica"
-    3. Observa cómo cambian las métricas
-    4. Compara con otros períodos o categorías
-    """)
-    
-    # Interactive practice area
-    st.markdown("### 🎮 Área de Práctica:")
-    
-    # Load user's data if available
-    uploaded_file = st.file_uploader(
-        "📁 Sube tu archivo para practicar (opcional):",
-        type=['csv', 'xlsx', 'xls'],
-        help="Si no tienes archivo, usa los datos de ejemplo"
-    )
-    
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith('.csv'):
-                practice_df = pd.read_csv(uploaded_file)
-            else:
-                practice_df = pd.read_excel(uploaded_file)
-            
-            # Try to convert date columns
-            for col in practice_df.columns:
-                if 'fecha' in col.lower() or 'date' in col.lower():
-                    try:
-                        practice_df[col] = pd.to_datetime(practice_df[col])
-                    except:
-                        pass
-            
-            st.success(f"✅ Archivo cargado: {len(practice_df)} filas")
-            
-        except Exception as e:
-            st.error(f"❌ Error al cargar archivo: {str(e)}")
-            practice_df = df  # Use sample data as fallback
-    else:
-        practice_df = df
-        st.info("📊 Usando datos de ejemplo para la práctica")
-    
-    # Practice filters
-    st.markdown("#### 🔧 Aplica Filtros:")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Date filter for practice
-        if any('fecha' in col.lower() or 'date' in col.lower() for col in practice_df.columns):
-            date_col = [col for col in practice_df.columns if 'fecha' in col.lower() or 'date' in col.lower()][0]
-            practice_date_range = st.date_input(
-                "📅 Rango de fechas:",
-                value=(practice_df[date_col].min(), practice_df[date_col].max()),
-                min_value=practice_df[date_col].min(),
-                max_value=practice_df[date_col].max()
-            )
-        else:
-            practice_date_range = None
-    
-    with col2:
-        # Category filter for practice
-        if any('categoria' in col.lower() or 'category' in col.lower() for col in practice_df.columns):
-            cat_col = [col for col in practice_df.columns if 'categoria' in col.lower() or 'category' in col.lower()][0]
-            practice_categories = st.multiselect(
-                "🏷️ Categorías:",
-                options=practice_df[cat_col].unique(),
-                default=practice_df[cat_col].unique()
-            )
-        else:
-            practice_categories = None
-    
-    # Apply filters and show results
-    filtered_practice_df = practice_df.copy()
-    
-    if practice_date_range and len(practice_date_range) == 2:
-        filtered_practice_df = filtered_practice_df[
-            (filtered_practice_df[date_col] >= pd.to_datetime(practice_date_range[0])) & 
-            (filtered_practice_df[date_col] <= pd.to_datetime(practice_date_range[1]))
-        ]
-    
-    if practice_categories:
-        filtered_practice_df = filtered_practice_df[filtered_practice_df[cat_col].isin(practice_categories)]
-    
-    # Show results
-    st.markdown("#### 📊 Resultados:")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric("📈 Filas Originales", len(practice_df))
-        st.metric("📉 Filas Filtradas", len(filtered_practice_df))
-    
-    with col2:
-        # Show numeric metrics if available
-        numeric_cols = filtered_practice_df.select_dtypes(include=[np.number]).columns
-        if len(numeric_cols) > 0:
-            main_numeric = numeric_cols[0]
-            st.metric(f"💰 Total {main_numeric}", f"{filtered_practice_df[main_numeric].sum():,.2f}")
+        st.metric("Ventas totales", f"${df_filtrado['Ventas'].sum():,.0f}")
+        st.metric("Promedio ventas", f"${df_filtrado['Ventas'].mean():,.0f}")
     
     with col3:
-        if len(filtered_practice_df) > 0:
-            reduction = ((len(practice_df) - len(filtered_practice_df)) / len(practice_df)) * 100
-            st.metric("📊 Reducción", f"{reduction:.1f}%")
-    
-    # Show filtered data
-    st.markdown("#### 📋 Datos Filtrados:")
-    st.dataframe(filtered_practice_df.head(10), use_container_width=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Success Criteria
-    st.markdown('<div class="success-box">', unsafe_allow_html=True)
-    st.markdown("## ✅ Criterios de Éxito")
-    
-    st.markdown("""
-    Has completado este nivel cuando:
-    - ✅ Puedes aplicar filtros de fecha correctamente
-    - ✅ Sabes usar filtros de categoría y región
-    - ✅ Entiendes cómo funcionan los filtros numéricos
-    - ✅ Puedes combinar múltiples filtros
-    - ✅ Observas cómo los filtros afectan las métricas
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Official Sources Section
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🏛️ Fuentes Oficiales")
-    
-    st.markdown("""
-    ### 📚 Respaldos Oficiales para este Nivel:
-    
-    **Metodología de Análisis Exploratorio:**
-    - **CRISP-DM Methodology**: [Metodología estándar de ciencia de datos](https://www.datascience-pm.com/crisp-dm-2/)
-    
-    **Filtrado y Segmentación:**
-    - **IBM Data Science Methodology**: [Técnicas de filtrado y segmentación](https://www.ibm.com/cloud/learn/data-science-methodology)
-    
-    **Análisis de Datos Interactivo:**
-    - **Kaggle Learn**: [Análisis exploratorio de datos](https://www.kaggle.com/learn/intro-to-data-science)
-    
-    **Herramientas de Filtrado:**
-    - **Tableau Data Preparation**: [Filtrado avanzado de datos](https://help.tableau.com/current/prep/en-us/prep.htm)
-    
-    ### 📖 Certificaciones Relacionadas:
-    - **IBM Data Science Professional Certificate**: [Certificación de IBM](https://www.coursera.org/professional-certificates/ibm-data-science)
-    - **Microsoft Data Analyst Associate**: [Certificación de Microsoft](https://docs.microsoft.com/en-us/certifications/data-analyst-associate/)
-    
-    ### 🔗 Recursos Adicionales:
-    - **DataCamp Data Analysis**: [Track de análisis de datos](https://www.datacamp.com/tracks/data-analyst-with-python)
-    - **R for Data Science**: [Libro de referencia](https://r4ds.had.co.nz/)
-    - **Python Data Science Handbook**: [Manual de Python](https://jakevdp.github.io/PythonDataScienceHandbook/)
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Navigation
-    st.divider()
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    
-    with col1:
-        if st.button("🏠 Dashboard Principal", key="nivel2_dashboard"):
-            st.switch_page("Inicio.py")
-    
-    with col2:
-        if st.button("⬅️ Nivel Anterior", key="nivel2_anterior"):
-            st.switch_page("pages/01_Nivel_1_Basico.py")
+        st.metric("Ingresos totales", f"${df_filtrado['Ingresos'].sum():,.0f}")
+        st.metric("Promedio ingresos", f"${df_filtrado['Ingresos'].mean():,.0f}")
     
     with col4:
-        if st.button("➡️ Siguiente Nivel", key="nivel2_siguiente"):
+        st.metric("Calificación promedio", f"{df_filtrado['Calificacion'].mean():.1f}")
+        st.metric("Productos únicos", df_filtrado['Categoria'].nunique())
+    
+    # Mostrar datos filtrados
+    if len(df_filtrado) > 0:
+        st.markdown("**📋 Datos filtrados:**")
+        st.dataframe(df_filtrado, use_container_width=True)
+    else:
+        st.warning("⚠️ No hay datos que coincidan con los filtros seleccionados. Intenta ajustar los filtros.")
+    
+    # Consejos importantes
+    st.markdown("## 💡 Consejos Importantes")
+    
+    st.markdown("""
+    <div class="warning-box">
+        <h3>⚠️ Errores comunes a evitar:</h3>
+        <ul>
+            <li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li>
+            <li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li>
+            <li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li>
+            <li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="success-box">
+        <h3>✅ Buenas prácticas:</h3>
+        <ul>
+            <li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li>
+            <li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li>
+            <li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li>
+            <li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Actividad práctica
+    st.markdown("## 🎯 Actividad Práctica")
+    
+    st.markdown("""
+    <div class="step-box">
+        <h3>📝 Ejercicio para practicar:</h3>
+        <p>1. <strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</p>
+        <p>2. <strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</p>
+        <p>3. <strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</p>
+        <p>4. <strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</p>
+        <p>5. <strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Verificación de completado
+    st.markdown("## ✅ Verificación del Nivel")
+    
+    nivel2_completed = st.checkbox(
+        "He completado todos los pasos del Nivel 2",
+        value=st.session_state.get('nivel2_completed', False),
+        key='nivel2_checkbox'
+    )
+    
+    if nivel2_completed:
+        st.session_state['nivel2_completed'] = True
+        st.markdown("""
+        <div class="completion-checkbox">
+            <h3>🎉 ¡Felicidades! Has completado el Nivel 2</h3>
+            <p>Ahora sabes cómo organizar y filtrar datos para encontrar exactamente lo que necesitas. 
+            Estás listo para continuar con el siguiente nivel.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Mostrar siguiente nivel
+        st.markdown("### 🚀 ¿Qué sigue?")
+        st.markdown("En el **Nivel 3** aprenderás a entender e interpretar métricas y KPIs para tomar mejores decisiones.")
+        
+        if st.button("Continuar al Nivel 3", type="primary"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")
     
-    # Tips section
+    # Información adicional
+    st.markdown("---")
     st.markdown("""
-    ---
-    ### 💡 Consejos para Filtros:
-    - **Combinar filtros**: Usa múltiples filtros para análisis más específicos
-    - **Comparar períodos**: Aplica filtros de fecha para comparar diferentes períodos
-    - **Segmentar datos**: Usa filtros de categoría para analizar segmentos específicos
-    - **Rangos numéricos**: Los deslizadores son ideales para encontrar valores atípicos
-    - **Resetear filtros**: Puedes quitar filtros seleccionando "Todos" o el rango completo
-    """)
+    <div class="info-box">
+        <h3>📚 ¿Quieres saber más?</h3>
+        <p>Este nivel está basado en metodologías de análisis exploratorio de datos y mejores prácticas de la industria. 
+        Si quieres profundizar en los fundamentos teóricos, consulta la documentación del proyecto.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

@@ -128,9 +128,136 @@ def create_sales_dataset():
     
     return df.sort_values('Fecha').reset_index(drop=True)
 
+def create_dirty_dataset():
+    """Create a dataset with intentional data quality issues for testing cleaning functions"""
+    np.random.seed(999)
+    n_records = 200
+    
+    # Create data with various issues
+    data = {
+        # Names with inconsistent formatting
+        'Nombre': [
+            '  Juan Pérez  ', 'MARÍA GARCÍA', 'carlos lopez', 'Ana María Rodríguez',
+            'JOSE MARTINEZ', 'lucia fernandez', '  Pedro Sánchez  ', 'ELENA MORALES',
+            'miguel torres', 'Carmen Jiménez', '  ', 'null', 'N/A', '  Roberto Díaz  ',
+            'Sofia Castro', 'ANTONIO RUIZ', '  isabel vega  ', 'Francisco Moreno',
+            'laura herrera', '  DAVID GUTIERREZ  '
+        ] * 10,
+        
+        # Emails with various formats
+        'Email': [
+            'juan.perez@email.com', 'MARIA.GARCIA@EMAIL.COM', 'carlos.lopez@email.com',
+            'ana.rodriguez@email.com', 'jose.martinez@email.com', 'lucia.fernandez@email.com',
+            'pedro.sanchez@email.com', 'elena.morales@email.com', 'miguel.torres@email.com',
+            'carmen.jimenez@email.com', 'roberto.diaz@email.com', 'sofia.castro@email.com',
+            'antonio.ruiz@email.com', 'isabel.vega@email.com', 'francisco.moreno@email.com',
+            'laura.herrera@email.com', 'david.gutierrez@email.com', '  ', 'null', 'N/A'
+        ] * 10,
+        
+        # Phone numbers with different formats
+        'Telefono': [
+            '+1-555-123-4567', '(555) 123-4567', '555-123-4567', '5551234567',
+            '+1-555-234-5678', '(555) 234-5678', '555-234-5678', '5552345678',
+            '+1-555-345-6789', '(555) 345-6789', '555-345-6789', '5553456789',
+            '+1-555-456-7890', '(555) 456-7890', '555-456-7890', '5554567890',
+            '+1-555-567-8901', '(555) 567-8901', '555-567-8901', '5555678901'
+        ] * 10,
+        
+        # Categories with inconsistencies
+        'Categoria': [
+            'Electrónicos', 'ELECTRONICOS', 'electronicos', 'Electrónicos',
+            'Ropa', 'ROPA', 'ropa', 'Ropa',
+            'Hogar', 'HOGAR', 'hogar', 'Hogar',
+            'Deportes', 'DEPORTES', 'deportes', 'Deportes',
+            'Libros', 'LIBROS', 'libros', 'Libros',
+            '  ', 'null', 'N/A', 'Otros'
+        ] * 5,
+        
+        # Cities with accents and special characters
+        'Ciudad': [
+            'México', 'Mexico', 'méxico', 'MEXICO',
+            'Bogotá', 'Bogota', 'bogotá', 'BOGOTA',
+            'Buenos Aires', 'Buenos aires', 'BUENOS AIRES', 'buenos aires',
+            'Santiago', 'santiago', 'SANTIAGO', 'Santiago',
+            'Lima', 'lima', 'LIMA', 'Lima',
+            '  ', 'null', 'N/A', 'Otra'
+        ] * 5,
+        
+        # Prices with various formats
+        'Precio': [
+            '$100.50', '100.50', '100,50', '100',
+            '$250.75', '250.75', '250,75', '250',
+            '$500.00', '500.00', '500,00', '500',
+            '$750.25', '750.25', '750,25', '750',
+            '$1000.00', '1000.00', '1000,00', '1000'
+        ] * 10,
+        
+        # Status with mixed formats
+        'Estado': [
+            'Activo', 'ACTIVO', 'activo', 'Activo',
+            'Inactivo', 'INACTIVO', 'inactivo', 'Inactivo',
+            'Pendiente', 'PENDIENTE', 'pendiente', 'Pendiente',
+            'Cancelado', 'CANCELADO', 'cancelado', 'Cancelado',
+            '  ', 'null', 'N/A', 'Otro'
+        ] * 5,
+        
+        # Dates with different formats
+        'Fecha_Registro': [
+            '2023-01-15', '15/01/2023', '2023-01-15 10:30:00', '15-01-2023',
+            '2023-02-20', '20/02/2023', '2023-02-20 14:45:00', '20-02-2023',
+            '2023-03-10', '10/03/2023', '2023-03-10 09:15:00', '10-03-2023',
+            '2023-04-05', '05/04/2023', '2023-04-05 16:20:00', '05-04-2023',
+            '2023-05-12', '12/05/2023', '2023-05-12 11:00:00', '12-05-2023'
+        ] * 10,
+        
+        # Numeric values with issues
+        'Edad': np.random.choice([25, 30, 35, 40, 45, 50, 55, 60, -5, 150, np.nan, ''], n_records),
+        'Puntuacion': np.random.choice([1, 2, 3, 4, 5, 0, 6, 7, np.nan, ''], n_records),
+        
+        # Text with special characters and accents
+        'Comentario': [
+            '¡Excelente producto!', 'excelente producto', 'EXCELENTE PRODUCTO',
+            'Muy bueno, lo recomiendo', 'muy bueno, lo recomiendo', 'MUY BUENO, LO RECOMIENDO',
+            'Regular, podría mejorar', 'regular, podría mejorar', 'REGULAR, PODRÍA MEJORAR',
+            'No me gustó mucho', 'no me gustó mucho', 'NO ME GUSTÓ MUCHO',
+            'Pésimo servicio', 'pésimo servicio', 'PESIMO SERVICIO',
+            '  ', 'null', 'N/A', 'Sin comentarios'
+        ] * 10
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Add some duplicates
+    df = pd.concat([df, df.iloc[:20]], ignore_index=True)
+    
+    # Add some completely empty rows
+    empty_rows = pd.DataFrame({
+        'Nombre': [''] * 5,
+        'Email': [''] * 5,
+        'Telefono': [''] * 5,
+        'Categoria': [''] * 5,
+        'Ciudad': [''] * 5,
+        'Precio': [''] * 5,
+        'Estado': [''] * 5,
+        'Fecha_Registro': [''] * 5,
+        'Edad': [np.nan] * 5,
+        'Puntuacion': [np.nan] * 5,
+        'Comentario': [''] * 5
+    })
+    
+    df = pd.concat([df, empty_rows], ignore_index=True)
+    
+    return df.reset_index(drop=True)
+
 def get_sample_datasets():
     """Return all available sample datasets"""
     return {
+        'Dataset Sucio (Limpieza)': {
+            'data': create_dirty_dataset(),
+            'description': 'Dataset con múltiples problemas de calidad para practicar limpieza automática',
+            'difficulty': 'Avanzado',
+            'data_quality_issues': 'Espacios, mayúsculas/minúsculas, acentos, teléfonos, emails, duplicados, valores faltantes'
+        },
         'E-commerce': {
             'data': create_ecommerce_dataset(),
             'description': 'Datos de ventas online con productos, regiones y calificaciones',

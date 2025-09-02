@@ -8,6 +8,7 @@ from core.data_quality_analyzer import data_quality_page
 from utils.auth_ui import handle_authentication, get_current_user
 from utils.main_ui import show_header, show_quick_start_section, should_show_main_content, clear_selected_template
 from utils.data_handling import show_upload_section, show_examples_section, get_current_data
+from utils.data_cleaner import create_data_cleaning_interface
 from utils.learning_progress import get_level_progress, show_learning_section, show_user_profile_section
 from utils.dashboard_templates import show_dashboard_selection
 
@@ -71,6 +72,13 @@ def main():
     if st.session_state.get('show_data_quality', False) and 'uploaded_data' in st.session_state:
         st.divider()
         data_quality_page(st.session_state.uploaded_data)
+    
+    # ============================================================================
+    # DATA CLEANING SECTION
+    # ============================================================================
+    if st.session_state.get('show_data_cleaning', False) and 'uploaded_data' in st.session_state:
+        st.divider()
+        create_data_cleaning_interface(st.session_state.uploaded_data)
     
     # ============================================================================
     # DASHBOARD SECTION

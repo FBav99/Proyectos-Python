@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from data.sample_datasets import get_sample_datasets
+from utils.data_cleaner import create_data_cleaning_interface
 
 def show_upload_section():
     """Show the file upload section"""
@@ -29,7 +30,7 @@ def show_upload_section():
                 st.dataframe(df.head(10), use_container_width=True)
             
             # Action buttons for loaded data
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 if st.button("🧹 Analizar Calidad de Datos", type="primary", use_container_width=True):
                     st.session_state.uploaded_data = df
@@ -37,6 +38,12 @@ def show_upload_section():
                     st.rerun()
             
             with col2:
+                if st.button("🧽 Limpieza Automática", use_container_width=True):
+                    st.session_state.uploaded_data = df
+                    st.session_state.show_data_cleaning = True
+                    st.rerun()
+            
+            with col3:
                 if st.button("🚀 Ir Directo al Dashboard", use_container_width=True):
                     st.session_state.cleaned_data = df
                     st.session_state.data_quality_completed = True
