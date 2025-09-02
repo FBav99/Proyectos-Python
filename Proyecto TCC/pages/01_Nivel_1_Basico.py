@@ -4,6 +4,9 @@ import numpy as np
 import io
 from datetime import datetime
 from utils.gif_utils import display_level_gif
+from utils.level_styles import load_level_styles
+from utils.level_components import get_level_progress, create_step_card, create_info_box
+from utils.level_data import create_sample_data, analyze_uploaded_data
 
 # Page config
 st.set_page_config(
@@ -12,325 +15,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS using the new boilerplate with theme-aware colors
-st.markdown("""
-<style>
-/* ===== Global Styles ===== */
-body {
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--background-color);
-    margin: 0;
-    padding: 0;
-}
+# Load CSS styling for level pages
+st.markdown(load_level_styles(), unsafe_allow_html=True)
 
-/* Headings */
-h1, h2, h3, h4, h5 {
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text-color);
-}
-
-/* Paragraphs and text */
-p {
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-/* ===== Separator Styles ===== */
-.separator-thin {
-    margin: 1rem 0;
-    border: none;
-    height: 2px;
-    background: var(--text-color);
-    opacity: 0.3;
-    border-radius: 1px;
-}
-
-.separator-gradient {
-    margin: 1rem 0;
-    border: none;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--text-color), transparent);
-    opacity: 0.3;
-    border-radius: 1px;
-}
-
-.separator-colorful {
-    margin: 1rem 0;
-    border: none;
-    height: 3px;
-    background: linear-gradient(90deg, #ff6b6b, #4facfe);
-    border-radius: 2px;
-}
-
-.separator-dotted {
-    margin: 1rem 0;
-    border: none;
-    height: 2px;
-    background: repeating-linear-gradient(
-        90deg,
-        var(--text-color) 0px,
-        var(--text-color) 4px,
-        transparent 4px,
-        transparent 12px
-    );
-    opacity: 0.3;
-    border-radius: 1px;
-}
-
-/* ===== Containers ===== */
-.section {
-    padding: 1.5rem;
-    margin: 1rem 0;
-    border-radius: 10px;
-    background-color: rgba(128, 128, 128, 0.05);
-    border: 1px solid rgba(128, 128, 128, 0.2);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Cards */
-.card {
-    border-radius: 12px;
-    padding: 1rem;
-    background-color: rgba(128, 128, 128, 0.05);
-    border: 1px solid rgba(128, 128, 128, 0.2);
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Lists */
-ul, ol {
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-li {
-    color: var(--text-color);
-}
-
-/* Emojis inline with text */
-.emoji {
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 1.75rem;
-    }
-    h2 {
-        font-size: 1.5rem;
-    }
-    .section {
-        padding: 1rem;
-    }
-}
-
-/* Custom progress bar styling */
-.progress-container {
-    background-color: rgba(128, 128, 128, 0.1);
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    border-radius: 10px;
-    padding: 1rem;
-    margin: 1rem 0;
-}
-
-/* Step cards */
-.step-card {
-    background-color: rgba(128, 128, 128, 0.05);
-    border: 1px solid rgba(128, 128, 128, 0.2);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.step-card h3,
-.step-card h4,
-.step-card p,
-.step-card ul,
-.step-card ol,
-.step-card li {
-    color: var(--text-color) !important;
-}
-
-.step-number {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-/* Info boxes */
-.info-box {
-    background-color: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 0;
-}
-
-.info-box h3,
-.info-box p,
-.info-box ul,
-.info-box ol,
-.info-box li {
-    color: var(--text-color) !important;
-}
-
-.warning-box {
-    background-color: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 0;
-}
-
-.warning-box h3,
-.warning-box p,
-.warning-box ul,
-.warning-box ol,
-.warning-box li {
-    color: var(--text-color) !important;
-}
-
-.success-box {
-    background-color: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 0;
-}
-
-.success-box h3,
-.success-box p,
-.success-box ul,
-.success-box ol,
-.success-box li {
-    color: var(--text-color) !important;
-}
-
-/* Ensure all text in cards is readable */
-.card h3,
-.card p,
-.card ul,
-.card ol,
-.card li {
-    color: var(--text-color) !important;
-}
-
-/* Dark mode specific adjustments */
-@media (prefers-color-scheme: dark) {
-    .step-card,
-    .card,
-    .section {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .progress-container {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-}
-
-/* Light mode specific adjustments */
-@media (prefers-color-scheme: light) {
-    .step-card,
-    .card,
-    .section {
-        background-color: rgba(0, 0, 0, 0.05);
-        border-color: rgba(0, 0, 0, 0.2);
-    }
-    
-    .progress-container {
-        background-color: rgba(0, 0, 0, 0.1);
-        border-color: rgba(0, 0, 0, 0.3);
-    }
-}
-</style>
-""", unsafe_allow_html=True)
-
-def get_level_progress():
-    """Get current progress across all levels"""
-    progress = {
-        'nivel1': st.session_state.get('nivel1_completed', False),
-        'nivel2': st.session_state.get('nivel2_completed', False),
-        'nivel3': st.session_state.get('nivel3_completed', False),
-        'nivel4': st.session_state.get('nivel4_completed', False)
-    }
-    
-    completed_count = sum(progress.values())
-    total_progress = (completed_count / 4) * 100
-    
-    return total_progress, completed_count, progress
-
-def create_sample_data():
-    """Create sample data for demonstration"""
-    np.random.seed(42)
-    dates = pd.date_range('2023-01-01', '2023-12-31', freq='D')
-    n_records = len(dates)
-    
-    data = {
-        'Fecha': np.random.choice(dates, n_records//2),
-        'Categoria': np.random.choice(['Electronica', 'Ropa', 'Libros', 'Hogar'], n_records//2),
-        'Region': np.random.choice(['Norte', 'Sur', 'Este', 'Oeste'], n_records//2),
-        'Ventas': np.random.normal(1000, 300, n_records//2).round(2),
-        'Cantidad': np.random.poisson(5, n_records//2),
-        'Calificacion': np.random.choice([1, 2, 3, 4, 5], n_records//2, p=[0.05, 0.1, 0.15, 0.4, 0.3])
-    }
-    
-    df = pd.DataFrame(data)
-    df['Fecha'] = pd.to_datetime(df['Fecha'])
-    df['Ingresos'] = df['Ventas'] * df['Cantidad']
-    
-    return df.sort_values('Fecha').reset_index(drop=True)
-
-def create_step_card(step_number, title, description, sections=None):
-    """Create a step card with proper HTML structure"""
-    html_content = f"""
-    <div class="step-card">
-        <div class="step-number">{step_number}</div>
-        <h3>{title}</h3>
-        <p>{description}</p>
-    """
-    
-    if sections:
-        for section_title, items in sections.items():
-            html_content += f"<h4>{section_title}</h4>"
-            if isinstance(items, list):
-                html_content += "<ul>"
-                for item in items:
-                    html_content += f"<li>{item}</li>"
-                html_content += "</ul>"
-            else:
-                html_content += f"<ol>"
-                for i, item in enumerate(items, 1):
-                    html_content += f"<li>{item}</li>"
-                html_content += "</ol>"
-    
-    html_content += "</div>"
-    st.markdown(html_content, unsafe_allow_html=True)
-
-def create_info_box(box_type, title, content):
-    """Create info boxes with different styles"""
-    html_content = f"""
-    <div class="{box_type}">
-        <h3>{title}</h3>
-        {content}
-    </div>
-    """
-    st.markdown(html_content, unsafe_allow_html=True)
+# Helper functions are now imported from utils.level_components and utils.level_data
 
 def main():
     # 1. Title (level name and description)
@@ -549,10 +237,11 @@ def main():
                 st.metric("Total de registros", len(df_uploaded))
                 st.metric("Columnas", len(df_uploaded.columns))
                 
-                # Calculate data types
-                numeric_cols = df_uploaded.select_dtypes(include=[np.number]).columns.tolist()
-                text_cols = df_uploaded.select_dtypes(include=['object']).columns.tolist()
-                date_cols = df_uploaded.select_dtypes(include=['datetime64']).columns.tolist()
+                # Calculate data types using utility function
+                analysis = analyze_uploaded_data(df_uploaded)
+                numeric_cols = analysis['numeric_cols']
+                text_cols = analysis['text_cols']
+                date_cols = analysis['date_cols']
                 
                 st.metric("Columnas numéricas", len(numeric_cols))
                 st.metric("Columnas de texto", len(text_cols))
@@ -583,22 +272,16 @@ def main():
             with col2:
                 st.markdown("**📚 Análisis de calidad:**")
                 
-                # Check for missing values
-                missing_data = df_uploaded.isnull().sum()
-                total_missing = missing_data.sum()
-                missing_percentage = (total_missing / (len(df_uploaded) * len(df_uploaded.columns))) * 100
-                
-                if total_missing == 0:
+                # Check for missing values and duplicates using utility function
+                if analysis['total_missing'] == 0:
                     st.markdown("✅ **Sin datos faltantes** - Excelente calidad")
                 else:
-                    st.markdown(f"⚠️ **Datos faltantes**: {total_missing} valores ({missing_percentage:.1f}%)")
+                    st.markdown(f"⚠️ **Datos faltantes**: {analysis['total_missing']} valores ({analysis['missing_percentage']:.1f}%)")
                 
-                # Check for duplicate rows
-                duplicates = df_uploaded.duplicated().sum()
-                if duplicates == 0:
+                if analysis['duplicates'] == 0:
                     st.markdown("✅ **Sin filas duplicadas** - Datos únicos")
                 else:
-                    st.markdown(f"⚠️ **Filas duplicadas**: {duplicates} registros")
+                    st.markdown(f"⚠️ **Filas duplicadas**: {analysis['duplicates']} registros")
                 
                 # Data range info
                 if numeric_cols:
