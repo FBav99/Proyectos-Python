@@ -1,0 +1,306 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from utils.ui import display_error
+
+def display_metric(config, df):
+    """Display a metric component"""
+    metric_type = config.get('metric_type', 'count')
+    column = config.get('column')
+    
+    try:
+        if metric_type == 'count':
+            value = len(df)
+            label = "Total de Registros"
+        elif metric_type in ['sum', 'mean', 'median', 'min', 'max']:
+            if not column:
+                st.error("Selecciona una columna para la métrica")
+                return
+            
+            if metric_type == 'sum':
+                value = df[column].sum()
+                label = f"Suma de {column}"
+            elif metric_type == 'mean':
+                value = df[column].mean()
+                label = f"Promedio de {column}"
+            elif metric_type == 'median':
+                value = df[column].median()
+                label = f"Mediana de {column}"
+            elif metric_type == 'min':
+                value = df[column].min()
+                label = f"Mínimo de {column}"
+            elif metric_type == 'max':
+                value = df[column].max()
+                label = f"Máximo de {column}"
+        else:
+            st.error(f"Tipo de métrica no válido: {metric_type}")
+            return
+        
+        # Format the value based on type
+        if isinstance(value, (int, np.integer)):
+            formatted_value = f"{value:,}"
+        elif isinstance(value, (float, np.floating)):
+            formatted_value = f"{value:,.2f}"
+        else:
+            formatted_value = str(value)
+        
+        st.metric(label, formatted_value)
+        
+    except Exception as e:
+        display_error(e, "Calculando métrica")
+
+def display_line_chart(config, df):
+    """Display a line chart"""
+    x_col = config.get('x_column')
+    y_col = config.get('y_column')
+    color_col = config.get('color_column')
+    
+    if not x_col or not y_col:
+        st.error("Selecciona columnas X e Y para el gráfico")
+        return
+    
+    try:
+        if color_col:
+            fig = px.line(df, x=x_col, y=y_col, color=color_col, title=config.get('title', 'Gráfico de Líneas'))
+        else:
+            fig = px.line(df, x=x_col, y=y_col, title=config.get('title', 'Gráfico de Líneas'))
+        
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando gráfico de líneas")
+
+def display_bar_chart(config, df):
+    """Display a bar chart"""
+    x_col = config.get('x_column')
+    y_col = config.get('y_column')
+    orientation = config.get('orientation', 'vertical')
+    
+    if not x_col or not y_col:
+        st.error("Selecciona columnas X e Y para el gráfico")
+        return
+    
+    try:
+        if orientation == 'horizontal':
+            fig = px.bar(df, y=x_col, x=y_col, title=config.get('title', 'Gráfico de Barras'))
+        else:
+            fig = px.bar(df, x=x_col, y=y_col, title=config.get('title', 'Gráfico de Barras'))
+        
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando gráfico de barras")
+
+def display_pie_chart(config, df):
+    """Display a pie chart"""
+    values_col = config.get('values_column')
+    names_col = config.get('names_column')
+    
+    if not values_col or not names_col:
+        st.error("Selecciona columnas de valores y nombres para el gráfico")
+        return
+    
+    try:
+        # Aggregate data for pie chart
+        pie_data = df.groupby(names_col)[values_col].sum().reset_index()
+        fig = px.pie(pie_data, values=values_col, names=names_col, title=config.get('title', 'Gráfico Circular'))
+        
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando gráfico circular")
+
+def display_area_chart(config, df):
+    """Display an area chart"""
+    x_col = config.get('x_column')
+    y_col = config.get('y_column')
+    color_col = config.get('color_column')
+    
+    if not x_col or not y_col:
+        st.error("Selecciona columnas X e Y para el gráfico")
+        return
+    
+    try:
+        if color_col:
+            fig = px.area(df, x=x_col, y=y_col, color=color_col, title=config.get('title', 'Gráfico de Área'))
+        else:
+            fig = px.area(df, x=x_col, y=y_col, title=config.get('title', 'Gráfico de Área'))
+        
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando gráfico de área")
+
+def display_scatter_plot(config, df):
+    """Display a scatter plot"""
+    x_col = config.get('x_column')
+    y_col = config.get('y_column')
+    color_col = config.get('color_column')
+    
+    if not x_col or not y_col:
+        st.error("Selecciona columnas X e Y para el gráfico")
+        return
+    
+    try:
+        if color_col:
+            fig = px.scatter(df, x=x_col, y=y_col, color=color_col, title=config.get('title', 'Gráfico de Dispersión'))
+        else:
+            fig = px.scatter(df, x=x_col, y=y_col, title=config.get('title', 'Gráfico de Dispersión'))
+        
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando gráfico de dispersión")
+
+def display_histogram(config, df):
+    """Display a histogram"""
+    column = config.get('column')
+    bins = config.get('bins', 20)
+    
+    if not column:
+        st.error("Selecciona una columna para el histograma")
+        return
+    
+    try:
+        fig = px.histogram(df, x=column, nbins=bins, title=config.get('title', 'Histograma'))
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando histograma")
+
+def display_box_plot(config, df):
+    """Display a box plot"""
+    x_col = config.get('x_column')
+    y_col = config.get('y_column')
+    
+    if not x_col or not y_col:
+        st.error("Selecciona columnas X e Y para el gráfico")
+        return
+    
+    try:
+        fig = px.box(df, x=x_col, y=y_col, title=config.get('title', 'Box Plot'))
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando box plot")
+
+def display_violin_plot(config, df):
+    """Display a violin plot"""
+    x_col = config.get('x_column')
+    y_col = config.get('y_column')
+    
+    if not x_col or not y_col:
+        st.error("Selecciona columnas X e Y para el gráfico")
+        return
+    
+    try:
+        fig = px.violin(df, x=x_col, y=y_col, title=config.get('title', 'Gráfico de Violín'))
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando gráfico de violín")
+
+def display_correlation_matrix(config, df):
+    """Display correlation matrix"""
+    columns = config.get('columns', [])
+    
+    if len(columns) < 2:
+        st.error("Selecciona al menos 2 columnas numéricas para la matriz de correlación")
+        return
+    
+    try:
+        corr_matrix = df[columns].corr()
+        fig = px.imshow(
+            corr_matrix,
+            text_auto=True,
+            aspect="auto",
+            title=config.get('title', 'Matriz de Correlación')
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        display_error(e, "Creando matriz de correlación")
+
+def display_data_table(config, df):
+    """Display a data table"""
+    columns = config.get('columns', df.columns.tolist())
+    rows = config.get('rows', min(20, len(df)))
+    
+    if not columns:
+        st.error("Selecciona columnas para la tabla")
+        return
+    
+    try:
+        # Filter columns and rows
+        table_df = df[columns].head(rows)
+        st.dataframe(table_df, use_container_width=True)
+        
+        # Show summary
+        st.caption(f"Mostrando {len(table_df)} de {len(df)} filas")
+    except Exception as e:
+        display_error(e, "Mostrando tabla de datos")
+
+def render_component(component, df):
+    """Render a dashboard component based on its type"""
+    component_type = component['type']
+    config = component['config']
+    
+    # Add component header
+    st.markdown(f"### {component.get('title', component_type)}")
+    
+    # Render based on component type
+    if component_type == "📈 Métricas":
+        display_metric(config, df)
+    
+    elif component_type == "📊 Gráfico de Líneas":
+        display_line_chart(config, df)
+    
+    elif component_type == "📋 Gráfico de Barras":
+        display_bar_chart(config, df)
+    
+    elif component_type == "🥧 Gráfico Circular":
+        display_pie_chart(config, df)
+    
+    elif component_type == "📈 Gráfico de Área":
+        display_area_chart(config, df)
+    
+    elif component_type == "📈 Gráfico de Dispersión":
+        display_scatter_plot(config, df)
+    
+    elif component_type == "📊 Histograma":
+        display_histogram(config, df)
+    
+    elif component_type == "📊 Box Plot":
+        display_box_plot(config, df)
+    
+    elif component_type == "📈 Gráfico de Violín":
+        display_violin_plot(config, df)
+    
+    elif component_type == "📊 Matriz de Correlación":
+        display_correlation_matrix(config, df)
+    
+    elif component_type == "📋 Tabla de Datos":
+        display_data_table(config, df)
+    
+    else:
+        st.warning(f"Tipo de componente no reconocido: {component_type}")
+    
+    # Add component controls
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("⚙️ Configurar", key=f"config_{component['id']}", use_container_width=True):
+            st.session_state.editing_component = component['id']
+            st.rerun()
+    
+    with col2:
+        if st.button("🗑️ Eliminar", key=f"delete_{component['id']}", use_container_width=True):
+            st.session_state.dashboard_components = [
+                c for c in st.session_state.dashboard_components if c['id'] != component['id']
+            ]
+            st.rerun()
+
+def render_dashboard(df):
+    """Render the complete dashboard"""
+    if not st.session_state.dashboard_components:
+        st.info("🎨 No hay componentes en tu dashboard. Usa la barra lateral para agregar componentes.")
+        return
+    
+    # Render each component
+    for component in st.session_state.dashboard_components:
+        render_component(component, df)
+        st.markdown("---")

@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from utils.export import export_data, get_csv_data, create_summary_report
+from utils.system import export_data, get_csv_data, create_summary_report
 
 def create_sidebar_controls():
     """Crear controles de la barra lateral"""
@@ -116,38 +116,76 @@ def create_custom_calculations_ui(df):
     return custom_calculations
 
 def display_metrics_dashboard(metrics, df):
-    """Mostrar panel de métricas clave"""
+    """Mostrar panel de métricas clave de forma flexible"""
     st.subheader("🎯 Métricas Clave de Rendimiento")
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Determinar cuántas columnas usar basado en las métricas disponibles
+    available_metrics = []
     
-    with col1:
-        st.metric(
-            "💰 Ingresos Totales",
-            f"${metrics['total_revenue']:,.2f}",
-            delta=f"{metrics['profit_margin']:.1f}% margen"
-        )
+    # Métricas básicas que siempre están disponibles
+    if 'total_records' in metrics:
+        available_metrics.append(('📊 Total Registros', f"{metrics['total_records']:,}", None))
     
-    with col2:
-        st.metric(
-            "📈 Pedidos Totales",
-            f"{metrics['total_orders']:,}",
-            delta=f"${metrics['avg_order_value']:.2f} promedio"
-        )
+    if 'total_columns' in metrics:
+        available_metrics.append(('📋 Total Columnas', f"{metrics['total_columns']}", None))
     
-    with col3:
-        st.metric(
-            "💵 Ganancia Total",
-            f"${metrics['total_profit']:,.2f}",
-            delta=f"{metrics['profit_margin']:.1f}% margen"
-        )
+    # Métricas numéricas
+    if 'total_value' in metrics:
+        available_metrics.append(('💰 Valor Total', f"{metrics['total_value']:,.2f}", None))
     
-    with col4:
-        st.metric(
-            "⭐ Calificación Promedio",
-            f"{metrics['avg_rating']:.2f}/5.0",
-            delta=f"{len(df[df['Rating'] >= 4])} clientes satisfechos"
-        )
+    if 'avg_value' in metrics:
+        available_metrics.append(('📈 Promedio', f"{metrics['avg_value']:,.2f}", None))
+    
+    if 'max_value' in metrics:
+        available_metrics.append(('📊 Valor Máximo', f"{metrics['max_value']:,.2f}", None))
+    
+    if 'min_value' in metrics:
+        available_metrics.append(('📉 Valor Mínimo', f"{metrics['min_value']:,.2f}", None))
+    
+    # Métricas categóricas
+    if 'unique_categories' in metrics:
+        available_metrics.append(('🏷️ Categorías Únicas', f"{metrics['unique_categories']}", None))
+    
+    # Métricas de fechas
+    if 'date_range_days' in metrics:
+        available_metrics.append(('📅 Rango de Días', f"{metrics['date_range_days']} días", None))
+    
+    # Métricas adicionales
+    if 'total_value_2' in metrics:
+        available_metrics.append(('💰 Valor Total 2', f"{metrics['total_value_2']:,.2f}", None))
+    
+    if 'avg_value_2' in metrics:
+        available_metrics.append(('📈 Promedio 2', f"{metrics['avg_value_2']:,.2f}", None))
+    
+    # Mostrar métricas en columnas
+    if len(available_metrics) >= 4:
+        cols = st.columns(4)
+        for i, (title, value, delta) in enumerate(available_metrics[:4]):
+            with cols[i]:
+                st.metric(title, value, delta=delta)
+    elif len(available_metrics) >= 2:
+        cols = st.columns(2)
+        for i, (title, value, delta) in enumerate(available_metrics[:2]):
+            with cols[i]:
+                st.metric(title, value, delta=delta)
+    else:
+        # Si solo hay una métrica, mostrarla centrada
+        for title, value, delta in available_metrics:
+            st.metric(title, value, delta=delta)
+    
+    # Si no hay métricas disponibles, mostrar información básica
+    if not available_metrics:
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("📊 Registros", f"{len(df):,}")
+        with col2:
+            st.metric("📋 Columnas", len(df.columns))
+        with col3:
+            numeric_cols = df.select_dtypes(include=[np.number]).columns
+            st.metric("🔢 Numéricas", len(numeric_cols))
+        with col4:
+            categorical_cols = df.select_dtypes(include=['object']).columns
+            st.metric("🏷️ Categóricas", len(categorical_cols))
 
 def display_custom_calculations_metrics(df, custom_calculations):
     """Mostrar métricas de cálculos personalizados"""

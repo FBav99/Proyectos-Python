@@ -1,9 +1,27 @@
 import streamlit as st
-import yaml
-from yaml.loader import SafeLoader
-import os
-from core.auth_config import init_authentication, load_auth_config
-from core.security import security_manager, secure_user_registration
+import re
+from core.auth_service import auth_service
+
+def validate_email(email):
+    """Validate email format"""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validate_password(password):
+    """Validate password strength"""
+    if len(password) < 8:
+        return False, "La contraseña debe tener al menos 8 caracteres"
+    
+    if not re.search(r'[A-Z]', password):
+        return False, "La contraseña debe contener al menos una letra mayúscula"
+    
+    if not re.search(r'[a-z]', password):
+        return False, "La contraseña debe contener al menos una letra minúscula"
+    
+    if not re.search(r'\d', password):
+        return False, "La contraseña debe contener al menos un número"
+    
+    return True, "Contraseña válida"
 
 def main():
     """Página de registro de usuarios"""
@@ -20,59 +38,107 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize authentication
-    authenticator = init_authentication()
-    
     # Create registration form
     st.markdown("### 🔐 Crear Nueva Cuenta")
     
-    try:
-        # Use the register_user method from Streamlit-Authenticator
-        email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(
-            location='main',
-            fields={
-                'Form name': 'Registro de Usuario',
-                'First name': 'Nombre',
-                'Last name': 'Apellido',
-                'Email': 'Correo Electrónico',
-                'Username': 'Nombre de Usuario',
-                'Password': 'Contraseña',
-                'Repeat password': 'Repetir Contraseña',
-                'Register': 'Registrarse'
-            },
-            captcha=True,  # Enable CAPTCHA for security
-            clear_on_submit=True
-        )
+    with st.form("registration_form", clear_on_submit=True):
+        col1, col2 = st.columns(2)
         
-        if email_of_registered_user:
-            st.success('✅ Usuario registrado exitosamente!')
-            st.info(f'📧 Email: {email_of_registered_user}')
-            st.info(f'👤 Usuario: {username_of_registered_user}')
-            st.info(f'👨‍💼 Nombre: {name_of_registered_user}')
+        with col1:
+            first_name = st.text_input("Nombre", placeholder="Tu nombre")
+            email = st.text_input("Correo Electrónico", placeholder="tu@email.com")
+            username = st.text_input("Nombre de Usuario", placeholder="usuario123")
+        
+        with col2:
+            last_name = st.text_input("Apellido", placeholder="Tu apellido")
+            password = st.text_input("Contraseña", type="password", placeholder="••••••••")
+            confirm_password = st.text_input("Confirmar Contraseña", type="password", placeholder="••••••••")
+        
+        # Password strength indicator
+        if password:
+            is_valid, message = validate_password(password)
+            if is_valid:
+                st.success(f"✅ {message}")
+            else:
+                st.error(f"❌ {message}")
+        
+        # Email validation
+        if email and not validate_email(email):
+            st.error("❌ Formato de email inválido")
+        
+        # Username validation
+        if username:
+            if len(username) < 3:
+                st.error("❌ El nombre de usuario debe tener al menos 3 caracteres")
+            elif not username.isalnum():
+                st.error("❌ El nombre de usuario solo puede contener letras y números")
+        
+        submitted = st.form_submit_button("📝 Registrarse", type="primary", use_container_width=True)
+        
+        if submitted:
+            # Validate all fields
+            if not all([first_name, last_name, email, username, password, confirm_password]):
+                st.error("❌ Todos los campos son obligatorios")
+                return
             
-            # Update the config file
-            config = load_auth_config()
-            with open('config/config.yaml', 'w') as file:
-                yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
+            if not validate_email(email):
+                st.error("❌ Formato de email inválido")
+                return
             
-            st.markdown("---")
-            st.markdown("### 🎉 ¡Registro Completado!")
-            st.markdown("""
-            Tu cuenta ha sido creada exitosamente. Ahora puedes:
+            is_valid, message = validate_password(password)
+            if not is_valid:
+                st.error(f"❌ {message}")
+                return
             
-            - 🔐 **Iniciar sesión** con tu nuevo usuario y contraseña
-            - 📚 **Acceder a todos los niveles** de aprendizaje
-            - 📊 **Crear dashboards** personalizados
-            - 💾 **Guardar tu progreso** automáticamente
-            """)
+            if password != confirm_password:
+                st.error("❌ Las contraseñas no coinciden")
+                return
             
-            col1, col2, col3 = st.columns(3)
-            with col2:
-                if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
-                    st.switch_page("Inicio.py")
+            if len(username) < 3:
+                st.error("❌ El nombre de usuario debe tener al menos 3 caracteres")
+                return
+            
+            if not username.isalnum():
+                st.error("❌ El nombre de usuario solo puede contener letras y números")
+                return
+            
+            # Attempt registration
+            try:
+                success, message = auth_service.register_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+                
+                if success:
+                    st.success('✅ Usuario registrado exitosamente!')
+                    st.info(f'📧 Email: {email}')
+                    st.info(f'👤 Usuario: {username}')
+                    st.info(f'👨‍💼 Nombre: {first_name} {last_name}')
                     
-    except Exception as e:
-        st.error(f'❌ Error durante el registro: {str(e)}')
+                    st.markdown("---")
+                    st.markdown("### 🎉 ¡Registro Completado!")
+                    st.markdown("""
+                    Tu cuenta ha sido creada exitosamente. Ahora puedes:
+                    
+                    - 🔐 **Iniciar sesión** con tu nuevo usuario y contraseña
+                    - 📚 **Acceder a todos los niveles** de aprendizaje
+                    - 📊 **Crear dashboards** personalizados
+                    - 💾 **Guardar tu progreso** automáticamente
+                    """)
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col2:
+                        if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
+                            st.switch_page("Inicio.py")
+                else:
+                    st.error(f'❌ Error durante el registro: {message}')
+                    
+            except Exception as e:
+                st.error(f'❌ Error durante el registro: {str(e)}')
+                # The error is already sanitized by auth_service
     
     # Navigation
     st.markdown("---")

@@ -2,609 +2,398 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from utils.system import display_level_gif
+from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
+from utils.learning.learning_progress import save_level_progress
 
 # Page config
 st.set_page_config(
-    page_title="Nivel 3: Métricas - KPIs y Análisis",
+    page_title="Nivel 3: Métricas - Análisis de Datos",
     page_icon="📊",
     layout="wide"
 )
 
-# Custom CSS for better styling
-st.markdown("""
-<style>
-    .level-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    .step-box {
-        background: linear-gradient(90deg, #f0f2f6, #ffffff);
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 4px solid #28a745;
-        margin: 1rem 0;
-    }
-    .warning-box {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-    .success-box {
-        background: #d4edda;
-        border: 1px solid #c3e6cb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-    .metric-demo {
-        background: #e8f5e8;
-        border: 1px solid #c8e6c9;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-    .kpi-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 0.5rem 0;
-        text-align: center;
-    }
-    .completion-checkbox {
-        background: #e8f5e8;
-        border: 2px solid #28a745;
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Load CSS styling for level pages
+st.markdown(load_level_styles(), unsafe_allow_html=True)
 
-def get_level_progress():
-    """Get current progress across all levels"""
-    progress = {
-        'nivel1': st.session_state.get('nivel1_completed', False),
-        'nivel2': st.session_state.get('nivel2_completed', False),
-        'nivel3': st.session_state.get('nivel3_completed', False),
-        'nivel4': st.session_state.get('nivel4_completed', False)
-    }
-    
-    completed_count = sum(progress.values())
-    total_progress = (completed_count / 4) * 100
-    
-    return total_progress, completed_count, progress
-
-def create_sample_data():
-    """Create sample data for demonstration"""
-    np.random.seed(42)
-    dates = pd.date_range('2023-01-01', '2023-12-31', freq='D')
-    n_records = len(dates)
-    
-    data = {
-        'Fecha': np.random.choice(dates, n_records//2),
-        'Categoria': np.random.choice(['Electronica', 'Ropa', 'Libros', 'Hogar', 'Deportes'], n_records//2),
-        'Region': np.random.choice(['Norte', 'Sur', 'Este', 'Oeste', 'Central'], n_records//2),
-        'Ventas': np.random.normal(1000, 300, n_records//2).round(2),
-        'Cantidad': np.random.poisson(5, n_records//2),
-        'Calificacion': np.random.choice([1, 2, 3, 4, 5], n_records//2, p=[0.05, 0.1, 0.15, 0.4, 0.3])
-    }
-    
-    df = pd.DataFrame(data)
-    df['Fecha'] = pd.to_datetime(df['Fecha'])
-    df['Ingresos'] = df['Ventas'] * df['Cantidad']
-    df['Margen_Ganancia'] = np.random.uniform(0.1, 0.4, len(df))
-    df['Ganancia'] = df['Ingresos'] * df['Margen_Ganancia']
-    
-    return df.sort_values('Fecha').reset_index(drop=True)
-
-def calculate_basic_metrics(df):
-    """Calculate basic business metrics"""
-    metrics = {
-        'total_ingresos': df['Ingresos'].sum(),
-        'total_ventas': df['Ventas'].sum(),
-        'total_cantidad': df['Cantidad'].sum(),
-        'total_ganancia': df['Ganancia'].sum(),
-        'promedio_ingresos': df['Ingresos'].mean(),
-        'promedio_ventas': df['Ventas'].mean(),
-        'promedio_calificacion': df['Calificacion'].mean(),
-        'total_transacciones': len(df),
-        'margen_ganancia': (df['Ganancia'].sum() / df['Ingresos'].sum() * 100) if df['Ingresos'].sum() > 0 else 0
-    }
-    return metrics
+# Helper functions are now imported from utils.level_components and utils.level_data
 
 def main():
-    # Header
-    st.markdown('<h1 class="level-header">📊 Nivel 3: Métricas</h1>', unsafe_allow_html=True)
-    st.markdown('<h2 style="text-align: center; color: #666;">KPIs y Análisis de Rendimiento</h2>', unsafe_allow_html=True)
+    # Check if user is authenticated
+    if 'user' not in st.session_state or not st.session_state.get('authenticated'):
+        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
     
-    # Dynamic Progress indicator
-    total_progress, completed_count, progress = get_level_progress()
+    # Get current user
+    user = st.session_state.get('user')
+    if not user or 'id' not in user:
+        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
     
+    # 1. Title (level name and description)
+    st.title("📊 Nivel 3: Métricas")
+    st.subheader("KPIs y Análisis de Rendimiento")
+    
+    # 2. Progress Bar (showing progress across levels)
+    total_progress, completed_count, progress = get_level_progress(user['id'])
+    
+    st.markdown('<div class="progress-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso: {total_progress:.0f}% - {completed_count} de 4 niveles completados")
-        
-        # Show completion status for each level
-        st.markdown("**Estado de Niveles:**")
-        col_a, col_b, col_c, col_d = st.columns(4)
-        with col_a:
-            status = "✅" if progress['nivel1'] else "⏳"
-            st.markdown(f"{status} Nivel 1")
-        with col_b:
-            status = "✅" if progress['nivel2'] else "⏳"
-            st.markdown(f"{status} Nivel 2")
-        with col_c:
-            status = "✅" if progress['nivel3'] else "⏳"
-            st.markdown(f"{status} Nivel 3")
-        with col_d:
-            status = "✅" if progress['nivel4'] else "⏳"
-            st.markdown(f"{status} Nivel 4")
-    
-    # Level Completion Checkbox - At the top
-    st.markdown('<div class="completion-checkbox">', unsafe_allow_html=True)
-    st.markdown("## 🎯 Marcar Nivel como Completado")
-    
-    # Check if this is the first time completing the level
-    was_completed = st.session_state.get('nivel3_completed', False)
-    
-    if st.checkbox("✅ Click aquí para marcar este nivel como Completado", 
-                  value=was_completed,
-                  key='nivel3_completion_checkbox'):
-        # Only show balloons if this is the first time completing
-        if not was_completed:
-            st.balloons()
-            st.success("🎉 ¡Felicidades! Has completado el Nivel 3. ¡Continúa con el siguiente nivel!")
-        st.session_state['nivel3_completed'] = True
-    else:
-        st.session_state['nivel3_completed'] = False
-    
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    st.divider()
+    # Verificar que los niveles anteriores estén completados
+    if not progress['nivel1'] or not progress['nivel2']:
+        st.warning("⚠️ Primero debes completar los Niveles 1 y 2 antes de continuar con este nivel.")
+        if st.button("Ir al Nivel 1", type="primary"):
+            st.switch_page("pages/01_Nivel_1_Basico.py")
+        return
     
-    # Introduction
+    # 3. Introduction Section (what the user will learn)
+    st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
-    ## 🎯 Objetivo de este Nivel
-    
-    En este nivel aprenderás a:
-    - Entender qué son las métricas y KPIs
-    - Interpretar métricas clave de negocio
-    - Analizar tendencias y patrones
-    - Usar métricas para tomar decisiones
-    - Crear dashboards de rendimiento
+    En este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y 
+    cómo usarlas para tomar mejores decisiones basadas en datos.
     """)
     
-    # Load sample data
+    # 4. Steps Section (clear, actionable instructions)
+    st.header("📋 Pasos para Entender Métricas y KPIs")
+    
+    # Step 1
+    create_step_card(
+        step_number="1",
+        title="Entender qué son las métricas y KPIs",
+        description="<strong>¿Qué son las métricas?</strong> Las métricas son números que te dicen algo importante sobre tu negocio o actividad. Son como 'termómetros' que miden el estado de las cosas.",
+        sections={
+            "📊 Tipos de métricas:": [
+                "<strong>Métricas de cantidad:</strong> Cuántos productos vendiste, cuántos clientes tienes",
+                "<strong>Métricas de dinero:</strong> Cuánto dinero ganaste, cuánto gastaste",
+                "<strong>Métricas de tiempo:</strong> Cuánto tiempo tardas en hacer algo",
+                "<strong>Métricas de calidad:</strong> Qué tan bien funciona algo, qué tan satisfechos están los clientes"
+            ],
+            "🎯 ¿Qué son los KPIs?": [
+                "<strong>KPI</strong> significa 'Indicador Clave de Rendimiento'. Son las métricas más importantes que te ayudan a saber si tu negocio va bien o mal."
+            ],
+            "✅ Ejemplos de KPIs comunes:": [
+                "<strong>Ventas totales:</strong> Cuánto dinero generaste en total",
+                "<strong>Número de clientes:</strong> Cuántas personas compran de ti",
+                "<strong>Satisfacción del cliente:</strong> Qué tan contentos están con tu servicio",
+                "<strong>Tiempo de entrega:</strong> Cuánto tardas en entregar un producto"
+            ]
+        }
+    )
+    
+    # Step 2
+    create_step_card(
+        step_number="2",
+        title="Identificar métricas clave para tu negocio",
+        description="<strong>¿Por qué es importante?</strong> No todas las métricas son igual de importantes. Necesitas enfocarte en las que realmente importan para tu objetivo.",
+        sections={
+            "🔍 Cómo identificar métricas clave:": [
+                "Pregúntate: ¿Qué quiero lograr?",
+                "Identifica qué números te dirán si lo estás logrando",
+                "Elige 3-5 métricas principales para enfocarte",
+                "Evita medir todo, enfócate en lo importante"
+            ],
+            "💡 Ejemplos por tipo de negocio:": [
+                "<strong>Tienda online:</strong> Ventas, visitantes, tasa de conversión",
+                "<strong>Servicio de consultoría:</strong> Horas facturables, satisfacción del cliente, proyectos completados",
+                "<strong>Restaurante:</strong> Ventas por mesa, tiempo de espera, calificaciones de clientes"
+            ]
+        }
+    )
+    
+    # Step 3
+    create_step_card(
+        step_number="3",
+        title="Interpretar y analizar métricas",
+        description="<strong>¿Qué significa interpretar?</strong> No solo ver los números, sino entender qué te están diciendo y qué acciones tomar.",
+        sections={
+            "📈 Tipos de análisis:": [
+                "<strong>Análisis de tendencias:</strong> ¿Los números van subiendo o bajando?",
+                "<strong>Comparaciones:</strong> ¿Cómo se comparan con el mes pasado o el año anterior?",
+                "<strong>Análisis de patrones:</strong> ¿Hay patrones que se repiten?",
+                "<strong>Análisis de correlación:</strong> ¿Cuando una cosa sube, otra también sube?"
+            ],
+            "✅ Preguntas clave para interpretar:": [
+                "¿Este número es bueno o malo?",
+                "¿Por qué cambió este número?",
+                "¿Qué puedo hacer para mejorarlo?",
+                "¿Qué consecuencias tiene este cambio?"
+            ]
+        }
+    )
+    
+    # Step 4
+    create_step_card(
+        step_number="4",
+        title="Usar métricas para tomar decisiones",
+        description="<strong>¿Cómo usar las métricas?</strong> Las métricas no son solo para ver, son para actuar. Te ayudan a tomar decisiones informadas.",
+        sections={
+            "🎯 Proceso de decisión basada en datos:": [
+                "Revisa las métricas regularmente",
+                "Identifica problemas o oportunidades",
+                "Genera hipótesis sobre qué está pasando",
+                "Toma acción basada en los datos",
+                "Mide el resultado de tus acciones"
+            ],
+            "⚠️ Errores comunes a evitar:": [
+                "Enfocarse solo en una métrica",
+                "No considerar el contexto",
+                "Tomar decisiones sin entender la causa",
+                "Ignorar tendencias a largo plazo"
+            ]
+        }
+    )
+    
+    # 5. Practical Example Section
+    st.header("💡 Ejemplo Práctico: Análisis de Ventas")
+    
+    # Create sample data
     df = create_sample_data()
     
-    # Step 1: Understanding Metrics
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 📈 Paso 1: ¿Qué son las Métricas?")
+    # Show data overview
+    st.subheader("📊 Datos de Ejemplo")
+    st.dataframe(df.head(10), use_container_width=True)
     
-    st.markdown("""
-    ### 🎯 Definición:
+    # Basic metrics calculation
+    st.subheader("🔢 Cálculo de Métricas Básicas")
     
-    **Métricas** son medidas numéricas que te ayudan a:
-    - **Evaluar** el rendimiento de tu negocio
-    - **Comparar** diferentes períodos o segmentos
-    - **Identificar** tendencias y patrones
-    - **Tomar decisiones** basadas en datos
-    
-    ### 🔑 Tipos de Métricas:
-    """)
-    
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown("""
-        **💰 Métricas Financieras**
-        - Ingresos totales
-        - Ganancia neta
-        - Margen de ganancia
-        - Valor promedio por transacción
-        """)
-        
-        st.markdown("""
-        **📊 Métricas Operacionales**
-        - Número de transacciones
-        - Cantidad vendida
-        - Tasa de conversión
-        - Eficiencia operativa
-        """)
+        total_sales = df['Ventas'].sum()
+        st.metric("💰 Ventas Totales", f"${total_sales:,.2f}")
     
     with col2:
-        st.markdown("""
-        **⭐ Métricas de Satisfacción**
-        - Calificación promedio
-        - NPS (Net Promoter Score)
-        - Tasa de retención
-        - Satisfacción del cliente
-        """)
-        
-        st.markdown("""
-        **📈 Métricas de Crecimiento**
-        - Crecimiento mes a mes
-        - Crecimiento año a año
-        - Tasa de expansión
-        - Adquisición de clientes
-        """)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Step 2: Key Business Metrics
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 💰 Paso 2: Métricas Clave de Negocio")
-    
-    st.markdown("""
-    ### 🎯 Las 5 Métricas Más Importantes:
-    """)
-    
-    # Calculate and display metrics
-    metrics = calculate_basic_metrics(df)
-    
-    # Display metrics in cards
-    col1, col2, col3, col4, col5 = st.columns(5)
-    
-    with col1:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h3>💰 Ingresos</h3>
-            <h2>${metrics['total_ingresos']:,.0f}</h2>
-            <p>Total de ventas</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h3>📈 Transacciones</h3>
-            <h2>{metrics['total_transacciones']:,}</h2>
-            <p>Número de ventas</p>
-        </div>
-        """, unsafe_allow_html=True)
+        avg_sales = df['Ventas'].mean()
+        st.metric("📊 Promedio de Ventas", f"${avg_sales:.2f}")
     
     with col3:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h3>💵 Ganancia</h3>
-            <h2>${metrics['total_ganancia']:,.0f}</h2>
-            <p>Beneficio neto</p>
-        </div>
-        """, unsafe_allow_html=True)
+        total_quantity = df['Cantidad'].sum()
+        st.metric("📦 Cantidad Total", f"{total_quantity:,}")
     
     with col4:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h3>📊 Margen</h3>
-            <h2>{metrics['margen_ganancia']:.1f}%</h2>
-            <p>Porcentaje de ganancia</p>
-        </div>
-        """, unsafe_allow_html=True)
+        avg_rating = df['Calificacion'].mean()
+        st.metric("⭐ Calificación Promedio", f"{avg_rating:.1f}")
     
-    with col5:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h3>⭐ Calificación</h3>
-            <h2>{metrics['promedio_calificacion']:.1f}/5</h2>
-            <p>Satisfacción promedio</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # Category analysis
+    st.subheader("🏷️ Análisis por Categoría")
+    category_sales = df.groupby('Categoria')['Ventas'].sum().sort_values(ascending=False)
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 1])
     
-    # Step 3: Interactive Metrics Demo
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🎮 Paso 3: Demostración Interactiva")
+    with col1:
+        st.bar_chart(category_sales)
+    
+    with col2:
+        st.dataframe(category_sales.reset_index().rename(columns={'Ventas': 'Ventas Totales'}), use_container_width=True)
+    
+    # Regional analysis
+    st.subheader("🌍 Análisis por Región")
+    region_sales = df.groupby('Region')['Ventas'].sum().sort_values(ascending=False)
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.bar_chart(region_sales)
+    
+    with col2:
+        st.dataframe(region_sales.reset_index().rename(columns={'Ventas': 'Ventas Totales'}), use_container_width=True)
+    
+    # 6. Interactive Practice Section
+    st.header("🎯 Práctica Interactiva")
     
     st.markdown("""
-    ### 📊 Explora las Métricas:
-    
-    Usa los filtros para ver cómo cambian las métricas:
+    Ahora es tu turno de practicar. Usa los filtros de abajo para analizar diferentes aspectos de los datos.
     """)
     
-    # Interactive filters for metrics demo
-    st.markdown('<div class="metric-demo">', unsafe_allow_html=True)
-    
+    # Filters
     col1, col2 = st.columns(2)
     
     with col1:
-        # Date filter
-        date_range = st.date_input(
-            "📅 Rango de fechas:",
-            value=(df['Fecha'].min(), df['Fecha'].max()),
-            min_value=df['Fecha'].min(),
-            max_value=df['Fecha'].max()
-        )
-        
-        # Category filter
-        categories = st.multiselect(
-            "🏷️ Categorías:",
-            options=df['Categoria'].unique(),
-            default=df['Categoria'].unique()
+        selected_category = st.selectbox(
+            "🏷️ Seleccionar Categoría",
+            ['Todas'] + list(df['Categoria'].unique())
         )
     
     with col2:
-        # Region filter
-        regions = st.multiselect(
-            "🌍 Regiones:",
-            options=df['Region'].unique(),
-            default=df['Region'].unique()
-        )
-        
-        # Rating filter
-        rating_range = st.slider(
-            "⭐ Rango de calificación:",
-            min_value=int(df['Calificacion'].min()),
-            max_value=int(df['Calificacion'].max()),
-            value=(int(df['Calificacion'].min()), int(df['Calificacion'].max())),
-            step=1
+        selected_region = st.selectbox(
+            "🌍 Seleccionar Región",
+            ['Todas'] + list(df['Region'].unique())
         )
     
     # Apply filters
     filtered_df = df.copy()
     
-    if len(date_range) == 2:
-        filtered_df = filtered_df[
-            (filtered_df['Fecha'] >= pd.to_datetime(date_range[0])) & 
-            (filtered_df['Fecha'] <= pd.to_datetime(date_range[1]))
-        ]
+    if selected_category != 'Todas':
+        filtered_df = filtered_df[filtered_df['Categoria'] == selected_category]
     
-    if categories:
-        filtered_df = filtered_df[filtered_df['Categoria'].isin(categories)]
+    if selected_region != 'Todas':
+        filtered_df = filtered_df[filtered_df['Region'] == selected_region]
     
-    if regions:
-        filtered_df = filtered_df[filtered_df['Region'].isin(regions)]
+    # Show filtered results
+    st.subheader("📊 Resultados Filtrados")
     
-    filtered_df = filtered_df[
-        (filtered_df['Calificacion'] >= rating_range[0]) & 
-        (filtered_df['Calificacion'] <= rating_range[1])
-    ]
-    
-    # Calculate filtered metrics
-    filtered_metrics = calculate_basic_metrics(filtered_df)
-    
-    # Show comparison
-    st.markdown("### 📊 Comparación de Métricas:")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric(
-            "💰 Ingresos",
-            f"${filtered_metrics['total_ingresos']:,.0f}",
-            delta=f"{((filtered_metrics['total_ingresos'] - metrics['total_ingresos']) / metrics['total_ingresos'] * 100):.1f}%"
-        )
+    if not filtered_df.empty:
+        col1, col2, col3, col4 = st.columns(4)
         
-        st.metric(
-            "📈 Transacciones",
-            f"{filtered_metrics['total_transacciones']:,}",
-            delta=f"{((filtered_metrics['total_transacciones'] - metrics['total_transacciones']) / metrics['total_transacciones'] * 100):.1f}%"
-        )
-    
-    with col2:
-        st.metric(
-            "💵 Ganancia",
-            f"${filtered_metrics['total_ganancia']:,.0f}",
-            delta=f"{((filtered_metrics['total_ganancia'] - metrics['total_ganancia']) / metrics['total_ganancia'] * 100):.1f}%"
-        )
+        with col1:
+            filtered_sales = filtered_df['Ventas'].sum()
+            st.metric("💰 Ventas Filtradas", f"${filtered_sales:,.2f}")
         
-        st.metric(
-            "📊 Margen",
-            f"{filtered_metrics['margen_ganancia']:.1f}%",
-            delta=f"{filtered_metrics['margen_ganancia'] - metrics['margen_ganancia']:.1f}%"
-        )
-    
-    with col3:
-        st.metric(
-            "⭐ Calificación",
-            f"{filtered_metrics['promedio_calificacion']:.1f}/5",
-            delta=f"{filtered_metrics['promedio_calificacion'] - metrics['promedio_calificacion']:.1f}"
-        )
+        with col2:
+            filtered_avg = filtered_df['Ventas'].mean()
+            st.metric("📊 Promedio Filtrado", f"${filtered_avg:.2f}")
         
-        st.metric(
-            "📊 Datos Filtrados",
-            f"{len(filtered_df):,}",
-            delta=f"{len(filtered_df) - len(df):,}"
-        )
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Step 4: Metrics Analysis
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🔍 Paso 4: Análisis de Métricas")
-    
-    st.markdown("""
-    ### 📈 Interpretando las Métricas:
-    """)
-    
-    # Show detailed analysis
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("#### 📊 Análisis por Categoría:")
-        cat_analysis = df.groupby('Categoria').agg({
-            'Ingresos': 'sum',
-            'Ganancia': 'sum',
-            'Calificacion': 'mean',
-            'Cantidad': 'sum'
-        }).round(2)
+        with col3:
+            filtered_count = len(filtered_df)
+            st.metric("📋 Registros", f"{filtered_count}")
         
-        # Calculate margin for each category
-        cat_analysis['Margen_%'] = (cat_analysis['Ganancia'] / cat_analysis['Ingresos'] * 100).round(1)
+        with col4:
+            filtered_rating = filtered_df['Calificacion'].mean()
+            st.metric("⭐ Calificación", f"{filtered_rating:.1f}")
         
-        st.dataframe(cat_analysis, use_container_width=True)
-    
-    with col2:
-        st.markdown("#### 🌍 Análisis por Región:")
-        region_analysis = df.groupby('Region').agg({
-            'Ingresos': 'sum',
-            'Ganancia': 'sum',
-            'Calificacion': 'mean',
-            'Cantidad': 'sum'
-        }).round(2)
+        # Show filtered data
+        st.dataframe(filtered_df, use_container_width=True)
         
-        # Calculate margin for each region
-        region_analysis['Margen_%'] = (region_analysis['Ganancia'] / region_analysis['Ingresos'] * 100).round(1)
-        
-        st.dataframe(region_analysis, use_container_width=True)
-    
-    # Insights section
-    st.markdown("#### 💡 Insights Clave:")
-    
-    # Find best performing category and region
-    best_category = cat_analysis['Ingresos'].idxmax()
-    best_region = region_analysis['Ingresos'].idxmax()
-    best_rating_category = cat_analysis['Calificacion'].idxmax()
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.success(f"🥇 **Mejor Categoría**: {best_category}")
-        st.caption(f"Ingresos: ${cat_analysis.loc[best_category, 'Ingresos']:,.0f}")
-    
-    with col2:
-        st.success(f"🌍 **Mejor Región**: {best_region}")
-        st.caption(f"Ingresos: ${region_analysis.loc[best_region, 'Ingresos']:,.0f}")
-    
-    with col3:
-        st.success(f"⭐ **Mejor Calificación**: {best_rating_category}")
-        st.caption(f"Calificación: {cat_analysis.loc[best_rating_category, 'Calificacion']:.1f}/5")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Step 5: Practice Section
-    st.markdown('<div class="step-box">', unsafe_allow_html=True)
-    st.markdown("## 🎯 Paso 5: Práctica - ¡Tu Turno!")
-    
-    st.markdown("""
-    ### 📝 Ejercicio Práctico:
-    
-    **Objetivo**: Analizar las métricas de tu negocio
-    
-    **Pasos**:
-    1. Carga tu archivo de datos
-    2. Observa las métricas principales
-    3. Aplica filtros y ve cómo cambian
-    4. Identifica insights clave
-    5. Compara diferentes segmentos
-    """)
-    
-    # File upload for practice
-    uploaded_file = st.file_uploader(
-        "📁 Sube tu archivo para practicar:",
-        type=['csv', 'xlsx', 'xls'],
-        help="Sube tu archivo para analizar tus propias métricas"
-    )
-    
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith('.csv'):
-                practice_df = pd.read_csv(uploaded_file)
-            else:
-                practice_df = pd.read_excel(uploaded_file)
-            
-            # Try to convert date columns
-            for col in practice_df.columns:
-                if 'fecha' in col.lower() or 'date' in col.lower():
-                    try:
-                        practice_df[col] = pd.to_datetime(practice_df[col])
-                    except:
-                        pass
-            
-            st.success(f"✅ Archivo cargado: {len(practice_df)} filas")
-            
-            # Show basic info about the data
-            st.markdown("### 📊 Información de tus Datos:")
-            
-            col1, col2, col3 = st.columns(3)
+        # Show filtered charts
+        if len(filtered_df) > 1:
+            col1, col2 = st.columns(2)
             
             with col1:
-                st.metric("📈 Total de Filas", len(practice_df))
-                st.metric("📋 Total de Columnas", len(practice_df.columns))
+                if 'Fecha' in filtered_df.columns:
+                    daily_sales = filtered_df.groupby(filtered_df['Fecha'].dt.date)['Ventas'].sum()
+                    st.line_chart(daily_sales)
             
             with col2:
-                numeric_cols = practice_df.select_dtypes(include=[np.number]).columns
-                st.metric("🔢 Columnas Numéricas", len(numeric_cols))
-                st.metric("📅 Columnas de Fecha", len(practice_df.select_dtypes(include=['datetime64']).columns))
-            
-            with col3:
-                if len(numeric_cols) > 0:
-                    total_numeric = practice_df[numeric_cols].sum().sum()
-                    st.metric("💰 Suma Total Numérica", f"{total_numeric:,.0f}")
-                
-                object_cols = practice_df.select_dtypes(include=['object']).columns
-                st.metric("🏷️ Columnas de Texto", len(object_cols))
-            
-            # Show sample data
-            st.markdown("### 📋 Vista Previa:")
-            st.dataframe(practice_df.head(10), use_container_width=True)
-            
-            # Show column types
-            st.markdown("### 📋 Tipos de Columnas:")
-            column_info = pd.DataFrame({
-                'Columna': practice_df.columns,
-                'Tipo': practice_df.dtypes.astype(str),
-                'Valores Únicos': [practice_df[col].nunique() for col in practice_df.columns],
-                'Valores Vacíos': [practice_df[col].isnull().sum() for col in practice_df.columns]
-            })
-            st.dataframe(column_info, use_container_width=True)
-            
-        except Exception as e:
-            st.error(f"❌ Error al cargar archivo: {str(e)}")
-            st.info("📊 Usando datos de ejemplo para la práctica")
+                if 'Categoria' in filtered_df.columns:
+                    cat_sales = filtered_df.groupby('Categoria')['Ventas'].sum()
+                    st.bar_chart(cat_sales)
     else:
-        st.info("📤 Sube un archivo para comenzar la práctica")
+        st.warning("No hay datos que coincidan con los filtros seleccionados.")
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Success Criteria
-    st.markdown('<div class="success-box">', unsafe_allow_html=True)
-    st.markdown("## ✅ Criterios de Éxito")
+    # 7. Quiz Section
+    st.header("🧠 Quiz de Comprensión")
     
     st.markdown("""
-    Has completado este nivel cuando:
-    - ✅ Entiendes qué son las métricas y KPIs
-    - ✅ Puedes interpretar métricas básicas de negocio
-    - ✅ Sabes cómo los filtros afectan las métricas
-    - ✅ Puedes identificar insights clave
-    - ✅ Entiendes la importancia del análisis de datos
+    Responde estas preguntas para verificar que entiendes los conceptos del nivel.
     """)
-    st.markdown('</div>', unsafe_allow_html=True)
     
-    # Navigation
-    st.divider()
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    # Quiz questions
+    quiz_questions = [
+        {
+            "question": "¿Qué significa KPI?",
+            "options": [
+                "Indicador Clave de Rendimiento",
+                "Indicador de Progreso Importante",
+                "Indicador de Calidad Principal",
+                "Indicador de Rendimiento Clave"
+            ],
+            "correct": 0
+        },
+        {
+            "question": "¿Cuál es el primer paso para usar métricas efectivamente?",
+            "options": [
+                "Calcular muchas métricas",
+                "Identificar qué métricas son importantes para tu objetivo",
+                "Comparar con la competencia",
+                "Crear gráficos bonitos"
+            ],
+            "correct": 1
+        },
+        {
+            "question": "¿Por qué es importante interpretar métricas, no solo verlas?",
+            "options": [
+                "Para impresionar a otros",
+                "Para entender qué significan y qué acciones tomar",
+                "Para llenar reportes",
+                "Para cumplir requisitos"
+            ],
+            "correct": 1
+        }
+    ]
+    
+    # Initialize quiz state
+    if 'quiz_answers' not in st.session_state:
+        st.session_state.quiz_answers = {}
+    
+    if 'quiz_completed' not in st.session_state:
+        st.session_state.quiz_completed = False
+    
+    # Display quiz
+    for i, q in enumerate(quiz_questions):
+        st.markdown(f"**Pregunta {i+1}:** {q['question']}")
+        
+        answer = st.radio(
+            f"Selecciona la respuesta correcta:",
+            q['options'],
+            key=f"quiz_{i}",
+            label_visibility="collapsed"
+        )
+        
+        st.session_state.quiz_answers[i] = q['options'].index(answer)
+    
+    # Quiz submission
+    if st.button("📝 Enviar Respuestas", type="primary"):
+        correct_answers = 0
+        total_questions = len(quiz_questions)
+        
+        for i, q in enumerate(quiz_questions):
+            if st.session_state.quiz_answers.get(i) == q['correct']:
+                correct_answers += 1
+        
+        score = (correct_answers / total_questions) * 100
+        
+        if score >= 80:
+            st.success(f"🎉 ¡Excelente! Obtuviste {score:.0f}% - Has completado este nivel exitosamente!")
+            
+            # Save progress
+            if save_level_progress(user['id'], 'nivel3', True):
+                st.session_state.quiz_completed = True
+                st.balloons()
+        else:
+            st.warning(f"📚 Obtuviste {score:.0f}%. Necesitas al menos 80% para completar el nivel. ¡Sigue estudiando!")
+    
+    # Show completion status
+    if st.session_state.get('quiz_completed', False):
+        st.success("✅ ¡Nivel 3 completado! Puedes continuar al siguiente nivel.")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🚀 Ir al Nivel 4", type="primary"):
+                st.switch_page("pages/04_Nivel_4_Avanzado.py")
+        with col2:
+            if st.button("🏠 Volver al Inicio"):
+                st.switch_page("Inicio.py")
+    
+    # 8. Navigation
+    st.markdown("---")
+    st.header("🧭 Navegación")
+    
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        if st.button("🏠 Dashboard Principal", key="nivel3_dashboard"):
-            st.switch_page("Inicio.py")
-    
-    with col2:
-        if st.button("⬅️ Nivel Anterior", key="nivel3_anterior"):
+        if st.button("⬅️ Nivel 2", use_container_width=True):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
-    with col4:
-        if st.button("➡️ Siguiente Nivel", key="nivel3_siguiente"):
-            st.switch_page("pages/04_Nivel_4_Avanzado.py")
+    with col2:
+        if st.button("🏠 Inicio", use_container_width=True):
+            st.switch_page("Inicio.py")
     
-    # Tips section
-    st.markdown("""
-    ---
-    ### 💡 Consejos para Métricas:
-    - **Contexto**: Siempre considera el contexto al interpretar métricas
-    - **Comparación**: Compara métricas con períodos anteriores o benchmarks
-    - **Tendencias**: Observa tendencias a lo largo del tiempo
-    - **Segmentación**: Analiza métricas por diferentes segmentos
-    - **Acción**: Usa las métricas para tomar decisiones informadas
-    """)
+    with col3:
+        if st.button("❓ Ayuda", use_container_width=True):
+            st.switch_page("pages/00_Ayuda.py")
+    
+    with col4:
+        if st.button("🚀 Nivel 4", use_container_width=True):
+            st.switch_page("pages/04_Nivel_4_Avanzado.py")
 
 if __name__ == "__main__":
     main()
