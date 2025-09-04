@@ -5,12 +5,10 @@ from core.config import setup_page_config, apply_custom_css
 from core.data_quality_analyzer import data_quality_page
 
 # Import new modular components
-from utils.auth_ui import handle_authentication, get_current_user
-from utils.main_ui import show_header, show_quick_start_section, should_show_main_content, clear_selected_template
-from utils.data_handling import show_upload_section, show_examples_section, get_current_data
-from utils.data_cleaner import create_data_cleaning_interface
-from utils.learning_progress import get_level_progress, show_learning_section, show_user_profile_section
-from utils.dashboard_templates import show_dashboard_selection
+from utils.ui import handle_authentication, get_current_user, show_header, show_quick_start_section, should_show_main_content, clear_selected_template
+from utils.data import show_upload_section, show_examples_section, get_current_data, create_data_cleaning_interface
+from utils.learning.learning_progress import get_level_progress, show_learning_section, show_user_profile_section
+from utils.dashboard import show_dashboard_selection
 
 def main():
     """Función principal de la aplicación"""
@@ -98,7 +96,7 @@ def main():
         # Clear selected_template when showing main page to avoid redirect loops
         clear_selected_template()
         
-        show_user_profile_section(current_user['username'], total_progress, completed_count)
+        show_user_profile_section(current_user['username'], total_progress, completed_count, current_user['id'])
 
 if __name__ == "__main__":
     main() 

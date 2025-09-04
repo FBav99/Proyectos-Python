@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from utils.export import export_data, get_csv_data, create_summary_report
+from utils.system import export_data, get_csv_data, create_summary_report
 
 def create_sidebar_controls():
     """Crear controles de la barra lateral"""

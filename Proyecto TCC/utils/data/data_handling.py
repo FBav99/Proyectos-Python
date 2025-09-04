@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from data.sample_datasets import get_sample_datasets
-from utils.data_cleaner import create_data_cleaning_interface
+from .data_cleaner import create_data_cleaning_interface
 
 def show_upload_section():
     """Show the file upload section"""

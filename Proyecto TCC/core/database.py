@@ -50,28 +50,28 @@ class DatabaseManager:
             conn.close()
     
     def init_database(self):
-        """Initialize database with all tables"""
-        logger.info("Initializing database...")
+        """Initialize database with essential tables including file uploads"""
+        logger.info("Initializing database with essential tables...")
         
-        # Create all tables
+        # Create essential tables
         self.create_users_table()
         self.create_user_sessions_table()
         self.create_user_progress_table()
         self.create_quiz_attempts_table()
         self.create_quiz_answers_table()
-        self.create_achievements_table()
+        self.create_rate_limiting_table()
+        
+        # File upload tables (needed for data analysis)
         self.create_uploaded_files_table()
         self.create_file_analysis_sessions_table()
-        self.create_dashboards_table()
-        self.create_dashboard_components_table()
-        self.create_user_activity_log_table()
-        self.create_system_metrics_table()
-        self.create_rate_limiting_table()
+        
+        # Optional tables (can be enabled later if needed)
+        # self.create_user_activity_log_table()
         
         # Create indexes
         self.create_indexes()
         
-        logger.info("Database initialization completed")
+        logger.info("Database initialization completed with essential tables and file uploads")
     
     def create_users_table(self):
         """Create users table"""
@@ -171,7 +171,7 @@ class DatabaseManager:
             conn.commit()
     
     def create_achievements_table(self):
-        """Create achievements table"""
+        """Create achievements table (optional - for future gamification)"""
         with self.get_connection() as conn:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS achievements (
@@ -263,7 +263,7 @@ class DatabaseManager:
             conn.commit()
     
     def create_user_activity_log_table(self):
-        """Create user activity log table"""
+        """Create user activity log table (optional - for security auditing)"""
         with self.get_connection() as conn:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS user_activity_log (

@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils.data_cleaner import create_data_cleaning_interface
-from utils.data_handling import show_upload_section, show_examples_section
+from utils.data import create_data_cleaning_interface, show_upload_section, show_examples_section
 from core.config import setup_page_config, apply_custom_css
 
 def main():

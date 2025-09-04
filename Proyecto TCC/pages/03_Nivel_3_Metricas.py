@@ -2,138 +2,51 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from utils.system import display_level_gif
+from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
+from utils.learning.learning_progress import save_level_progress
 
 # Page config
 st.set_page_config(
-    page_title="Nivel 3: Métricas - KPIs y Análisis",
+    page_title="Nivel 3: Métricas - Análisis de Datos",
     page_icon="📊",
     layout="wide"
 )
 
-# Custom CSS for better styling
-st.markdown("""
-<style>
-    .level-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    
-    .step-box {
-        background: linear-gradient(90deg, #f8f9fa, #ffffff);
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 4px solid #28a745;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .warning-box {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .success-box {
-        background: #d4edda;
-        border: 1px solid #c3e6cb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .metric-demo {
-        background: #e8f5e8;
-        border: 1px solid #c8e6c9;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .kpi-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 0.5rem 0;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .completion-checkbox {
-        background: #e8f5e8;
-        border: 2px solid #28a745;
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .info-box {
-        background: #e3f2fd;
-        border: 1px solid #bbdefb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-</style>
-""", unsafe_allow_html=True)
+# Load CSS styling for level pages
+st.markdown(load_level_styles(), unsafe_allow_html=True)
 
-def get_level_progress():
-    """Get current progress across all levels"""
-    progress = {
-        'nivel1': st.session_state.get('nivel1_completed', False),
-        'nivel2': st.session_state.get('nivel2_completed', False),
-        'nivel3': st.session_state.get('nivel3_completed', False),
-        'nivel4': st.session_state.get('nivel4_completed', False)
-    }
-    
-    completed_count = sum(progress.values())
-    total_progress = (completed_count / 4) * 100
-    
-    return total_progress, completed_count, progress
-
-def create_sample_data():
-    """Create sample data for demonstration"""
-    np.random.seed(42)
-    dates = pd.date_range('2023-01-01', '2023-12-31', freq='D')
-    n_records = len(dates)
-    
-    data = {
-        'Fecha': np.random.choice(dates, n_records//2),
-        'Categoria': np.random.choice(['Electronica', 'Ropa', 'Libros', 'Hogar', 'Deportes'], n_records//2),
-        'Region': np.random.choice(['Norte', 'Sur', 'Este', 'Oeste', 'Central'], n_records//2),
-        'Ventas': np.random.normal(1000, 300, n_records//2).round(2),
-        'Cantidad': np.random.poisson(5, n_records//2),
-        'Calificacion': np.random.choice([1, 2, 3, 4, 5], n_records//2, p=[0.05, 0.1, 0.15, 0.4, 0.3])
-    }
-    
-    df = pd.DataFrame(data)
-    df['Fecha'] = pd.to_datetime(df['Fecha'])
-    df['Ingresos'] = df['Ventas'] * df['Cantidad']
-    
-    return df.sort_values('Fecha').reset_index(drop=True)
+# Helper functions are now imported from utils.level_components and utils.level_data
 
 def main():
-    # Header
-    st.markdown('<h1 class="level-header">📊 Nivel 3: Entender Métricas</h1>', unsafe_allow_html=True)
-    st.markdown('<h2 style="text-align: center; color: #666;">KPIs y Análisis de Rendimiento</h2>', unsafe_allow_html=True)
+    # Check if user is authenticated
+    if 'user' not in st.session_state or not st.session_state.get('authenticated'):
+        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
     
-    # Dynamic Progress indicator
-    total_progress, completed_count, progress = get_level_progress()
+    # Get current user
+    user = st.session_state.get('user')
+    if not user or 'id' not in user:
+        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
     
+    # 1. Title (level name and description)
+    st.title("📊 Nivel 3: Métricas")
+    st.subheader("KPIs y Análisis de Rendimiento")
+    
+    # 2. Progress Bar (showing progress across levels)
+    total_progress, completed_count, progress = get_level_progress(user['id'])
+    
+    st.markdown('<div class="progress-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
         st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Verificar que los niveles anteriores estén completados
     if not progress['nivel1'] or not progress['nivel2']:
@@ -142,377 +55,345 @@ def main():
             st.switch_page("pages/01_Nivel_1_Basico.py")
         return
     
-    # Información introductoria
+    # 3. Introduction Section (what the user will learn)
+    st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
-    <div class="info-box">
-        <h3>🎯 ¿Qué aprenderás en este nivel?</h3>
-        <p>En este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y 
-        cómo usarlas para tomar mejores decisiones basadas en datos.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    En este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y 
+    cómo usarlas para tomar mejores decisiones basadas en datos.
+    """)
     
-    # Pasos del nivel
-    st.markdown("## 📋 Pasos para Entender Métricas y KPIs")
+    # 4. Steps Section (clear, actionable instructions)
+    st.header("📋 Pasos para Entender Métricas y KPIs")
     
-    # Paso 1
-    st.markdown("""
-    <div class="step-box">
-        <h3>1️⃣ Entender qué son las métricas y KPIs</h3>
-        <p><strong>¿Qué son las métricas?</strong> Las métricas son números que te dicen algo importante 
-        sobre tu negocio o actividad. Son como "termómetros" que miden el estado de las cosas.</p>
-        
-        <h4>📊 Tipos de métricas:</h4>
-        <ul>
-            <li><strong>Métricas de cantidad:</strong> Cuántos productos vendiste, cuántos clientes tienes</li>
-            <li><strong>Métricas de dinero:</strong> Cuánto dinero ganaste, cuánto gastaste</li>
-            <li><strong>Métricas de tiempo:</strong> Cuánto tiempo tardas en hacer algo</li>
-            <li><strong>Métricas de calidad:</strong> Qué tan bien funciona algo, qué tan satisfechos están los clientes</li>
-        </ul>
-        
-        <h4>🎯 ¿Qué son los KPIs?</h4>
-        <p><strong>KPI</strong> significa "Indicador Clave de Rendimiento". Son las métricas más importantes 
-        que te ayudan a saber si tu negocio va bien o mal.</p>
-        
-        <h4>✅ Ejemplos de KPIs comunes:</h4>
-        <ul>
-            <li><strong>Ventas totales:</strong> Cuánto dinero generaste en total</li>
-            <li><strong>Número de clientes:</strong> Cuántas personas compran de ti</li>
-            <li><strong>Satisfacción del cliente:</strong> Qué tan contentos están con tu servicio</li>
-            <li><strong>Tiempo de entrega:</strong> Cuánto tardas en entregar un producto</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # Step 1
+    create_step_card(
+        step_number="1",
+        title="Entender qué son las métricas y KPIs",
+        description="<strong>¿Qué son las métricas?</strong> Las métricas son números que te dicen algo importante sobre tu negocio o actividad. Son como 'termómetros' que miden el estado de las cosas.",
+        sections={
+            "📊 Tipos de métricas:": [
+                "<strong>Métricas de cantidad:</strong> Cuántos productos vendiste, cuántos clientes tienes",
+                "<strong>Métricas de dinero:</strong> Cuánto dinero ganaste, cuánto gastaste",
+                "<strong>Métricas de tiempo:</strong> Cuánto tiempo tardas en hacer algo",
+                "<strong>Métricas de calidad:</strong> Qué tan bien funciona algo, qué tan satisfechos están los clientes"
+            ],
+            "🎯 ¿Qué son los KPIs?": [
+                "<strong>KPI</strong> significa 'Indicador Clave de Rendimiento'. Son las métricas más importantes que te ayudan a saber si tu negocio va bien o mal."
+            ],
+            "✅ Ejemplos de KPIs comunes:": [
+                "<strong>Ventas totales:</strong> Cuánto dinero generaste en total",
+                "<strong>Número de clientes:</strong> Cuántas personas compran de ti",
+                "<strong>Satisfacción del cliente:</strong> Qué tan contentos están con tu servicio",
+                "<strong>Tiempo de entrega:</strong> Cuánto tardas en entregar un producto"
+            ]
+        }
+    )
     
-    # Paso 2
-    st.markdown("""
-    <div class="step-box">
-        <h3>2️⃣ Interpretar métricas clave de negocio</h3>
-        <p><strong>¿Por qué es importante interpretar?</strong> Los números por sí solos no te dicen mucho. 
-        Necesitas entender qué significan y cómo usarlos para tomar decisiones.</p>
-        
-        <h4>🔍 Cómo interpretar métricas:</h4>
-        <ul>
-            <li><strong>Compara con el pasado:</strong> ¿Son mejores o peores que antes?</li>
-            <li><strong>Compara con metas:</strong> ¿Estás alcanzando tus objetivos?</li>
-            <li><strong>Busca patrones:</strong> ¿Hay tendencias que se repiten?</li>
-            <li><strong>Identifica problemas:</strong> ¿Qué números te preocupan?</li>
-        </ul>
-        
-        <h4>📈 Ejemplos de interpretación:</h4>
-        <ul>
-            <li><strong>Ventas bajas:</strong> Podría ser temporada baja, problema de precios, o competencia</li>
-            <li><strong>Clientes insatisfechos:</strong> Podría ser problema de calidad, servicio, o comunicación</li>
-            <li><strong>Gastos altos:</strong> Podría ser inversión necesaria o desperdicio</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # Step 2
+    create_step_card(
+        step_number="2",
+        title="Identificar métricas clave para tu negocio",
+        description="<strong>¿Por qué es importante?</strong> No todas las métricas son igual de importantes. Necesitas enfocarte en las que realmente importan para tu objetivo.",
+        sections={
+            "🔍 Cómo identificar métricas clave:": [
+                "Pregúntate: ¿Qué quiero lograr?",
+                "Identifica qué números te dirán si lo estás logrando",
+                "Elige 3-5 métricas principales para enfocarte",
+                "Evita medir todo, enfócate en lo importante"
+            ],
+            "💡 Ejemplos por tipo de negocio:": [
+                "<strong>Tienda online:</strong> Ventas, visitantes, tasa de conversión",
+                "<strong>Servicio de consultoría:</strong> Horas facturables, satisfacción del cliente, proyectos completados",
+                "<strong>Restaurante:</strong> Ventas por mesa, tiempo de espera, calificaciones de clientes"
+            ]
+        }
+    )
     
-    # Paso 3
-    st.markdown("""
-    <div class="step-box">
-        <h3>3️⃣ Analizar tendencias y patrones</h3>
-        <p><strong>¿Qué son las tendencias?</strong> Son cambios que ocurren con el tiempo. 
-        Pueden ser hacia arriba (mejorando), hacia abajo (empeorando), o estables.</p>
-        
-        <h4>📊 Tipos de tendencias:</h4>
-        <ul>
-            <li><strong>Tendencia ascendente:</strong> Los números van subiendo (ej: más ventas cada mes)</li>
-            <li><strong>Tendencia descendente:</strong> Los números van bajando (ej: menos clientes)</li>
-            <li><strong>Tendencia estable:</strong> Los números se mantienen igual</li>
-            <li><strong>Tendencia estacional:</strong> Los números suben y bajan en ciertos períodos</li>
-        </ul>
-        
-        <h4>🔍 Cómo identificar patrones:</h4>
-        <ul>
-            <li><strong>Observa gráficos:</strong> Las líneas y barras te muestran patrones visualmente</li>
-            <li><strong>Compara períodos:</strong> Este mes vs. el mes pasado, este año vs. el año pasado</li>
-            <li><strong>Busca repeticiones:</strong> ¿Se repite algo cada semana, mes, o temporada?</li>
-            <li><strong>Analiza causas:</strong> ¿Qué eventos causan los cambios?</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # Step 3
+    create_step_card(
+        step_number="3",
+        title="Interpretar y analizar métricas",
+        description="<strong>¿Qué significa interpretar?</strong> No solo ver los números, sino entender qué te están diciendo y qué acciones tomar.",
+        sections={
+            "📈 Tipos de análisis:": [
+                "<strong>Análisis de tendencias:</strong> ¿Los números van subiendo o bajando?",
+                "<strong>Comparaciones:</strong> ¿Cómo se comparan con el mes pasado o el año anterior?",
+                "<strong>Análisis de patrones:</strong> ¿Hay patrones que se repiten?",
+                "<strong>Análisis de correlación:</strong> ¿Cuando una cosa sube, otra también sube?"
+            ],
+            "✅ Preguntas clave para interpretar:": [
+                "¿Este número es bueno o malo?",
+                "¿Por qué cambió este número?",
+                "¿Qué puedo hacer para mejorarlo?",
+                "¿Qué consecuencias tiene este cambio?"
+            ]
+        }
+    )
     
-    # Paso 4
-    st.markdown("""
-    <div class="step-box">
-        <h3>4️⃣ Usar métricas para tomar decisiones</h3>
-        <p><strong>¿Cómo ayudan las métricas?</strong> Las métricas te dan información objetiva 
-        para tomar decisiones más inteligentes en lugar de adivinar.</p>
-        
-        <h4>🎯 Decisiones basadas en métricas:</h4>
-        <ul>
-            <li><strong>Invertir más:</strong> Si las métricas muestran que algo funciona bien</li>
-            <li><strong>Cambiar estrategia:</strong> Si las métricas muestran que algo no funciona</li>
-            <li><strong>Establecer metas:</strong> Basándote en lo que has logrado antes</li>
-            <li><strong>Identificar problemas:</strong> Antes de que se vuelvan graves</li>
-        </ul>
-        
-        <h4>💡 Ejemplos prácticos:</h4>
-        <ul>
-            <li><strong>Si las ventas bajan:</strong> Podrías revisar precios, promociones, o calidad</li>
-            <li><strong>Si los clientes están insatisfechos:</strong> Podrías mejorar el servicio o productos</li>
-            <li><strong>Si los gastos suben mucho:</strong> Podrías revisar dónde se va el dinero</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # Step 4
+    create_step_card(
+        step_number="4",
+        title="Usar métricas para tomar decisiones",
+        description="<strong>¿Cómo usar las métricas?</strong> Las métricas no son solo para ver, son para actuar. Te ayudan a tomar decisiones informadas.",
+        sections={
+            "🎯 Proceso de decisión basada en datos:": [
+                "Revisa las métricas regularmente",
+                "Identifica problemas o oportunidades",
+                "Genera hipótesis sobre qué está pasando",
+                "Toma acción basada en los datos",
+                "Mide el resultado de tus acciones"
+            ],
+            "⚠️ Errores comunes a evitar:": [
+                "Enfocarse solo en una métrica",
+                "No considerar el contexto",
+                "Tomar decisiones sin entender la causa",
+                "Ignorar tendencias a largo plazo"
+            ]
+        }
+    )
     
-    # Paso 5
-    st.markdown("""
-    <div class="step-box">
-        <h3>5️⃣ Crear dashboards de rendimiento</h3>
-        <p><strong>¿Qué es un dashboard?</strong> Es una pantalla que muestra las métricas más importantes 
-        de tu negocio en un solo lugar, como un "tablero de control".</p>
-        
-        <h4>📱 Elementos de un dashboard:</h4>
-        <ul>
-            <li><strong>Números grandes:</strong> Las métricas más importantes (ventas, clientes, etc.)</li>
-            <li><strong>Gráficos:</strong> Para mostrar tendencias y comparaciones</li>
-            <li><strong>Tablas:</strong> Para mostrar datos detallados</li>
-            <li><strong>Alertas:</strong> Para avisarte cuando algo necesita atención</li>
-        </ul>
-        
-        <h4>✅ Beneficios de un dashboard:</h4>
-        <ul>
-            <li><strong>Vista rápida:</strong> Ves todo lo importante en un vistazo</li>
-            <li><strong>Detección temprana:</strong> Identificas problemas antes de que empeoren</li>
-            <li><strong>Comunicación:</strong> Puedes mostrar a otros cómo va el negocio</li>
-            <li><strong>Enfoque:</strong> Te concentras en lo que realmente importa</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # 5. Practical Example Section
+    st.header("💡 Ejemplo Práctico: Análisis de Ventas")
     
-    # Ejemplo práctico
-    st.markdown("## 🎯 Ejemplo Práctico")
-    
-    st.markdown("""
-    <div class="info-box">
-        <h3>📊 Vamos a analizar métricas usando datos de ventas</h3>
-        <p>Te mostraré cómo interpretar diferentes métricas y qué decisiones podrías tomar basándote en ellas.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Crear datos de ejemplo
+    # Create sample data
     df = create_sample_data()
     
-    st.markdown("### 📁 Datos de ejemplo (Ventas de una tienda)")
+    # Show data overview
+    st.subheader("📊 Datos de Ejemplo")
     st.dataframe(df.head(10), use_container_width=True)
     
-    # Análisis de métricas
-    st.markdown("### 📊 Análisis de Métricas Clave")
+    # Basic metrics calculation
+    st.subheader("🔢 Cálculo de Métricas Básicas")
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("**💰 Métricas de Ventas:**")
-        
-        # Calcular métricas
-        ventas_totales = df['Ventas'].sum()
-        ventas_promedio = df['Ventas'].mean()
-        ventas_max = df['Ventas'].max()
-        ventas_min = df['Ventas'].min()
-        
-        st.metric("Ventas totales", f"${ventas_totales:,.0f}")
-        st.metric("Ventas promedio", f"${ventas_promedio:,.0f}")
-        st.metric("Venta más alta", f"${ventas_max:,.0f}")
-        st.metric("Venta más baja", f"${ventas_min:,.0f}")
-        
-        st.markdown("**📈 Análisis:**")
-        if ventas_promedio > 1000:
-            st.success("✅ Las ventas están por encima del promedio esperado")
-        else:
-            st.warning("⚠️ Las ventas están por debajo del promedio esperado")
-    
-    with col2:
-        st.markdown("**👥 Métricas de Clientes:**")
-        
-        # Calcular métricas de clientes
-        total_registros = len(df)
-        categorias_unicas = df['Categoria'].nunique()
-        regiones_unicas = df['Region'].nunique()
-        calificacion_promedio = df['Calificacion'].mean()
-        
-        st.metric("Total de transacciones", total_registros)
-        st.metric("Categorías de productos", categorias_unicas)
-        st.metric("Regiones atendidas", regiones_unicas)
-        st.metric("Calificación promedio", f"{calificacion_promedio:.1f}/5")
-        
-        st.markdown("**📊 Análisis:**")
-        if calificacion_promedio >= 4:
-            st.success("✅ Los clientes están muy satisfechos")
-        elif calificacion_promedio >= 3:
-            st.info("ℹ️ Los clientes están moderadamente satisfechos")
-        else:
-            st.warning("⚠️ Los clientes no están satisfechos")
-    
-    # Análisis de tendencias
-    st.markdown("### 📈 Análisis de Tendencias")
-    
-    # Agrupar por mes para ver tendencias
-    df['Mes'] = df['Fecha'].dt.to_period('M')
-    ventas_mensuales = df.groupby('Mes')['Ventas'].sum().reset_index()
-    ventas_mensuales['Mes'] = ventas_mensuales['Mes'].astype(str)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("**📅 Ventas por Mes:**")
-        st.dataframe(ventas_mensuales, use_container_width=True)
-        
-        # Calcular tendencia
-        if len(ventas_mensuales) > 1:
-            primer_mes = ventas_mensuales.iloc[0]['Ventas']
-            ultimo_mes = ventas_mensuales.iloc[-1]['Ventas']
-            cambio = ((ultimo_mes - primer_mes) / primer_mes) * 100
-            
-            st.markdown(f"**📊 Cambio total:** {cambio:+.1f}%")
-            
-            if cambio > 0:
-                st.success("✅ Tendencia positiva - las ventas están subiendo")
-            elif cambio < 0:
-                st.warning("⚠️ Tendencia negativa - las ventas están bajando")
-            else:
-                st.info("ℹ️ Tendencia estable - las ventas se mantienen igual")
-    
-    with col2:
-        st.markdown("**🏷️ Ventas por Categoría:**")
-        ventas_categoria = df.groupby('Categoria')['Ventas'].sum().sort_values(ascending=False)
-        
-        # Mostrar top categorías
-        st.markdown("**Top 3 categorías:**")
-        for i, (cat, venta) in enumerate(ventas_categoria.head(3).items(), 1):
-            st.markdown(f"{i}. **{cat}**: ${venta:,.0f}")
-        
-        # Análisis de la mejor categoría
-        mejor_categoria = ventas_categoria.index[0]
-        mejor_venta = ventas_categoria.iloc[0]
-        st.markdown(f"**🎯 Mejor categoría:** {mejor_categoria}")
-        st.markdown(f"**💰 Ventas:** ${mejor_venta:,.0f}")
-    
-    # Dashboard simple
-    st.markdown("### 📱 Dashboard de Rendimiento")
-    
-    st.markdown("""
-    <div class="metric-demo">
-        <h3>🎯 KPIs Principales</h3>
-        <p>Estos son los indicadores más importantes para monitorear el rendimiento de tu negocio:</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # KPIs en tarjetas
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>💰 Ventas Totales</h4>
-            <h2>${ventas_totales:,.0f}</h2>
-            <p>Ingresos generados</p>
-        </div>
-        """, unsafe_allow_html=True)
+        total_sales = df['Ventas'].sum()
+        st.metric("💰 Ventas Totales", f"${total_sales:,.2f}")
     
     with col2:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>📊 Transacciones</h4>
-            <h2>{total_registros}</h2>
-            <p>Total de ventas</p>
-        </div>
-        """, unsafe_allow_html=True)
+        avg_sales = df['Ventas'].mean()
+        st.metric("📊 Promedio de Ventas", f"${avg_sales:.2f}")
     
     with col3:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>⭐ Satisfacción</h4>
-            <h2>{calificacion_promedio:.1f}/5</h2>
-            <p>Calificación clientes</p>
-        </div>
-        """, unsafe_allow_html=True)
+        total_quantity = df['Cantidad'].sum()
+        st.metric("📦 Cantidad Total", f"{total_quantity:,}")
     
     with col4:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>🏷️ Categorías</h4>
-            <h2>{categorias_unicas}</h2>
-            <p>Productos ofrecidos</p>
-        </div>
-        """, unsafe_allow_html=True)
+        avg_rating = df['Calificacion'].mean()
+        st.metric("⭐ Calificación Promedio", f"{avg_rating:.1f}")
     
-    # Consejos importantes
-    st.markdown("## 💡 Consejos Importantes")
+    # Category analysis
+    st.subheader("🏷️ Análisis por Categoría")
+    category_sales = df.groupby('Categoria')['Ventas'].sum().sort_values(ascending=False)
     
-    st.markdown("""
-    <div class="warning-box">
-        <h3>⚠️ Errores comunes a evitar:</h3>
-        <ul>
-            <li><strong>Enfocarse solo en una métrica:</strong> Mira varias métricas juntas para tener una visión completa</li>
-            <li><strong>Ignorar el contexto:</strong> Los números pueden cambiar por razones temporales o estacionales</li>
-            <li><strong>No establecer metas:</strong> Sin metas, no sabes si los números son buenos o malos</li>
-            <li><strong>Reaccionar demasiado rápido:</strong> Espera a ver si los cambios son temporales o permanentes</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 1])
     
-    st.markdown("""
-    <div class="success-box">
-        <h3>✅ Buenas prácticas:</h3>
-        <ul>
-            <li><strong>Revisa métricas regularmente:</strong> Establece un horario para revisar tus números</li>
-            <li><strong>Establece metas realistas:</strong> Basadas en tu historial y capacidades</li>
-            <li><strong>Documenta cambios:</strong> Anota qué acciones causaron mejoras o problemas</li>
-            <li><strong>Comparte con tu equipo:</strong> Todos deben entender cómo va el negocio</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    with col1:
+        st.bar_chart(category_sales)
     
-    # Actividad práctica
-    st.markdown("## 🎯 Actividad Práctica")
+    with col2:
+        st.dataframe(category_sales.reset_index().rename(columns={'Ventas': 'Ventas Totales'}), use_container_width=True)
+    
+    # Regional analysis
+    st.subheader("🌍 Análisis por Región")
+    region_sales = df.groupby('Region')['Ventas'].sum().sort_values(ascending=False)
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.bar_chart(region_sales)
+    
+    with col2:
+        st.dataframe(region_sales.reset_index().rename(columns={'Ventas': 'Ventas Totales'}), use_container_width=True)
+    
+    # 6. Interactive Practice Section
+    st.header("🎯 Práctica Interactiva")
     
     st.markdown("""
-    <div class="step-box">
-        <h3>📝 Ejercicio para practicar:</h3>
-        <p>1. <strong>Identifica tus KPIs:</strong> Piensa en 3-5 métricas más importantes para tu negocio</p>
-        <p>2. <strong>Establece metas:</strong> Define números objetivo para cada KPI</p>
-        <p>3. <strong>Revisa regularmente:</strong> Establece un horario para revisar tus métricas</p>
-        <p>4. <strong>Analiza tendencias:</strong> Compara este mes con meses anteriores</p>
-        <p>5. <strong>Toma decisiones:</strong> Basándote en lo que te dicen los números</p>
-    </div>
-    """, unsafe_allow_html=True)
+    Ahora es tu turno de practicar. Usa los filtros de abajo para analizar diferentes aspectos de los datos.
+    """)
     
-    # Verificación de completado
-    st.markdown("## ✅ Verificación del Nivel")
+    # Filters
+    col1, col2 = st.columns(2)
     
-    nivel3_completed = st.checkbox(
-        "He completado todos los pasos del Nivel 3",
-        value=st.session_state.get('nivel3_completed', False),
-        key='nivel3_checkbox'
-    )
+    with col1:
+        selected_category = st.selectbox(
+            "🏷️ Seleccionar Categoría",
+            ['Todas'] + list(df['Categoria'].unique())
+        )
     
-    if nivel3_completed:
-        st.session_state['nivel3_completed'] = True
-        st.markdown("""
-        <div class="completion-checkbox">
-            <h3>🎉 ¡Felicidades! Has completado el Nivel 3</h3>
-            <p>Ahora sabes cómo entender e interpretar métricas y KPIs para tomar mejores decisiones. 
-            Estás listo para continuar con el siguiente nivel.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    with col2:
+        selected_region = st.selectbox(
+            "🌍 Seleccionar Región",
+            ['Todas'] + list(df['Region'].unique())
+        )
+    
+    # Apply filters
+    filtered_df = df.copy()
+    
+    if selected_category != 'Todas':
+        filtered_df = filtered_df[filtered_df['Categoria'] == selected_category]
+    
+    if selected_region != 'Todas':
+        filtered_df = filtered_df[filtered_df['Region'] == selected_region]
+    
+    # Show filtered results
+    st.subheader("📊 Resultados Filtrados")
+    
+    if not filtered_df.empty:
+        col1, col2, col3, col4 = st.columns(4)
         
-        # Mostrar siguiente nivel
-        st.markdown("### 🚀 ¿Qué sigue?")
-        st.markdown("En el **Nivel 4** aprenderás a crear cálculos personalizados y visualizaciones avanzadas.")
+        with col1:
+            filtered_sales = filtered_df['Ventas'].sum()
+            st.metric("💰 Ventas Filtradas", f"${filtered_sales:,.2f}")
         
-        if st.button("Continuar al Nivel 4", type="primary"):
-            st.switch_page("pages/04_Nivel_4_Avanzado.py")
+        with col2:
+            filtered_avg = filtered_df['Ventas'].mean()
+            st.metric("📊 Promedio Filtrado", f"${filtered_avg:.2f}")
+        
+        with col3:
+            filtered_count = len(filtered_df)
+            st.metric("📋 Registros", f"{filtered_count}")
+        
+        with col4:
+            filtered_rating = filtered_df['Calificacion'].mean()
+            st.metric("⭐ Calificación", f"{filtered_rating:.1f}")
+        
+        # Show filtered data
+        st.dataframe(filtered_df, use_container_width=True)
+        
+        # Show filtered charts
+        if len(filtered_df) > 1:
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if 'Fecha' in filtered_df.columns:
+                    daily_sales = filtered_df.groupby(filtered_df['Fecha'].dt.date)['Ventas'].sum()
+                    st.line_chart(daily_sales)
+            
+            with col2:
+                if 'Categoria' in filtered_df.columns:
+                    cat_sales = filtered_df.groupby('Categoria')['Ventas'].sum()
+                    st.bar_chart(cat_sales)
+    else:
+        st.warning("No hay datos que coincidan con los filtros seleccionados.")
     
-    # Información adicional
+    # 7. Quiz Section
+    st.header("🧠 Quiz de Comprensión")
+    
+    st.markdown("""
+    Responde estas preguntas para verificar que entiendes los conceptos del nivel.
+    """)
+    
+    # Quiz questions
+    quiz_questions = [
+        {
+            "question": "¿Qué significa KPI?",
+            "options": [
+                "Indicador Clave de Rendimiento",
+                "Indicador de Progreso Importante",
+                "Indicador de Calidad Principal",
+                "Indicador de Rendimiento Clave"
+            ],
+            "correct": 0
+        },
+        {
+            "question": "¿Cuál es el primer paso para usar métricas efectivamente?",
+            "options": [
+                "Calcular muchas métricas",
+                "Identificar qué métricas son importantes para tu objetivo",
+                "Comparar con la competencia",
+                "Crear gráficos bonitos"
+            ],
+            "correct": 1
+        },
+        {
+            "question": "¿Por qué es importante interpretar métricas, no solo verlas?",
+            "options": [
+                "Para impresionar a otros",
+                "Para entender qué significan y qué acciones tomar",
+                "Para llenar reportes",
+                "Para cumplir requisitos"
+            ],
+            "correct": 1
+        }
+    ]
+    
+    # Initialize quiz state
+    if 'quiz_answers' not in st.session_state:
+        st.session_state.quiz_answers = {}
+    
+    if 'quiz_completed' not in st.session_state:
+        st.session_state.quiz_completed = False
+    
+    # Display quiz
+    for i, q in enumerate(quiz_questions):
+        st.markdown(f"**Pregunta {i+1}:** {q['question']}")
+        
+        answer = st.radio(
+            f"Selecciona la respuesta correcta:",
+            q['options'],
+            key=f"quiz_{i}",
+            label_visibility="collapsed"
+        )
+        
+        st.session_state.quiz_answers[i] = q['options'].index(answer)
+    
+    # Quiz submission
+    if st.button("📝 Enviar Respuestas", type="primary"):
+        correct_answers = 0
+        total_questions = len(quiz_questions)
+        
+        for i, q in enumerate(quiz_questions):
+            if st.session_state.quiz_answers.get(i) == q['correct']:
+                correct_answers += 1
+        
+        score = (correct_answers / total_questions) * 100
+        
+        if score >= 80:
+            st.success(f"🎉 ¡Excelente! Obtuviste {score:.0f}% - Has completado este nivel exitosamente!")
+            
+            # Save progress
+            if save_level_progress(user['id'], 'nivel3', True):
+                st.session_state.quiz_completed = True
+                st.balloons()
+        else:
+            st.warning(f"📚 Obtuviste {score:.0f}%. Necesitas al menos 80% para completar el nivel. ¡Sigue estudiando!")
+    
+    # Show completion status
+    if st.session_state.get('quiz_completed', False):
+        st.success("✅ ¡Nivel 3 completado! Puedes continuar al siguiente nivel.")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🚀 Ir al Nivel 4", type="primary"):
+                st.switch_page("pages/04_Nivel_4_Avanzado.py")
+        with col2:
+            if st.button("🏠 Volver al Inicio"):
+                st.switch_page("Inicio.py")
+    
+    # 8. Navigation
     st.markdown("---")
-    st.markdown("""
-    <div class="info-box">
-        <h3>📚 ¿Quieres saber más?</h3>
-        <p>Este nivel está basado en frameworks de métricas empresariales y mejores prácticas de análisis de rendimiento. 
-        Si quieres profundizar en los fundamentos teóricos, consulta la documentación del proyecto.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.header("🧭 Navegación")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        if st.button("⬅️ Nivel 2", use_container_width=True):
+            st.switch_page("pages/02_Nivel_2_Filtros.py")
+    
+    with col2:
+        if st.button("🏠 Inicio", use_container_width=True):
+            st.switch_page("Inicio.py")
+    
+    with col3:
+        if st.button("❓ Ayuda", use_container_width=True):
+            st.switch_page("pages/00_Ayuda.py")
+    
+    with col4:
+        if st.button("🚀 Nivel 4", use_container_width=True):
+            st.switch_page("pages/04_Nivel_4_Avanzado.py")
 
 if __name__ == "__main__":
     main()

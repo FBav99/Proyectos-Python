@@ -4,14 +4,16 @@ import numpy as np
 import plotly.express as px
 from datetime import datetime
 
-from utils.metrics import calculate_metrics, calculate_growth_metrics, calculate_performance_insights
-from utils.visualizations import (
+from utils.analysis import (
+    calculate_metrics, 
+    calculate_growth_metrics, 
+    calculate_performance_insights,
     create_time_series_chart, 
     create_category_analysis, 
     create_regional_analysis,
     create_correlation_matrix
 )
-from utils.ui_components import (
+from utils.ui import (
     display_metrics_dashboard,
     create_custom_calculations_ui,
     display_export_section

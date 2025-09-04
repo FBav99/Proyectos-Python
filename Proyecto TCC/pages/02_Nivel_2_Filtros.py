@@ -2,10 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from utils.gif_utils import display_level_gif
-from utils.level_styles import load_level_styles
-from utils.level_components import get_level_progress, create_step_card, create_info_box
-from utils.level_data import create_sample_data, analyze_uploaded_data
+from utils.system import display_level_gif
+from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
+from utils.learning.learning_progress import save_level_progress
 
 # Page config
 st.set_page_config(
@@ -22,12 +21,27 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 # Sample data functions are now imported from utils.level_data
 
 def main():
+    # Check if user is authenticated
+    if 'user' not in st.session_state or not st.session_state.get('authenticated'):
+        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
+    
+    # Get current user
+    user = st.session_state.get('user')
+    if not user or 'id' not in user:
+        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
+    
     # 1. Title (level name and description)
     st.title("🔍 Nivel 2: Filtros")
     st.subheader("Organizar y Filtrar Información")
     
     # 2. Progress Bar (showing progress across levels)
-    total_progress, completed_count, progress = get_level_progress()
+    total_progress, completed_count, progress = get_level_progress(user['id'])
     
     st.markdown('<div class="progress-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -337,16 +351,22 @@ def main():
     )
     
     if nivel2_completed:
-        st.session_state['nivel2_completed'] = True
+        # Save progress to database
+        user_id = user['id']
+        if save_level_progress(user_id, 'nivel2', True):
+            st.session_state['nivel2_completed'] = True
+        else:
+            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            return
         
         create_info_box(
             "success-box",
             "🎉 ¡Felicidades! Has completado el Nivel 2",
-            "<p>Ahora sabes cómo organizar y filtrar datos para encontrar exactamente lo que necesitas. Estás listo para continuar con el siguiente nivel.</p>"
+            "<p>Ahora sabes cómo filtrar y organizar datos. Estás listo para continuar con el siguiente nivel.</p>"
         )
         
         st.subheader("🚀 ¿Qué sigue?")
-        st.markdown("En el **Nivel 3** aprenderás a entender e interpretar métricas y KPIs para tomar mejores decisiones.")
+        st.markdown("En el **Nivel 3** aprenderás a calcular métricas y estadísticas.")
         
         if st.button("Continuar al Nivel 3", type="primary"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")

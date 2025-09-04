@@ -3,10 +3,9 @@ import pandas as pd
 import numpy as np
 import io
 from datetime import datetime
-from utils.gif_utils import display_level_gif
-from utils.level_styles import load_level_styles
-from utils.level_components import get_level_progress, create_step_card, create_info_box
-from utils.level_data import create_sample_data, analyze_uploaded_data
+from utils.system import display_level_gif
+from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
+from utils.learning.learning_progress import save_level_progress
 
 # Page config
 st.set_page_config(
@@ -21,12 +20,27 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 # Helper functions are now imported from utils.level_components and utils.level_data
 
 def main():
+    # Check if user is authenticated
+    if 'user' not in st.session_state or not st.session_state.get('authenticated'):
+        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
+    
+    # Get current user
+    user = st.session_state.get('user')
+    if not user or 'id' not in user:
+        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        if st.button("Ir al Inicio", type="primary"):
+            st.switch_page("Inicio.py")
+        return
+    
     # 1. Title (level name and description)
     st.title("📚 Nivel 1: Básico")
     st.subheader("Preparación y Carga de Datos")
     
     # 2. Progress Bar (showing progress across levels)
-    total_progress, completed_count, progress = get_level_progress()
+    total_progress, completed_count, progress = get_level_progress(user['id'])
     
     st.markdown('<div class="progress-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -410,7 +424,13 @@ def main():
     )
     
     if nivel1_completed:
-        st.session_state['nivel1_completed'] = True
+        # Save progress to database
+        user_id = user['id']
+        if save_level_progress(user_id, 'nivel1', True):
+            st.session_state['nivel1_completed'] = True
+        else:
+            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            return
         
         create_info_box(
             "success-box",

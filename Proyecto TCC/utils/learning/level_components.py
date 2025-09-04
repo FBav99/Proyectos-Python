@@ -1,18 +1,5 @@
 import streamlit as st
-
-def get_level_progress():
-    """Get current progress across all levels"""
-    progress = {
-        'nivel1': st.session_state.get('nivel1_completed', False),
-        'nivel2': st.session_state.get('nivel2_completed', False),
-        'nivel3': st.session_state.get('nivel3_completed', False),
-        'nivel4': st.session_state.get('nivel4_completed', False)
-    }
-    
-    completed_count = sum(progress.values())
-    total_progress = (completed_count / 4) * 100
-    
-    return total_progress, completed_count, progress
+from core.progress_tracker import progress_tracker
 
 def create_step_card(step_number, title, description, sections=None):
     """Create a step card with proper HTML structure"""
