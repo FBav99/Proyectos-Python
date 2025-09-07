@@ -22,16 +22,22 @@ def create_learning_levels_section():
     st.markdown("## 📚 Niveles de Aprendizaje")
     
     st.markdown("""
-    Hemos creado **4 niveles progresivos** para guiarte paso a paso en el análisis de datos:
+    Hemos creado **5 niveles progresivos** para guiarte paso a paso en el análisis de datos:
     """)
     
     col1, col2 = st.columns(2)
     
     with col1:
         create_step_card(
+            step_number="0",
+            title="🌟 Nivel 0: Introducción",
+            description="Conceptos fundamentales de datos. Comienza aquí si eres completamente nuevo en análisis de datos"
+        )
+        
+        create_step_card(
             step_number="1",
             title="📚 Nivel 1: Básico",
-            description="Preparación y carga de datos. Comienza aquí si eres nuevo en análisis de datos"
+            description="Preparación y carga de datos. Aprende a preparar y cargar datos correctamente"
         )
         
         create_step_card(
@@ -56,7 +62,7 @@ def create_learning_levels_section():
     create_info_box(
         "info-box",
         "💡 Consejo",
-        "Si eres nuevo, comienza con el Nivel 1. Si ya tienes experiencia, puedes saltar al nivel que necesites."
+        "Si eres completamente nuevo, comienza con el Nivel 0. Si ya entiendes los conceptos básicos, puedes empezar en el Nivel 1."
     )
 
 def create_dashboard_blanco_section():
@@ -292,24 +298,28 @@ def create_navigation_section():
     st.divider()
     st.markdown("## 🎯 ¿Listo para Comenzar?")
     
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
-        if st.button("📚 Comenzar Nivel 1", type="primary", key="ayuda_nivel1"):
-            st.switch_page("pages/01_Nivel_1_Basico.py")
+        if st.button("🌟 Comenzar Nivel 0", type="primary", key="ayuda_nivel0"):
+            st.switch_page("pages/00_Nivel_0_Introduccion.py")
     
     with col2:
-        if st.button("🏠 Dashboard Principal", key="ayuda_dashboard"):
-            st.switch_page("Inicio.py")
+        if st.button("📚 Nivel 1 Básico", key="ayuda_nivel1"):
+            st.switch_page("pages/01_Nivel_1_Basico.py")
     
     with col3:
-        if st.button("📊 Nivel 4 Avanzado", key="ayuda_nivel4"):
-            st.switch_page("pages/04_Nivel_4_Avanzado.py")
-    
-    with col4:
         if st.button("🔍 Nivel 2 Filtros", key="ayuda_nivel2"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
+    with col4:
+        if st.button("📊 Nivel 3 Métricas", key="ayuda_nivel3"):
+            st.switch_page("pages/03_Nivel_3_Metricas.py")
+    
     with col5:
-        if st.button("🎨 Dashboard en Blanco", key="ayuda_dashboard_blanco"):
-            st.switch_page("pages/08_Dashboard_Blanco.py")
+        if st.button("🚀 Nivel 4 Avanzado", key="ayuda_nivel4"):
+            st.switch_page("pages/04_Nivel_4_Avanzado.py")
+    
+    with col6:
+        if st.button("🏠 Dashboard Principal", key="ayuda_dashboard"):
+            st.switch_page("Inicio.py")

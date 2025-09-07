@@ -122,6 +122,7 @@ class DatabaseManager:
                 CREATE TABLE IF NOT EXISTS user_progress (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
+                    nivel0_completed BOOLEAN DEFAULT 0,
                     nivel1_completed BOOLEAN DEFAULT 0,
                     nivel2_completed BOOLEAN DEFAULT 0,
                     nivel3_completed BOOLEAN DEFAULT 0,

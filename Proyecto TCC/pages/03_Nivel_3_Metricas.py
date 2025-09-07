@@ -45,7 +45,7 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Verificar que los niveles anteriores estén completados

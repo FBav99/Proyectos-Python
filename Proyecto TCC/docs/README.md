@@ -81,7 +81,13 @@ Proyecto TCC/
 
 ## 📚 Sistema de Aprendizaje por Niveles
 
-La aplicación incluye un sistema de aprendizaje progresivo con 4 niveles:
+La aplicación incluye un sistema de aprendizaje progresivo con 5 niveles:
+
+### 🌟 Nivel 0: Introducción - Conceptos de Datos
+- **Objetivo**: Entender los conceptos fundamentales sobre qué son los datos
+- **Contenido**: Tipos de datos, qué puedes hacer con ellos, estructura de datos
+- **Duración**: 10-15 minutos
+- **Archivo**: `pages/00_Nivel_0_Introduccion.py`
 
 ### 🎯 Nivel 1: Básico - Preparación de Datos
 - **Objetivo**: Aprender a preparar y cargar datos correctamente
@@ -176,7 +182,7 @@ La aplicación incluye un sistema de aprendizaje progresivo con 4 niveles:
 
 ## 🔧 Características
 
-- **Sistema de aprendizaje por niveles:** 4 niveles progresivos de dificultad
+- **Sistema de aprendizaje por niveles:** 5 niveles progresivos de dificultad
 - **Carga de datos:** Soporte para CSV y Excel
 - **Filtros dinámicos:** Por fecha, categoría, región y valores numéricos
 - **Cálculos personalizados:** Matemáticas básicas, temporales y agregaciones

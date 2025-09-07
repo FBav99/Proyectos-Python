@@ -46,14 +46,22 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Verificar que el nivel anterior esté completado
+    if not progress.get('nivel0', False):
+        st.warning("⚠️ Primero debes completar el Nivel 0 (Introducción) antes de continuar con este nivel.")
+        if st.button("Ir al Nivel 0", type="primary"):
+            st.switch_page("pages/00_Nivel_0_Introduccion.py")
+        return
     
     # 3. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
-    En este nivel aprenderás los pasos básicos para preparar y cargar datos en herramientas de análisis. 
-    Es el primer paso fundamental para cualquier análisis de datos.
+    Ahora que ya entiendes qué son los datos, en este nivel aprenderás los pasos prácticos para 
+    preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico 
+    para trabajar con datos reales.
     """)
     
     # 4. Steps Section (clear, actionable instructions)
@@ -62,17 +70,23 @@ def main():
     # Step 1
     create_step_card(
         step_number="1",
-        title="Preparar tu archivo de datos",
-        description="<strong>¿Por qué es importante?</strong> Los datos bien organizados son más fáciles de analizar y te dan resultados más confiables.",
+        title="Elegir el formato correcto para tus datos",
+        description="<strong>¿Por qué es importante el formato?</strong> El formato correcto asegura que tus datos se carguen sin errores y sean fáciles de trabajar.",
         sections={
             "📁 Formatos recomendados:": [
-                "<strong>CSV</strong> - Para datos simples en tablas",
-                "<strong>Excel (.xlsx)</strong> - Para datos con formato y múltiples hojas"
+                "<strong>CSV (.csv)</strong> - Para datos simples, se abre en cualquier programa",
+                "<strong>Excel (.xlsx)</strong> - Para datos con formato, colores y múltiples hojas",
+                "<strong>JSON (.json)</strong> - Para datos estructurados complejos"
             ],
-            "✅ Consejos para organizar datos:": [
-                "Cada columna debe tener un título claro",
-                "Los datos deben estar en filas y columnas ordenadas",
-                "Evita celdas vacías o datos mezclados"
+            "🔧 Cómo elegir el formato:": [
+                "<strong>Usa CSV si:</strong> Tienes datos simples en tabla, quieres compatibilidad máxima",
+                "<strong>Usa Excel si:</strong> Tienes formato, colores, o múltiples hojas de datos",
+                "<strong>Usa JSON si:</strong> Tienes datos anidados o estructuras complejas"
+            ],
+            "⚠️ Formatos a evitar:": [
+                "<strong>PDF:</strong> No se puede analizar directamente",
+                "<strong>Imágenes:</strong> Necesitan procesamiento especial",
+                "<strong>Word:</strong> No está diseñado para datos tabulares"
             ]
         }
     )
@@ -80,29 +94,52 @@ def main():
     # Step 2
     create_step_card(
         step_number="2",
-        title="Cargar el archivo en la herramienta",
-        description="<strong>¿Qué significa?</strong> Subir tu archivo de datos para que la herramienta pueda leerlo y analizarlo.",
+        title="Preparar la estructura de datos correctamente",
+        description="<strong>¿Por qué es importante la estructura?</strong> Una estructura bien organizada hace que el análisis sea más fácil y preciso.",
         sections={
-            "🔧 Proceso de carga:": {
-                "Haz clic en 'Cargar archivo' o 'Subir datos'",
-                "Selecciona tu archivo desde tu computadora",
-                "Espera a que se complete la carga",
-                "Verifica que los datos se cargaron correctamente"
-            }
+            "📋 Reglas para organizar datos:": [
+                "<strong>Una fila = un registro:</strong> Cada fila debe representar una sola cosa (una venta, un cliente, un producto)",
+                "<strong>Una columna = un tipo de información:</strong> Cada columna debe tener el mismo tipo de dato",
+                "<strong>Encabezados claros:</strong> Usa nombres descriptivos para las columnas",
+                "<strong>Sin filas vacías:</strong> Evita filas completamente vacías en el medio de los datos"
+            ],
+            "✅ Ejemplo de estructura correcta:": [
+                "| Fecha | Producto | Cantidad | Precio |",
+                "|-------|----------|----------|--------|",
+                "| 15/03 | Laptop   | 1        | 800    |",
+                "| 15/03 | Mouse    | 2        | 25     |"
+            ],
+            "❌ Ejemplo de estructura incorrecta:": [
+                "| Fecha | Producto | Cantidad | Precio |",
+                "|-------|----------|----------|--------|",
+                "| 15/03 | Laptop   | 1        | 800    |",
+                "|       |          |          |        | ← Fila vacía",
+                "| 15/03 | Mouse    | 2        | 25     |"
+            ]
         }
     )
     
     # Step 3
     create_step_card(
         step_number="3",
-        title="Verificar que los datos se cargaron correctamente",
-        description="<strong>¿Por qué verificar?</strong> Es importante asegurarse de que todos los datos se cargaron sin errores.",
+        title="Cargar el archivo en la herramienta",
+        description="<strong>¿Cómo cargar datos?</strong> Una vez que tienes tu archivo preparado, necesitas subirlo a la herramienta de análisis.",
         sections={
-            "👀 Qué revisar:": [
-                "¿Se ven todos los números y texto?",
-                "¿Las fechas se muestran correctamente?",
-                "¿No hay datos faltantes o extraños?",
-                "¿El número de filas y columnas es el esperado?"
+            "🔧 Proceso de carga paso a paso:": [
+                "<strong>1. Localiza el botón de carga:</strong> Busca 'Cargar archivo', 'Subir datos' o 'Importar'",
+                "<strong>2. Selecciona tu archivo:</strong> Navega hasta donde guardaste tu archivo",
+                "<strong>3. Confirma la carga:</strong> Haz clic en 'Abrir' o 'Subir'",
+                "<strong>4. Espera la confirmación:</strong> La herramienta te dirá si la carga fue exitosa"
+            ],
+            "📁 Tipos de carga disponibles:": [
+                "<strong>Arrastrar y soltar:</strong> Arrastra el archivo directamente a la zona de carga",
+                "<strong>Explorador de archivos:</strong> Haz clic en 'Examinar' y selecciona el archivo",
+                "<strong>URL o enlace:</strong> Si tienes un enlace a los datos en internet"
+            ],
+            "⚠️ Problemas comunes al cargar:": [
+                "<strong>Archivo muy grande:</strong> Algunas herramientas tienen límites de tamaño",
+                "<strong>Formato no soportado:</strong> Verifica que el formato sea compatible",
+                "<strong>Archivo corrupto:</strong> Intenta abrirlo en otro programa primero"
             ]
         }
     )
@@ -110,14 +147,53 @@ def main():
     # Step 4
     create_step_card(
         step_number="4",
-        title="Explorar la estructura básica de los datos",
-        description="<strong>¿Qué es la estructura?</strong> Es cómo están organizados tus datos: qué columnas tienes, qué tipo de información contienen, y cuántos registros hay.",
+        title="Verificar que los datos se cargaron correctamente",
+        description="<strong>¿Por qué verificar?</strong> Es crucial asegurarse de que todos los datos se cargaron sin errores antes de continuar con el análisis.",
+        sections={
+            "👀 Checklist de verificación:": [
+                "<strong>¿Se ven todos los datos?</strong> Revisa que no falten números o texto",
+                "<strong>¿Las fechas se ven correctas?</strong> Verifica que el formato de fechas sea el esperado",
+                "<strong>¿No hay datos extraños?</strong> Busca símbolos raros, errores de tipeo, o valores imposibles",
+                "<strong>¿El conteo es correcto?</strong> Confirma que el número de filas y columnas sea el esperado"
+            ],
+            "🔍 Qué buscar específicamente:": [
+                "<strong>Datos faltantes:</strong> Celdas vacías donde no debería haberlas",
+                "<strong>Formato incorrecto:</strong> Números que se ven como texto, fechas mal formateadas",
+                "<strong>Datos duplicados:</strong> Filas que aparecen más de una vez",
+                "<strong>Valores atípicos:</strong> Números que parecen demasiado grandes o pequeños"
+            ],
+            "✅ Señales de que todo está bien:": [
+                "Los números se ven como números (alineados a la derecha)",
+                "Las fechas tienen un formato consistente",
+                "No hay celdas con errores (#N/A, #ERROR, etc.)",
+                "El número total de registros coincide con lo esperado"
+            ]
+        }
+    )
+    
+    # Step 5
+    create_step_card(
+        step_number="5",
+        title="Entender la estructura de tus datos cargados",
+        description="<strong>¿Por qué es importante?</strong> Conocer la estructura te ayuda a entender qué puedes hacer con los datos y cómo organizarlos para el análisis.",
         sections={
             "📊 Información básica a revisar:": [
-                "<strong>Número de filas:</strong> Cuántos registros tienes",
-                "<strong>Número de columnas:</strong> Qué tipos de información tienes",
-                "<strong>Tipos de datos:</strong> Números, texto, fechas",
-                "<strong>Valores únicos:</strong> Qué categorías o rangos tienes"
+                "<strong>Número de filas:</strong> Cuántos registros tienes en total",
+                "<strong>Número de columnas:</strong> Qué tipos de información tienes disponibles",
+                "<strong>Tipos de datos:</strong> Qué columnas son números, texto, fechas, etc.",
+                "<strong>Valores únicos:</strong> Cuántas categorías diferentes tienes en cada columna"
+            ],
+            "🔍 Cómo interpretar la información:": [
+                "<strong>Filas:</strong> Cada fila representa un evento, transacción, o registro individual",
+                "<strong>Columnas:</strong> Cada columna representa una característica o medida",
+                "<strong>Tipos de datos:</strong> Te dicen qué operaciones puedes hacer (sumar números, contar categorías)",
+                "<strong>Valores únicos:</strong> Te muestran la diversidad de tus datos"
+            ],
+            "💡 Preguntas útiles para hacerte:": [
+                "¿Tengo suficientes datos para hacer análisis confiables?",
+                "¿Qué columnas contienen la información más importante?",
+                "¿Hay columnas que no necesito para mi análisis?",
+                "¿Los tipos de datos son correctos para lo que quiero hacer?"
             ]
         }
     )
@@ -134,8 +210,8 @@ def main():
     
     create_info_box(
         "info-box",
-        "📊 Vamos a ver un ejemplo con datos de ventas",
-        "<p>Te mostraré cómo se ven los datos cuando están bien organizados y qué información puedes obtener de ellos.</p>"
+        "📊 Vamos a practicar la preparación y carga de datos",
+        "<p>Te mostraré cómo preparar datos correctamente y qué verificar después de cargarlos.</p>"
     )
     
     df = create_sample_data()
@@ -175,24 +251,26 @@ def main():
     
     st.markdown("""
     <div class="warning-box">
-        <h3>⚠️ Errores comunes a evitar:</h3>
+        <h3>⚠️ Errores comunes al preparar datos:</h3>
         <ul>
-            <li><strong>Datos mezclados:</strong> No mezcles texto y números en la misma columna</li>
-            <li><strong>Formato de fechas:</strong> Usa un formato consistente</li>
-            <li><strong>Caracteres especiales:</strong> Evita símbolos extraños</li>
-            <li><strong>Datos vacíos:</strong> Es mejor dejar celdas vacías que poner "0" o "N/A"</li>
+            <li><strong>Formato incorrecto:</strong> Elegir un formato que no es compatible con la herramienta</li>
+            <li><strong>Estructura inconsistente:</strong> Mezclar diferentes tipos de información en una columna</li>
+            <li><strong>Nombres confusos:</strong> Usar abreviaciones o nombres poco claros en las columnas</li>
+            <li><strong>Datos incompletos:</strong> No verificar que todos los datos se cargaron correctamente</li>
+            <li><strong>Archivos corruptos:</strong> Intentar cargar archivos dañados o incompletos</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("""
     <div class="success-box">
-        <h3>✅ Buenas prácticas:</h3>
+        <h3>✅ Buenas prácticas para preparar datos:</h3>
         <ul>
-            <li><strong>Nombres claros:</strong> Usa nombres descriptivos</li>
-            <li><strong>Consistencia:</strong> Mantén el mismo formato en toda la columna</li>
-            <li><strong>Organización:</strong> Agrupa información relacionada</li>
-            <li><strong>Documentación:</strong> Describe cada columna</li>
+            <li><strong>Planifica antes de empezar:</strong> Decide qué formato usar según tus necesidades</li>
+            <li><strong>Organiza la estructura:</strong> Una fila = un registro, una columna = un tipo de información</li>
+            <li><strong>Usa nombres descriptivos:</strong> Las columnas deben tener nombres claros y específicos</li>
+            <li><strong>Verifica la calidad:</strong> Siempre revisa que los datos se cargaron sin errores</li>
+            <li><strong>Mantén copias de seguridad:</strong> Guarda una copia de tus datos originales</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
@@ -201,13 +279,14 @@ def main():
     st.header("🎯 Actividad Práctica")
     st.markdown("""
     <div class="card">
-        <h3>📝 Ejercicio para practicar:</h3>
+        <h3>📝 Ejercicio para practicar la preparación de datos:</h3>
         <ol>
-            <li><strong>Prepara un archivo:</strong> Crea una tabla simple en Excel con información de ventas</li>
-            <li><strong>Organiza los datos:</strong> Usa columnas para: Fecha, Producto, Cantidad, Precio</li>
-            <li><strong>Agrega algunos datos:</strong> Incluye al menos 10 registros</li>
-            <li><strong>Guarda el archivo:</strong> Como .xlsx o .csv</li>
-            <li><strong>Verifica la estructura:</strong> Asegúrate de que esté ordenado</li>
+            <li><strong>Elige un formato:</strong> Decide si usar CSV o Excel para tu archivo</li>
+            <li><strong>Diseña la estructura:</strong> Planifica qué columnas necesitas (ej: Fecha, Producto, Cantidad, Precio)</li>
+            <li><strong>Crea el archivo:</strong> Abre Excel o un editor de texto y crea tu tabla</li>
+            <li><strong>Agrega datos de ejemplo:</strong> Incluye al menos 10 registros con información realista</li>
+            <li><strong>Verifica la calidad:</strong> Revisa que no haya errores, datos faltantes o inconsistencias</li>
+            <li><strong>Guarda correctamente:</strong> Guarda en el formato que elegiste (.csv o .xlsx)</li>
         </ol>
     </div>
     """, unsafe_allow_html=True)
@@ -439,7 +518,7 @@ def main():
         )
         
         st.subheader("🚀 ¿Qué sigue?")
-        st.markdown("En el **Nivel 2** aprenderás a organizar y filtrar la información.")
+        st.markdown("En el **Nivel 2** aprenderás a organizar y filtrar la información para encontrar exactamente lo que necesitas.")
         
         if st.button("Continuar al Nivel 2", type="primary"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
