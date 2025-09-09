@@ -68,7 +68,7 @@ class DataCleaningOperations:
                 
                 if remove_empty_strings:
                     # Replace empty strings with NaN
-                    self.cleaned_df[col] = self.cleaned_df[col].replace(['', 'nan', 'None'], np.nan)
+                    self.cleaned_df[col] = self.cleaned_df[col].replace(['', 'nan', 'None', 'null', 'N/A'], np.nan)
                 
                 # Count changes
                 changes = (original_values != self.cleaned_df[col]).sum()
@@ -213,10 +213,11 @@ class DataCleaningOperations:
         """
         if columns is None:
             # Try to detect columns that might contain phone numbers
-            phone_pattern = r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+            # Use non-capturing groups to avoid warnings
+            phone_pattern = r'(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
             columns = []
             for col in self.cleaned_df.select_dtypes(include=['object']).columns:
-                if self.cleaned_df[col].astype(str).str.contains(phone_pattern, regex=True).any():
+                if self.cleaned_df[col].astype(str).str.contains(phone_pattern, regex=True, na=False).any():
                     columns.append(col)
         
         changes_made = 0
@@ -251,7 +252,17 @@ class DataCleaningOperations:
         if len(digits) == 0:
             return phone
         
-        if format_type == 'international':
+        if format_type == 'paraguay':
+            # Paraguay format: +595 9xx xxxxxx
+            if len(digits) == 9 and digits[0] == '9':
+                return f"+595 {digits[0]}{digits[1]}{digits[2]} {digits[3:]}"
+            elif len(digits) == 12 and digits[:3] == '595':
+                return f"+{digits[:3]} {digits[3:6]} {digits[6:]}"
+            elif len(digits) == 11 and digits[:2] == '59':
+                return f"+{digits[:3]} {digits[3:6]} {digits[6:]}"
+            else:
+                return f"+595 {digits}" if len(digits) <= 9 else f"+{digits}"
+        elif format_type == 'international':
             if len(digits) == 10:
                 return f"+1-{digits[:3]}-{digits[3:6]}-{digits[6:]}"
             elif len(digits) == 11 and digits[0] == '1':
@@ -278,7 +289,7 @@ class DataCleaningOperations:
             email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             columns = []
             for col in self.cleaned_df.select_dtypes(include=['object']).columns:
-                if self.cleaned_df[col].astype(str).str.contains(email_pattern, regex=True).any():
+                if self.cleaned_df[col].astype(str).str.contains(email_pattern, regex=True, na=False).any():
                     columns.append(col)
         
         changes_made = 0
@@ -313,6 +324,83 @@ class DataCleaningOperations:
         email = re.sub(r'\s+', '', email)
         
         return email
+    
+    def standardize_dates(self, columns: Optional[List[str]] = None,
+                         format_type: str = 'dd/mm/yyyy') -> pd.DataFrame:
+        """
+        Standardize date formats
+        
+        Args:
+            columns: List of date columns
+            format_type: 'dd/mm/yyyy', 'yyyy-mm-dd', 'mm/dd/yyyy', 'dd-mm-yyyy'
+        """
+        if columns is None:
+            # Try to detect date columns
+            columns = []
+            for col in self.cleaned_df.select_dtypes(include=['object', 'datetime64']).columns:
+                # Check if column contains date-like patterns
+                sample_values = self.cleaned_df[col].dropna().astype(str).head(10)
+                if any(self._is_date_like(val) for val in sample_values):
+                    columns.append(col)
+        
+        changes_made = 0
+        
+        for col in columns:
+            if col in self.cleaned_df.columns:
+                original_values = self.cleaned_df[col].copy()
+                
+                # Convert to datetime first, then format
+                try:
+                    # Try to parse as datetime with format inference
+                    self.cleaned_df[col] = pd.to_datetime(self.cleaned_df[col], errors='coerce')
+                    
+                    # Format according to specified format
+                    if format_type == 'dd/mm/yyyy':
+                        self.cleaned_df[col] = self.cleaned_df[col].dt.strftime('%d/%m/%Y')
+                    elif format_type == 'yyyy-mm-dd':
+                        self.cleaned_df[col] = self.cleaned_df[col].dt.strftime('%Y-%m-%d')
+                    elif format_type == 'mm/dd/yyyy':
+                        self.cleaned_df[col] = self.cleaned_df[col].dt.strftime('%m/%d/%Y')
+                    elif format_type == 'dd-mm-yyyy':
+                        self.cleaned_df[col] = self.cleaned_df[col].dt.strftime('%d-%m-%Y')
+                    
+                    # Replace NaT with original values that couldn't be parsed
+                    self.cleaned_df[col] = self.cleaned_df[col].fillna(original_values)
+                    
+                except Exception:
+                    # If conversion fails, keep original values
+                    self.cleaned_df[col] = original_values
+                
+                changes = (original_values != self.cleaned_df[col]).sum()
+                changes_made += changes
+        
+        self.add_to_history(
+            f"Date standardization ({format_type})",
+            f"Columns: {columns}, Changes made: {changes_made}"
+        )
+        
+        return self.cleaned_df
+    
+    def _is_date_like(self, value: str) -> bool:
+        """Check if a string looks like a date"""
+        if pd.isna(value) or value == 'nan':
+            return False
+        
+        value = str(value).strip()
+        
+        # Common date patterns
+        date_patterns = [
+            r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}',  # dd/mm/yyyy or dd-mm-yyyy
+            r'\d{4}[/-]\d{1,2}[/-]\d{1,2}',    # yyyy/mm/dd or yyyy-mm-dd
+            r'\d{1,2}\s+\w+\s+\d{4}',          # dd Month yyyy
+            r'\w+\s+\d{1,2},?\s+\d{4}',        # Month dd, yyyy
+        ]
+        
+        for pattern in date_patterns:
+            if re.search(pattern, value, re.IGNORECASE):
+                return True
+        
+        return False
     
     def replace_values(self, replacements: Dict[str, str], 
                       columns: Optional[List[str]] = None) -> pd.DataFrame:

@@ -29,22 +29,84 @@ def main():
     
     # Verificar si hay datos cargados
     if 'uploaded_data' in st.session_state and st.session_state.uploaded_data is not None:
+        # Header with current file info and upload new file option
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown(f"### 📊 Datos Actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas")
+        with col2:
+            if st.button("📁 Subir Nuevo Archivo", type="secondary", use_container_width=True):
+                # Show confirmation dialog
+                st.session_state.show_upload_new = True
+                st.rerun()
+        
+        # Confirmation dialog for uploading new file
+        if st.session_state.get('show_upload_new', False):
+            st.warning("⚠️ ¿Estás seguro de que quieres subir un nuevo archivo? Se perderán los datos actuales y cualquier limpieza realizada.")
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col1:
+                if st.button("✅ Sí, Subir Nuevo", type="primary"):
+                    # Clear current data and show upload section
+                    st.session_state.uploaded_data = None
+                    if 'global_replacements' in st.session_state:
+                        del st.session_state.global_replacements
+                    st.session_state.show_upload_new = False
+                    st.rerun()
+            with col2:
+                if st.button("❌ Cancelar"):
+                    st.session_state.show_upload_new = False
+                    st.rerun()
+        
         # Mostrar interfaz de limpieza
         cleaned_df = create_data_cleaning_interface(st.session_state.uploaded_data)
         
-        # Mostrar vista previa de datos limpiados
-        if st.button("👀 Ver Vista Previa de Datos Limpiados"):
-            st.subheader("📊 Vista Previa de Datos Limpiados")
-            st.dataframe(cleaned_df.head(20), use_container_width=True)
-            
-            # Estadísticas comparativas
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Filas Originales", len(st.session_state.uploaded_data))
-            with col2:
-                st.metric("Filas Limpiadas", len(cleaned_df))
-            with col3:
-                st.metric("Cambios", len(st.session_state.uploaded_data) - len(cleaned_df))
+        # Always show comparison stats using the session state cleaner
+        st.markdown("---")
+        st.markdown("### 📊 Comparación de Datos")
+        
+        # Get the current cleaner from session state
+        if 'data_cleaner' in st.session_state:
+            cleaner = st.session_state.data_cleaner
+            original_df = cleaner.original_df
+            current_df = cleaner.cleaned_df
+            # Debug info
+            st.write(f"🔍 Debug: Original rows: {len(original_df)}, Current rows: {len(current_df)}")
+            st.write(f"🔍 Debug: Original columns: {len(original_df.columns)}, Current columns: {len(current_df.columns)}")
+        else:
+            # Fallback to uploaded data if no cleaner in session state
+            original_df = st.session_state.uploaded_data
+            current_df = cleaned_df
+            st.write("🔍 Debug: Using fallback data")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("📈 Filas Originales", len(original_df))
+        with col2:
+            st.metric("🧹 Filas Limpiadas", len(current_df))
+        with col3:
+            rows_changed = len(original_df) - len(current_df)
+            st.metric("📉 Filas Removidas", rows_changed)
+        with col4:
+            cols_changed = len(original_df.columns) - len(current_df.columns)
+            st.metric("🗑️ Columnas Removidas", cols_changed)
+        
+        # Data preview and download section
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            if st.button("👀 Ver Vista Previa de Datos Limpiados"):
+                st.subheader("📊 Vista Previa de Datos Limpiados")
+                st.dataframe(cleaned_df.head(20), use_container_width=True)
+        
+        with col2:
+            # Download cleaned data using current state
+            download_df = current_df if 'data_cleaner' in st.session_state else cleaned_df
+            csv_data = download_df.to_csv(index=False)
+            st.download_button(
+                label="💾 Descargar Datos Limpiados",
+                data=csv_data,
+                file_name="datos_limpiados.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
     
     else:
         # Mostrar opciones para cargar datos

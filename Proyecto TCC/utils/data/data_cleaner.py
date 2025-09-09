@@ -56,35 +56,56 @@ class DataCleaner:
                 'missing_values': True
             }
         
+        # Start with current cleaned_df
+        current_df = self.cleaned_df.copy()
+        
         if cleaning_options.get('whitespace', False):
-            self.cleaned_df = self.cleaning_ops.clean_whitespace()
+            # Update cleaning_ops with current data
+            self.cleaning_ops.cleaned_df = current_df.copy()
+            current_df = self.cleaning_ops.clean_whitespace()
             self.add_to_history("Auto whitespace cleaning", "Applied to all text columns")
         
         if cleaning_options.get('case_normalization', False):
-            self.cleaned_df = self.cleaning_ops.normalize_text_case(case_type='lower')
+            # Update cleaning_ops with current data
+            self.cleaning_ops.cleaned_df = current_df.copy()
+            current_df = self.cleaning_ops.normalize_text_case(case_type='lower')
             self.add_to_history("Auto case normalization", "Applied to all text columns")
         
         if cleaning_options.get('special_characters', False):
-            self.cleaned_df = self.cleaning_ops.remove_special_characters()
+            # Update cleaning_ops with current data
+            self.cleaning_ops.cleaned_df = current_df.copy()
+            current_df = self.cleaning_ops.remove_special_characters()
             self.add_to_history("Auto special character removal", "Applied to all text columns")
         
         if cleaning_options.get('accents', False):
-            self.cleaned_df = self.cleaning_ops.normalize_accents()
+            # Update cleaning_ops with current data
+            self.cleaning_ops.cleaned_df = current_df.copy()
+            current_df = self.cleaning_ops.normalize_accents()
             self.add_to_history("Auto accent normalization", "Applied to all text columns")
         
         if cleaning_options.get('duplicates', False):
-            self.cleaned_df, removed_count = self.validation.remove_duplicates()
+            # Update validation with current data
+            self.validation.df = current_df.copy()
+            current_df, removed_count = self.validation.remove_duplicates()
             self.add_to_history("Auto duplicate removal", f"Removed {removed_count} duplicate rows")
         
         if cleaning_options.get('missing_values', False):
-            self.cleaned_df = self.validation.fill_missing_values(method='auto')
+            # Update validation with current data
+            self.validation.df = current_df.copy()
+            current_df = self.validation.fill_missing_values(method='auto')
             self.add_to_history("Auto missing value filling", "Applied auto-fill method")
+        
+        # Update all components with final result
+        self.cleaned_df = current_df.copy()
+        self.cleaning_ops.cleaned_df = current_df.copy()
         
         return self.cleaned_df
     
     def reset_to_original(self) -> pd.DataFrame:
         """Reset to original data"""
         self.cleaned_df = self.original_df.copy()
+        self.cleaning_ops.cleaned_df = self.original_df.copy()
+        self.validation.df = self.original_df.copy()
         self.cleaning_history = []
         return self.cleaned_df
     
@@ -112,220 +133,531 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Cleaned DataFrame
     """
-    st.markdown("## 🧹 Limpieza Automática de Datos")
-    st.markdown("### Configura las opciones de limpieza para tus datos")
-    
     # Initialize cleaner
     cleaner = DataCleaner(df)
     
-    # Automatic cleaning options
-    st.markdown("### ⚙️ Opciones de Limpieza Automática")
+    # Store cleaner in session state to persist across reruns
+    if 'data_cleaner' not in st.session_state:
+        st.session_state.data_cleaner = cleaner
+    else:
+        # Update the cleaner with current data if it changed
+        if not st.session_state.data_cleaner.original_df.equals(df):
+            st.session_state.data_cleaner = cleaner
+    
+    # Use the session state cleaner
+    cleaner = st.session_state.data_cleaner
+    
+    # Main header with data overview
+    st.markdown("## 🧹 Limpieza de Datos")
+    
+    # Quick data overview
+    quality_report = cleaner.get_quality_report()
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("📊 Calidad", f"{quality_report['quality_score']:.1f}%")
+    with col2:
+        st.metric("📈 Filas", quality_report['total_rows'])
+    with col3:
+        st.metric("🏷️ Columnas", quality_report['total_columns'])
+    with col4:
+        missing_count = sum(info['missing_count'] for info in quality_report['missing_values'].values())
+        st.metric("❌ Faltantes", missing_count)
+    
+    st.markdown("---")
+    
+    # Main cleaning interface with better organization
+    tab1, tab2, tab3, tab4 = st.tabs(["🚀 Limpieza Rápida", "🔧 Limpieza Avanzada", "📊 Análisis", "📋 Historial"])
+    
+    with tab1:
+        st.markdown("### 🚀 Limpieza Rápida")
+        st.markdown("Limpieza automática con configuraciones predefinidas")
+        
+        # Quick cleaning presets
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 🎯 Presets de Limpieza")
+            
+            if st.button("🧹 Limpieza Básica", use_container_width=True, type="primary"):
+                with st.spinner("Aplicando limpieza básica..."):
+                    cleaning_options = {
+                        'whitespace': True,
+                        'case_normalization': True,
+                        'duplicates': True,
+                        'missing_values': True,
+                        'special_characters': False,
+                        'accents': False
+                    }
+                    cleaner.apply_auto_cleaning(cleaning_options)
+                    # Update session state cleaner
+                    st.session_state.data_cleaner = cleaner
+                    st.success("✅ Limpieza básica completada!")
+                    st.rerun()
+            
+            if st.button("🔧 Limpieza Completa", use_container_width=True):
+                with st.spinner("Aplicando limpieza completa..."):
+                    cleaning_options = {
+                        'whitespace': True,
+                        'case_normalization': True,
+                        'special_characters': True,
+                        'accents': True,
+                        'duplicates': True,
+                        'missing_values': True
+                    }
+                    cleaner.apply_auto_cleaning(cleaning_options)
+                    
+                    # Apply specific cleanings
+                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                    cleaner.cleaned_df = cleaner.cleaning_ops.standardize_phone_numbers()
+                    cleaner.cleaned_df = cleaner.cleaning_ops.standardize_emails()
+                    
+                    # Update session state cleaner
+                    st.session_state.data_cleaner = cleaner
+                    st.success("✅ Limpieza completa finalizada!")
+                    st.rerun()
+    
+    with col2:
+            st.markdown("#### ⚙️ Opciones Personalizadas")
+            
+            # Collapsible advanced options
+            with st.expander("🔧 Configuración Avanzada"):
+                auto_whitespace = st.checkbox("🧹 Limpiar espacios", value=True)
+                auto_case = st.checkbox("📝 Normalizar capitalización", value=True)
+                auto_duplicates = st.checkbox("🔄 Remover duplicados", value=True)
+                auto_missing = st.checkbox("❌ Llenar faltantes", value=True)
+                auto_special_chars = st.checkbox("🔤 Remover caracteres especiales", value=False)
+                auto_accents = st.checkbox("🌍 Normalizar acentos", value=False)
+                auto_phones = st.checkbox("📞 Estandarizar teléfonos", value=False)
+                auto_emails = st.checkbox("📧 Estandarizar emails", value=False)
+                auto_dates = st.checkbox("📅 Estandarizar fechas", value=False)
+                
+                # Advanced options
+                if auto_case:
+                    auto_case_type = st.selectbox(
+                        "Tipo de normalización:",
+                        ["lower", "upper", "title", "capitalize"],
+                        format_func=lambda x: {
+                            "lower": "Minúsculas",
+                            "upper": "MAYÚSCULAS", 
+                            "title": "Título",
+                            "capitalize": "Primera Mayúscula"
+                        }[x],
+                        key="auto_case_type"
+                    )
+                
+                if auto_phones:
+                    auto_phone_format = st.selectbox(
+                        "Formato de teléfono:",
+                        ["paraguay", "international", "national", "simple"],
+                        format_func=lambda x: {
+                            "paraguay": "Paraguay (+595 9xx xxxxxx)",
+                            "international": "Internacional",
+                            "national": "Nacional",
+                            "simple": "Simple"
+                        }[x],
+                        key="auto_phone_format"
+                    )
+                
+                if auto_dates:
+                    auto_date_format = st.selectbox(
+                        "Formato de fecha:",
+                        ["dd/mm/yyyy", "yyyy-mm-dd", "mm/dd/yyyy", "dd-mm-yyyy"],
+                        format_func=lambda x: {
+                            "dd/mm/yyyy": "DD/MM/YYYY (Recomendado)",
+                            "yyyy-mm-dd": "YYYY-MM-DD (ISO)",
+                            "mm/dd/yyyy": "MM/DD/YYYY (US)",
+                            "dd-mm-yyyy": "DD-MM-YYYY"
+                        }[x],
+                        key="auto_date_format"
+                    )
+                
+                if st.button("🚀 Aplicar Configuración Personalizada", type="secondary"):
+                    with st.spinner("Aplicando limpieza personalizada..."):
+                        cleaning_options = {
+                            'whitespace': auto_whitespace,
+                            'case_normalization': auto_case,
+                            'special_characters': auto_special_chars,
+                            'accents': auto_accents,
+                            'duplicates': auto_duplicates,
+                            'missing_values': auto_missing
+                        }
+                        
+                        cleaner.apply_auto_cleaning(cleaning_options)
+                        
+                        # Apply specific cleanings with custom options
+                        if auto_phones:
+                            cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                            cleaner.cleaned_df = cleaner.cleaning_ops.standardize_phone_numbers(format_type=auto_phone_format)
+                        
+                        if auto_emails:
+                            cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                            cleaner.cleaned_df = cleaner.cleaning_ops.standardize_emails()
+                        
+                        if auto_dates:
+                            cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                            cleaner.cleaned_df = cleaner.cleaning_ops.standardize_dates(format_type=auto_date_format)
+                        
+                        # Update session state cleaner
+                        st.session_state.data_cleaner = cleaner
+                        st.success("✅ Limpieza personalizada completada!")
+                        st.rerun()
+    
+    with tab2:
+        st.markdown("### 🔧 Limpieza Avanzada")
+        st.markdown("Control granular sobre cada operación de limpieza")
+        
+        # Initialize global_replacements in session state if not exists
+        if 'global_replacements' not in st.session_state:
+            st.session_state.global_replacements = {}
+        
+        # Organized manual cleaning sections
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 🧹 Limpieza de Texto")
+            
+            # Column selection
+            st.markdown("**Seleccionar columnas:**")
+            all_columns = cleaner.cleaned_df.columns.tolist()
+            text_columns = cleaner.cleaned_df.select_dtypes(include=['object']).columns.tolist()
+            
+            col_selection = st.selectbox(
+                "Aplicar a:",
+                ["Todas las columnas de texto", "Columna específica", "Múltiples columnas"],
+                key="col_selection"
+            )
+            
+            selected_columns = None
+            if col_selection == "Columna específica":
+                selected_columns = [st.selectbox("Seleccionar columna:", text_columns, key="single_col")]
+            elif col_selection == "Múltiples columnas":
+                selected_columns = st.multiselect("Seleccionar columnas:", text_columns, key="multi_col")
+            
+            # Text cleaning operations
+            text_ops = st.container()
+            with text_ops:
+                if st.button("🧹 Limpiar Espacios", use_container_width=True):
+                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                    result_df = cleaner.cleaning_ops.clean_whitespace(columns=selected_columns)
+                    cleaner.cleaned_df = result_df.copy()
+                    st.session_state.data_cleaner = cleaner
+                    st.success("✅ Espacios limpiados!")
+                    st.rerun()
+                
+                # Enhanced case normalization
+                st.markdown("**Normalización de capitalización:**")
+                case_type = st.selectbox(
+                    "Tipo de normalización:",
+                    ["lower", "upper", "title", "capitalize"],
+                    format_func=lambda x: {
+                        "lower": "Minúsculas (lower)",
+                        "upper": "MAYÚSCULAS (upper)", 
+                        "title": "Título (Title Case)",
+                        "capitalize": "Primera Mayúscula (Capitalize)"
+                    }[x],
+                    key="case_type"
+                )
+                
+                if st.button("📝 Normalizar Capitalización", use_container_width=True):
+                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                    result_df = cleaner.cleaning_ops.normalize_text_case(columns=selected_columns, case_type=case_type)
+                    cleaner.cleaned_df = result_df.copy()
+                    st.session_state.data_cleaner = cleaner
+                    st.success(f"✅ Capitalización normalizada a {case_type}!")
+                    st.rerun()
+                
+                if st.button("🔤 Remover Caracteres Especiales", use_container_width=True):
+                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                    result_df = cleaner.cleaning_ops.remove_special_characters(columns=selected_columns)
+                    cleaner.cleaned_df = result_df.copy()
+                    st.session_state.data_cleaner = cleaner
+                    st.success("✅ Caracteres especiales removidos!")
+                    st.rerun()
+                
+                if st.button("🌍 Normalizar Acentos", use_container_width=True):
+                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                    result_df = cleaner.cleaning_ops.normalize_accents(columns=selected_columns)
+                    cleaner.cleaned_df = result_df.copy()
+                    st.session_state.data_cleaner = cleaner
+                    st.success("✅ Acentos normalizados!")
+                    st.rerun()
+                
+                # Data preview button
+                st.markdown("---")
+                if st.button("👁️ Vista Previa de Datos", use_container_width=True, type="secondary"):
+                    st.markdown("### 📊 Vista Previa de Datos Limpiados")
+                    st.dataframe(cleaner.cleaned_df.head(10), use_container_width=True)
+                    
+                    # Show some basic stats
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("📊 Filas", len(cleaner.cleaned_df))
+                    with col2:
+                        st.metric("📋 Columnas", len(cleaner.cleaned_df.columns))
+                    with col3:
+                        missing_count = cleaner.cleaned_df.isnull().sum().sum()
+                        st.metric("❌ Valores Faltantes", missing_count)
+        
+        with col2:
+            st.markdown("#### 📞 Estandarización")
+            
+            # Phone number standardization options
+            st.markdown("**Estandarización de teléfonos:**")
+            phone_format = st.selectbox(
+                "Formato de teléfono:",
+                ["paraguay", "international", "national", "simple"],
+                format_func=lambda x: {
+                    "paraguay": "Paraguay (+595 9xx xxxxxx)",
+                    "international": "Internacional (+1-555-123-4567)",
+                    "national": "Nacional ((555) 123-4567)",
+                    "simple": "Simple (5551234567)"
+                }[x],
+                key="phone_format"
+            )
+            
+            if st.button("📞 Estandarizar Teléfonos", use_container_width=True):
+                cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                result_df = cleaner.cleaning_ops.standardize_phone_numbers(format_type=phone_format)
+                cleaner.cleaned_df = result_df.copy()
+                st.session_state.data_cleaner = cleaner
+                st.success("✅ Teléfonos estandarizados!")
+                st.rerun()
+            
+            if st.button("📧 Estandarizar Emails", use_container_width=True):
+                cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                result_df = cleaner.cleaning_ops.standardize_emails()
+                cleaner.cleaned_df = result_df.copy()
+                st.session_state.data_cleaner = cleaner
+                st.success("✅ Emails estandarizados!")
+                st.rerun()
+            
+            # Date standardization options
+            st.markdown("**Estandarización de fechas:**")
+            date_format = st.selectbox(
+                "Formato de fecha:",
+                ["dd/mm/yyyy", "yyyy-mm-dd", "mm/dd/yyyy", "dd-mm-yyyy"],
+                format_func=lambda x: {
+                    "dd/mm/yyyy": "DD/MM/YYYY (Recomendado)",
+                    "yyyy-mm-dd": "YYYY-MM-DD (ISO)",
+                    "mm/dd/yyyy": "MM/DD/YYYY (US)",
+                    "dd-mm-yyyy": "DD-MM-YYYY"
+                }[x],
+                key="date_format"
+            )
+            
+            if st.button("📅 Estandarizar Fechas", use_container_width=True):
+                cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                result_df = cleaner.cleaning_ops.standardize_dates(format_type=date_format)
+                cleaner.cleaned_df = result_df.copy()
+                st.session_state.data_cleaner = cleaner
+                st.success(f"✅ Fechas estandarizadas a {date_format}!")
+                st.rerun()
+            
+            # Data preview button for standardization section
+            st.markdown("---")
+            if st.button("👁️ Vista Previa", use_container_width=True, type="secondary"):
+                st.markdown("### 📊 Vista Previa de Datos Estandarizados")
+                st.dataframe(cleaner.cleaned_df.head(10), use_container_width=True)
+        
+        # Global value replacements in a separate section
+        st.markdown("---")
+        st.markdown("#### 🔄 Reemplazos Globales")
+        
+        # Column selection for replacements
+        st.markdown("**Aplicar reemplazos a:**")
+        replacement_scope = st.selectbox(
+            "Alcance:",
+            ["Todas las columnas", "Solo columnas de texto", "Columna específica"],
+            key="replacement_scope"
+        )
+        
+        replacement_columns = None
+        if replacement_scope == "Solo columnas de texto":
+            replacement_columns = text_columns
+        elif replacement_scope == "Columna específica":
+            replacement_columns = [st.selectbox("Seleccionar columna:", all_columns, key="replacement_col")]
+        
+        # Display current replacements in a cleaner way
+        if st.session_state.global_replacements:
+            st.markdown("**Reemplazos configurados:**")
+            for old_val, new_val in st.session_state.global_replacements.items():
+                st.write(f"• `{old_val}` → `{new_val}`")
+            st.markdown("")
+        
+        # Replacement input in a cleaner layout
+        col1, col2, col3 = st.columns([2, 2, 1])
+        with col1:
+            old_value = st.text_input("Valor a reemplazar", key="old_value_input", placeholder="ej: null, N/A, etc.")
+        with col2:
+            new_value = st.text_input("Nuevo valor", key="new_value_input", placeholder="ej: '', Unknown, etc.")
+        with col3:
+            st.markdown("")  # Spacer
+            if st.button("➕ Agregar", use_container_width=True) and old_value and new_value:
+                st.session_state.global_replacements[old_value] = new_value
+                st.success(f"✅ Reemplazo agregado!")
+                st.rerun()
+        
+        # Action buttons for replacements
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.session_state.global_replacements and st.button("🚀 Aplicar Reemplazos", use_container_width=True, type="primary"):
+                cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
+                result_df = cleaner.cleaning_ops.replace_values(
+                    replacements=st.session_state.global_replacements,
+                    columns=replacement_columns
+                )
+                cleaner.cleaned_df = result_df.copy()
+                st.session_state.data_cleaner = cleaner
+                st.success("✅ Reemplazos aplicados!")
+                st.rerun()
+        
+        with col2:
+            if st.button("🗑️ Limpiar Reemplazos", use_container_width=True):
+                st.session_state.global_replacements = {}
+                st.success("✅ Reemplazos limpiados!")
+                st.rerun()
+    
+    with tab3:
+        st.markdown("### 📊 Análisis de Calidad")
+        st.markdown("Insights detallados sobre la calidad de tus datos")
+        
+        # Data quality metrics in a cleaner layout
+        quality_report = cleaner.get_quality_report()
+        
+        # Main quality metrics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("📊 Calidad General", f"{quality_report['quality_score']:.1f}%")
+        with col2:
+            missing_count = sum(info['missing_count'] for info in quality_report['missing_values'].values())
+            st.metric("❌ Valores Faltantes", missing_count)
+        with col3:
+            st.metric("🔄 Duplicados", quality_report['duplicates']['duplicate_rows'])
+        with col4:
+            outlier_count = sum(info['outlier_count'] for info in quality_report['outliers'].values())
+            st.metric("📈 Outliers", outlier_count)
+        
+        st.markdown("---")
+        
+        # Detailed analysis sections
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 📋 Valores Faltantes por Columna")
+            missing_data = pd.DataFrame(quality_report['missing_values']).T
+            missing_data['missing_percent'] = pd.to_numeric(missing_data['missing_percent'], errors='coerce').round(2)
+            
+            # Show only columns with missing values
+            missing_cols = missing_data[missing_data['missing_count'] > 0]
+            if not missing_cols.empty:
+                st.dataframe(missing_cols[['missing_count', 'missing_percent', 'data_type']], use_container_width=True)
+            else:
+                st.success("✅ No hay valores faltantes en el dataset")
+        
+        with col2:
+            st.markdown("#### 🔄 Análisis de Duplicados")
+            duplicate_info = quality_report['duplicates']
+            if duplicate_info['duplicate_rows'] > 0:
+                st.warning(f"⚠️ Se encontraron {duplicate_info['duplicate_rows']} filas duplicadas ({duplicate_info['duplicate_percent']:.2f}%)")
+            else:
+                st.success("✅ No se encontraron duplicados")
+        
+        # Cleaning suggestions in a cleaner format
+        suggestions = cleaner.get_cleaning_suggestions()
+        if suggestions:
+            st.markdown("---")
+            st.markdown("#### 💡 Sugerencias de Limpieza")
+            
+            # Group suggestions by severity
+            high_priority = [s for s in suggestions if s.get('severity') == 'high']
+            medium_priority = [s for s in suggestions if s.get('severity') == 'medium']
+            low_priority = [s for s in suggestions if s.get('severity') == 'low']
+            
+            if high_priority:
+                st.markdown("**🔴 Alta Prioridad:**")
+                for suggestion in high_priority:
+                    st.markdown(f"• **{suggestion['description']}**")
+                    st.markdown(f"  *{suggestion['action']}*")
+            
+            if medium_priority:
+                st.markdown("**🟡 Prioridad Media:**")
+                for suggestion in medium_priority:
+                    st.markdown(f"• **{suggestion['description']}**")
+                    st.markdown(f"  *{suggestion['action']}*")
+            
+            if low_priority:
+                st.markdown("**🟢 Baja Prioridad:**")
+                for suggestion in low_priority:
+                    st.markdown(f"• **{suggestion['description']}**")
+                    st.markdown(f"  *{suggestion['action']}*")
+        else:
+            st.success("✅ No se encontraron problemas de calidad significativos")
+    
+    with tab4:
+        st.markdown("### 📋 Historial y Control")
+        st.markdown("Seguimiento de operaciones y control de datos")
+        
+        summary = cleaner.get_cleaning_summary()
+        
+        # Summary metrics in a cleaner layout
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("🔧 Operaciones Realizadas", summary['total_operations'])
+        with col2:
+            st.metric("📉 Filas Removidas", summary['rows_removed'])
+        with col3:
+            st.metric("🗑️ Columnas Removidas", summary['columns_removed'])
+        
+        st.markdown("---")
+        
+        # Operations history
+        if summary['operations']:
+            st.markdown("#### 📝 Historial de Operaciones")
+            for i, op in enumerate(summary['operations'], 1):
+                with st.expander(f"{i}. {op['operation']}", expanded=False):
+                    st.markdown(f"**Detalles:** {op['details']}")
+                    st.markdown(f"**Timestamp:** {op['timestamp']}")
+        else:
+            st.info("📝 No se han realizado operaciones de limpieza aún.")
+        
+        # Reset section
+        st.markdown("---")
+        st.markdown("#### 🔄 Control de Datos")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 Resetear a Datos Originales", use_container_width=True, type="secondary"):
+                cleaner.reset_to_original()
+                # Clear global replacements
+                if 'global_replacements' in st.session_state:
+                    st.session_state.global_replacements = {}
+                st.success("✅ Datos reseteados a estado original!")
+                st.rerun()
+        
+        with col2:
+            if st.button("💾 Guardar Estado Actual", use_container_width=True):
+                # Store current state in session
+                st.session_state.saved_cleaned_data = cleaner.cleaned_df.copy()
+                st.success("✅ Estado actual guardado!")
+                st.rerun()
+    
+    # Action buttons for using cleaned data
+    st.markdown("---")
+    st.markdown("### 🎯 Acciones con Datos Limpiados")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        auto_whitespace = st.checkbox("🧹 Limpiar espacios en blanco", value=True)
-        auto_case = st.checkbox("📝 Normalizar mayúsculas/minúsculas", value=True)
-        auto_duplicates = st.checkbox("🔄 Remover duplicados", value=True)
-        auto_missing = st.checkbox("❌ Llenar valores faltantes", value=True)
-    
-    with col2:
-        auto_special_chars = st.checkbox("🔤 Remover caracteres especiales", value=False)
-        auto_accents = st.checkbox("🌍 Normalizar acentos", value=False)
-        auto_phones = st.checkbox("📞 Estandarizar teléfonos", value=False)
-        auto_emails = st.checkbox("📧 Estandarizar emails", value=False)
-    
-    # Apply automatic cleaning
-    if st.button("🚀 Aplicar Limpieza Automática", type="primary"):
-        with st.spinner("Aplicando limpieza automática..."):
-            cleaning_options = {
-                'whitespace': auto_whitespace,
-                'case_normalization': auto_case,
-                'special_characters': auto_special_chars,
-                'accents': auto_accents,
-                'duplicates': auto_duplicates,
-                'missing_values': auto_missing
-            }
-            
-            cleaner.apply_auto_cleaning(cleaning_options)
-            
-            # Apply specific cleanings
-            if auto_phones:
-                cleaner.cleaned_df = cleaner.cleaning_ops.standardize_phone_numbers()
-                cleaner.add_to_history("Phone standardization", "Applied to detected phone columns")
-            
-            if auto_emails:
-                cleaner.cleaned_df = cleaner.cleaning_ops.standardize_emails()
-                cleaner.add_to_history("Email standardization", "Applied to detected email columns")
-            
-            st.success("✅ Limpieza automática completada!")
-    
-    # Create tabs for different cleaning operations
-    tab1, tab2, tab3, tab4 = st.tabs(["🔍 Análisis", "🧹 Limpieza Manual", "📊 Calidad", "📋 Historial"])
-    
-    with tab1:
-        st.markdown("#### Análisis de Datos")
-        
-        # Data quality report
-        quality_report = cleaner.get_quality_report()
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("📊 Calidad General", f"{quality_report['quality_score']:.1f}%")
-        with col2:
-            st.metric("📈 Filas", quality_report['total_rows'])
-        with col3:
-            st.metric("🏷️ Columnas", quality_report['total_columns'])
-        
-        # Missing values analysis
-        st.markdown("**Valores Faltantes:**")
-        missing_data = pd.DataFrame(quality_report['missing_values']).T
-        missing_data['missing_percent'] = missing_data['missing_percent'].round(2)
-        st.dataframe(missing_data[['missing_count', 'missing_percent', 'data_type']])
-        
-        # Duplicates analysis
-        st.markdown("**Duplicados:**")
-        duplicate_info = quality_report['duplicates']
-        st.metric("Filas duplicadas", duplicate_info['duplicate_rows'])
-        st.metric("Porcentaje duplicados", f"{duplicate_info['duplicate_percent']:.2f}%")
-    
-    with tab2:
-        st.markdown("#### Limpieza Manual")
-        
-        # Manual cleaning options
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("**Limpieza de Texto:**")
-            if st.button("🧹 Limpiar Espacios"):
-                cleaner.cleaned_df = cleaner.cleaning_ops.clean_whitespace()
-                st.success("✅ Espacios limpiados!")
-            
-            if st.button("📝 Normalizar Caso"):
-                cleaner.cleaned_df = cleaner.cleaning_ops.normalize_text_case()
-                st.success("✅ Caso normalizado!")
-            
-            if st.button("🔤 Remover Caracteres Especiales"):
-                cleaner.cleaned_df = cleaner.cleaning_ops.remove_special_characters()
-                st.success("✅ Caracteres especiales removidos!")
-        
-        with col2:
-            st.markdown("**Estandarización:**")
-            if st.button("📞 Estandarizar Teléfonos"):
-                cleaner.cleaned_df = cleaner.cleaning_ops.standardize_phone_numbers()
-                st.success("✅ Teléfonos estandarizados!")
-            
-            if st.button("📧 Estandarizar Emails"):
-                cleaner.cleaned_df = cleaner.cleaning_ops.standardize_emails()
-                st.success("✅ Emails estandarizados!")
-            
-            if st.button("🌍 Normalizar Acentos"):
-                cleaner.cleaned_df = cleaner.cleaning_ops.normalize_accents()
-                st.success("✅ Acentos normalizados!")
-        
-        # Global value replacements
-        st.markdown("**Reemplazos Globales:**")
-        global_replacements = {}
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            old_value = st.text_input("Valor a reemplazar")
-        with col2:
-            new_value = st.text_input("Nuevo valor")
-        
-        if st.button("Agregar Reemplazo Global") and old_value and new_value:
-            global_replacements[old_value] = new_value
-            st.success(f"✅ Reemplazo agregado: '{old_value}' → '{new_value}'")
-        
-        # Apply replacements
-        if global_replacements and st.button("Aplicar Reemplazos"):
-            cleaner.cleaned_df = cleaner.cleaning_ops.replace_values(replacements=global_replacements)
-            st.success("✅ Reemplazos aplicados!")
-    
-    with tab3:
-        st.markdown("#### Calidad de Datos")
-        
-        # Data quality metrics
-        quality_report = cleaner.get_quality_report()
-        
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("📊 Calidad", f"{quality_report['quality_score']:.1f}%")
-        with col2:
-            st.metric("❌ Faltantes", sum(info['missing_count'] for info in quality_report['missing_values'].values()))
-        with col3:
-            st.metric("🔄 Duplicados", quality_report['duplicates']['duplicate_rows'])
-        with col4:
-            st.metric("📈 Outliers", sum(info['outlier_count'] for info in quality_report['outliers'].values()))
-        
-        # Cleaning suggestions
-        suggestions = cleaner.get_cleaning_suggestions()
-        if suggestions:
-            st.markdown("**💡 Sugerencias de Limpieza:**")
-            for i, suggestion in enumerate(suggestions, 1):
-                severity_color = {
-                    'high': '🔴',
-                    'medium': '🟡',
-                    'low': '🟢'
-                }
-                st.markdown(f"{i}. {severity_color.get(suggestion['severity'], '⚪')} **{suggestion['description']}**")
-                st.markdown(f"   *{suggestion['action']}*")
-    
-    with tab4:
-        st.markdown("#### Historial de Limpieza")
-        
-        summary = cleaner.get_cleaning_summary()
-        
-        st.metric("Operaciones realizadas", summary['total_operations'])
-        st.metric("Filas removidas", summary['rows_removed'])
-        st.metric("Columnas removidas", summary['columns_removed'])
-        
-        if summary['operations']:
-            st.markdown("**Detalle de operaciones:**")
-            for i, op in enumerate(summary['operations'], 1):
-                st.markdown(f"{i}. **{op['operation']}** - {op['details']}")
-    
-    # Data comparison
-    st.markdown("### 📊 Comparación de Datos")
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown("**📈 Datos Originales**")
-        st.metric("Filas", len(df))
-        st.metric("Columnas", len(df.columns))
-        st.metric("Memoria", f"{df.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB")
-    
-    with col2:
-        st.markdown("**🧹 Datos Limpiados**")
-        st.metric("Filas", len(cleaner.cleaned_df))
-        st.metric("Columnas", len(cleaner.cleaned_df.columns))
-        st.metric("Memoria", f"{cleaner.cleaned_df.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB")
-    
-    with col3:
-        st.markdown("**📉 Cambios**")
-        st.metric("Filas removidas", len(df) - len(cleaner.cleaned_df))
-        st.metric("Columnas removidas", len(df.columns) - len(cleaner.cleaned_df.columns))
-        st.metric("Operaciones", summary['total_operations'])
-    
-    # Action buttons
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        if st.button("✅ Usar Datos Limpiados", type="primary"):
+        if st.button("✅ Usar Datos Limpiados", type="primary", use_container_width=True):
             st.session_state.cleaned_data = cleaner.get_cleaned_data()
             st.session_state.data_quality_completed = True
             st.success("¡Datos limpiados cargados exitosamente!")
             st.rerun()
     
     with col2:
-        if st.button("🔄 Resetear a Originales"):
+        if st.button("🔄 Resetear a Originales", use_container_width=True):
             cleaner.reset_to_original()
             st.success("¡Datos reseteados a originales!")
-            st.rerun()
-    
-    with col3:
-        if st.button("📤 Subir Nuevo Archivo"):
-            st.session_state.data_quality_completed = False
             st.rerun()
     
     return cleaner.get_cleaned_data()
