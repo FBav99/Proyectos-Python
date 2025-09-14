@@ -8,6 +8,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -58,14 +60,24 @@ def main():
             st.switch_page("pages/01_Nivel_1_Basico.py")
         return
     
-    # 3. Introduction Section (what the user will learn)
+    # 3. Progression Summary
+    create_progression_summary(progress)
+    
+    # 4. Show achievement for previous level if completed
+    if progress.get('nivel3', False):
+        create_achievement_display('nivel3', progress)
+    
+    # 5. Level Preview
+    create_level_preview('nivel4')
+    
+    # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
     En este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas 
     y crear dashboards completos para presentar tu información de manera profesional.
     """)
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Crear Análisis Avanzados")
     
     # Step 1
@@ -154,8 +166,11 @@ def main():
     # 5. Practical Example Section
     st.header("💡 Ejemplo Práctico: Dashboard Avanzado")
     
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel4', 'clean')
+    
     # Create sample data
-    df = create_sample_data()
+    df = create_sample_data('clean')  # Use clean data for Level 4
     
     # Show data overview
     st.subheader("📊 Datos de Ejemplo")
@@ -441,6 +456,12 @@ def main():
     
     # Show completion status
     if st.session_state.get('quiz_completed', False):
+        # Show final achievement
+        create_achievement_display('nivel4', progress)
+        
+        # Show final progression summary
+        create_progression_summary(progress)
+        
         st.success("🎉 ¡Felicidades! Has completado todos los niveles del curso. ¡Eres un experto en análisis de datos!")
         
         col1, col2 = st.columns(2)

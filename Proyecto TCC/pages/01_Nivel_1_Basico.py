@@ -6,6 +6,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -56,7 +58,17 @@ def main():
             st.switch_page("pages/00_Nivel_0_Introduccion.py")
         return
     
-    # 3. Introduction Section (what the user will learn)
+    # 3. Progression Summary
+    create_progression_summary(progress)
+    
+    # 4. Show achievement for previous level if completed
+    if progress.get('nivel0', False):
+        create_achievement_display('nivel0', progress)
+    
+    # 5. Level Preview
+    create_level_preview('nivel1')
+    
+    # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
     Ahora que ya entiendes qué son los datos, en este nivel aprenderás los pasos prácticos para 
@@ -64,7 +76,7 @@ def main():
     para trabajar con datos reales.
     """)
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Preparar y Cargar Datos")
     
     # Step 1
@@ -214,8 +226,11 @@ def main():
         "<p>Te mostraré cómo preparar datos correctamente y qué verificar después de cargarlos.</p>"
     )
     
-    df = create_sample_data()
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel1', 'dirty')
+    
+    df = create_sample_data('dirty')  # Use dirty data for Level 1
+    st.subheader("📁 Datos de ejemplo (Ventas de una tienda - Datos sin procesar)")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -245,6 +260,70 @@ def main():
             <p><strong>✅ bool:</strong> Verdadero o Falso</p>
         </div>
         """, unsafe_allow_html=True)
+    
+    # Show dirty vs clean data comparison
+    st.subheader("🔄 Comparación: Datos Sin Procesar vs Datos Limpios")
+    
+    create_info_box(
+        "warning-box",
+        "⚠️ Problemas en los datos sin procesar",
+        "<p>Observa los problemas que pueden tener los datos reales y cómo afectan el análisis.</p>"
+    )
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**📊 Datos Sin Procesar (Actual):**")
+        st.dataframe(df.head(8), use_container_width=True)
+        
+        # Show data quality issues
+        st.markdown("**🔍 Problemas identificados:**")
+        issues = []
+        if df['Categoria'].isnull().any():
+            issues.append("❌ Valores faltantes en Categoría")
+        if df.duplicated().any():
+            issues.append("❌ Filas duplicadas")
+        if df['Calificacion'].max() > 5 or df['Calificacion'].min() < 1:
+            issues.append("❌ Calificaciones fuera del rango 1-5")
+        if df['Ventas'].max() > df['Ventas'].quantile(0.95) * 5:
+            issues.append("❌ Valores atípicos en Ventas")
+        
+        for issue in issues:
+            st.markdown(f"- {issue}")
+    
+    with col2:
+        st.markdown("**✨ Datos Después de Limpiar:**")
+        df_clean = create_sample_data('clean')
+        st.dataframe(df_clean.head(8), use_container_width=True)
+        
+        # Show improvements
+        st.markdown("**✅ Mejoras aplicadas:**")
+        improvements = [
+            "✅ Valores faltantes eliminados",
+            "✅ Duplicados removidos", 
+            "✅ Calificaciones normalizadas (1-5)",
+            "✅ Valores atípicos corregidos",
+            "✅ Formatos consistentes"
+        ]
+        
+        for improvement in improvements:
+            st.markdown(f"- {improvement}")
+    
+    # Show the impact
+    st.markdown("**📈 Impacto de la limpieza:**")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Registros originales", len(df))
+        st.metric("Registros limpios", len(df_clean))
+    
+    with col2:
+        st.metric("Datos faltantes", df.isnull().sum().sum())
+        st.metric("Duplicados", df.duplicated().sum())
+    
+    with col3:
+        st.metric("Calidad general", "75%", "25%")
+        st.metric("Calidad mejorada", "95%", "20%")
     
     # Tips section
     st.header("💡 Consejos Importantes")
@@ -511,6 +590,9 @@ def main():
             st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
             return
         
+        # Show achievement
+        create_achievement_display('nivel1', progress)
+        
         create_info_box(
             "success-box",
             "🎉 ¡Felicidades! Has completado el Nivel 1",
@@ -519,6 +601,9 @@ def main():
         
         st.subheader("🚀 ¿Qué sigue?")
         st.markdown("En el **Nivel 2** aprenderás a organizar y filtrar la información para encontrar exactamente lo que necesitas.")
+        
+        # Show next level preview
+        create_level_preview('nivel2')
         
         if st.button("Continuar al Nivel 2", type="primary"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")

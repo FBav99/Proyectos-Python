@@ -5,6 +5,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -57,14 +59,24 @@ def main():
             st.switch_page("pages/01_Nivel_1_Basico.py")
         return
     
-    # 3. Introduction Section (what the user will learn)
+    # 3. Progression Summary
+    create_progression_summary(progress)
+    
+    # 4. Show achievement for previous level if completed
+    if progress.get('nivel1', False):
+        create_achievement_display('nivel1', progress)
+    
+    # 5. Level Preview
+    create_level_preview('nivel2')
+    
+    # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
     En este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. 
     Los filtros te ayudan a organizar y analizar datos de manera más efectiva.
     """)
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Organizar y Filtrar Datos")
     
     # Step 1
@@ -181,8 +193,11 @@ def main():
         "<p>Te mostraré cómo aplicar diferentes tipos de filtros y ver cómo cambian los resultados.</p>"
     )
     
-    df = create_sample_data()
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel2', 'clean')
+    
+    df = create_sample_data('clean')  # Use clean data for Level 2
+    st.subheader("📁 Datos de ejemplo (Ventas de una tienda - Datos preparados)")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -359,6 +374,9 @@ def main():
             st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
             return
         
+        # Show achievement
+        create_achievement_display('nivel2', progress)
+        
         create_info_box(
             "success-box",
             "🎉 ¡Felicidades! Has completado el Nivel 2",
@@ -367,6 +385,9 @@ def main():
         
         st.subheader("🚀 ¿Qué sigue?")
         st.markdown("En el **Nivel 3** aprenderás a calcular métricas y estadísticas.")
+        
+        # Show next level preview
+        create_level_preview('nivel3')
         
         if st.button("Continuar al Nivel 3", type="primary"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")

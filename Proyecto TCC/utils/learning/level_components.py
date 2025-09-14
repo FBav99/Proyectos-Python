@@ -1,5 +1,6 @@
 import streamlit as st
 from core.progress_tracker import progress_tracker
+from .progression_tracker import get_level_achievements, get_progression_summary, get_achievement_badge, get_data_quality_insights
 
 def create_step_card(step_number, title, description, sections=None):
     """Create a step card with proper HTML structure"""
@@ -35,4 +36,144 @@ def create_info_box(box_type, title, content):
         {content}
     </div>
     """
+    st.markdown(html_content, unsafe_allow_html=True)
+
+def create_achievement_display(level, user_progress):
+    """Create achievement display for completed levels"""
+    achievements = get_level_achievements()
+    
+    if level not in achievements:
+        return
+    
+    achievement_info = achievements[level]
+    badge = get_achievement_badge(level)
+    
+    if badge:
+        html_content = f"""
+        <div class="achievement-card" style="border-left: 5px solid {badge['color']};">
+            <div class="achievement-header">
+                <span class="achievement-icon" style="color: {badge['color']};">{badge['icon']}</span>
+                <h3 style="color: {badge['color']};">{badge['title']}</h3>
+            </div>
+            <p><strong>{achievement_info['description']}</strong></p>
+            <h4>🎯 Habilidades Adquiridas:</h4>
+            <ul>
+        """
+        
+        for skill in achievement_info['skills_gained']:
+            html_content += f"<li>✅ {skill}</li>"
+        
+        html_content += """
+            </ul>
+        </div>
+        """
+        
+        st.markdown(html_content, unsafe_allow_html=True)
+
+def create_progression_summary(user_progress):
+    """Create a summary of user's progression"""
+    summary = get_progression_summary(user_progress)
+    achievements = get_level_achievements()
+    
+    html_content = f"""
+    <div class="progression-summary">
+        <h3>📊 Tu Progreso de Aprendizaje</h3>
+        <div class="progress-stats">
+            <div class="stat-item">
+                <span class="stat-number">{len(summary['completed_levels'])}</span>
+                <span class="stat-label">Niveles Completados</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{summary['total_skills_learned']}</span>
+                <span class="stat-label">Habilidades Aprendidas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{summary['completion_percentage']:.0f}%</span>
+                <span class="stat-label">Progreso Total</span>
+            </div>
+        </div>
+    """
+    
+    if summary['completed_levels']:
+        html_content += """
+        <h4>🏆 Logros Desbloqueados:</h4>
+        <div class="achievements-grid">
+        """
+        
+        for level in summary['completed_levels']:
+            if level in achievements:
+                badge = get_achievement_badge(level)
+                html_content += f"""
+                <div class="achievement-badge" style="border-color: {badge['color']};">
+                    <span class="badge-icon" style="color: {badge['color']};">{badge['icon']}</span>
+                    <span class="badge-title">{badge['title']}</span>
+                </div>
+                """
+        
+        html_content += "</div>"
+    
+    # Next milestone
+    next_milestone = summary['next_milestone']
+    html_content += f"""
+        <div class="next-milestone">
+            <h4>🎯 Siguiente Meta:</h4>
+            <p><strong>{next_milestone['title']}</strong></p>
+            <p>{next_milestone['description']}</p>
+        </div>
+    </div>
+    """
+    
+    st.markdown(html_content, unsafe_allow_html=True)
+
+def create_data_quality_insight(level, data_type):
+    """Create data quality insight display"""
+    insight = get_data_quality_insights(level, data_type)
+    
+    quality_color = '#4CAF50' if insight['quality_score'] == '100%' else '#FF9800' if insight['quality_score'] == '95%' else '#F44336'
+    
+    html_content = f"""
+    <div class="data-quality-card">
+        <div class="quality-header">
+            <h4>📊 {insight['title']}</h4>
+            <span class="quality-score" style="color: {quality_color};">{insight['quality_score']}</span>
+        </div>
+        <p>{insight['description']}</p>
+        <div class="quality-details">
+            <strong>Estado de los datos:</strong> {insight['issues']}
+        </div>
+    </div>
+    """
+    
+    st.markdown(html_content, unsafe_allow_html=True)
+
+def create_level_preview(level):
+    """Create preview of what user will achieve in this level"""
+    achievements = get_level_achievements()
+    
+    if level not in achievements:
+        return
+    
+    achievement_info = achievements[level]
+    
+    html_content = f"""
+    <div class="level-preview">
+        <h3>🎯 ¿Qué lograrás en este nivel?</h3>
+        <div class="preview-content">
+            <p><strong>{achievement_info['description']}</strong></p>
+            <h4>🚀 Habilidades que desarrollarás:</h4>
+            <ul>
+    """
+    
+    for skill in achievement_info['skills_gained']:
+        html_content += f"<li>🎯 {skill}</li>"
+    
+    html_content += f"""
+            </ul>
+            <div class="preview-next">
+                <p><strong>Después de este nivel:</strong> {achievement_info['next_level_preview']}</p>
+            </div>
+        </div>
+    </div>
+    """
+    
     st.markdown(html_content, unsafe_allow_html=True)

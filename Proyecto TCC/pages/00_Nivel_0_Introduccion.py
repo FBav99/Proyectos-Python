@@ -6,6 +6,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -47,14 +49,20 @@ def main():
         st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # 3. Introduction Section (what the user will learn)
+    # 3. Progression Summary
+    create_progression_summary(progress)
+    
+    # 4. Level Preview
+    create_level_preview('nivel0')
+    
+    # 5. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("""
     En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, 
     y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.
     """)
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 6. Steps Section (clear, actionable instructions)
     st.header("📋 Conceptos Fundamentales de Datos")
     
     # Step 1
@@ -207,7 +215,10 @@ def main():
         "<p>Te mostraré cómo se ven los datos en la vida real y qué información puedes obtener de ellos.</p>"
     )
     
-    df = create_sample_data()
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel0', 'clean')
+    
+    df = create_sample_data('clean')  # Use clean data for Level 0
     st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
     
     col1, col2 = st.columns([2, 1])
@@ -331,6 +342,9 @@ def main():
             st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
             return
         
+        # Show achievement
+        create_achievement_display('nivel0', progress)
+        
         create_info_box(
             "success-box",
             "🎉 ¡Felicidades! Has completado el Nivel 0",
@@ -339,6 +353,9 @@ def main():
         
         st.subheader("🚀 ¿Qué sigue?")
         st.markdown("En el **Nivel 1** aprenderás a preparar y cargar datos correctamente.")
+        
+        # Show next level preview
+        create_level_preview('nivel1')
         
         if st.button("Continuar al Nivel 1", type="primary"):
             st.switch_page("pages/01_Nivel_1_Basico.py")
