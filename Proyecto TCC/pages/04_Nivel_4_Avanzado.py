@@ -72,10 +72,7 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas 
-    y crear dashboards completos para presentar tu información de manera profesional.
-    """)
+    st.markdown("En este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas y crear dashboards completos para presentar tu información de manera profesional.")
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Crear Análisis Avanzados")
@@ -298,12 +295,7 @@ def main():
         st.plotly_chart(fig_corr, use_container_width=True)
         
         # Show correlation insights
-        st.markdown("""
-        **💡 Insights de Correlación:**
-        - Los valores cercanos a 1 indican correlación positiva fuerte
-        - Los valores cercanos a -1 indican correlación negativa fuerte
-        - Los valores cercanos a 0 indican poca o ninguna correlación
-        """)
+        st.markdown("**💡 Insights de Correlación:** - Los valores cercanos a 1 indican correlación positiva fuerte - Los valores cercanos a -1 indican correlación negativa fuerte - Los valores cercanos a 0 indican poca o ninguna correlación")
     
     else:
         st.warning("No hay datos que coincidan con los filtros seleccionados.")
@@ -311,9 +303,7 @@ def main():
     # 6. Dashboard Creation Section
     st.header("🏗️ Crear tu Propio Dashboard")
     
-    st.markdown("""
-    Ahora puedes crear tu propio dashboard personalizado. Selecciona las métricas y visualizaciones que quieras incluir.
-    """)
+    st.markdown("Ahora puedes crear tu propio dashboard personalizado. Selecciona las métricas y visualizaciones que quieras incluir.")
     
     # Dashboard configuration
     col1, col2 = st.columns(2)
@@ -375,9 +365,7 @@ def main():
     # 7. Quiz Section
     st.header("🧠 Quiz de Comprensión")
     
-    st.markdown("""
-    Responde estas preguntas para verificar que entiendes los conceptos avanzados del nivel.
-    """)
+    st.markdown("Responde estas preguntas para verificar que entiendes los conceptos avanzados del nivel.")
     
     # Quiz questions
     quiz_questions = [

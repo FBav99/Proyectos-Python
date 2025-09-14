@@ -75,55 +75,37 @@ def create_progression_summary(user_progress):
     summary = get_progression_summary(user_progress)
     achievements = get_level_achievements()
     
-    html_content = f"""
-    <div class="progression-summary">
-        <h3>📊 Tu Progreso de Aprendizaje</h3>
-        <div class="progress-stats">
-            <div class="stat-item">
-                <span class="stat-number">{len(summary['completed_levels'])}</span>
-                <span class="stat-label">Niveles Completados</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{summary['total_skills_learned']}</span>
-                <span class="stat-label">Habilidades Aprendidas</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{summary['completion_percentage']:.0f}%</span>
-                <span class="stat-label">Progreso Total</span>
-            </div>
-        </div>
-    """
+    # Main title
+    st.markdown("### 📊 Tu Progreso de Aprendizaje")
     
+    # Progress stats in columns
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Niveles Completados", len(summary['completed_levels']))
+    with col2:
+        st.metric("Habilidades Aprendidas", summary['total_skills_learned'])
+    with col3:
+        st.metric("Progreso Total", f"{summary['completion_percentage']:.0f}%")
+    
+    # Achievements section
     if summary['completed_levels']:
-        html_content += """
-        <h4>🏆 Logros Desbloqueados:</h4>
-        <div class="achievements-grid">
-        """
+        st.markdown("#### 🏆 Logros Desbloqueados:")
         
-        for level in summary['completed_levels']:
+        # Create achievement badges in columns
+        achievement_cols = st.columns(min(len(summary['completed_levels']), 3))
+        for i, level in enumerate(summary['completed_levels']):
             if level in achievements:
                 badge = get_achievement_badge(level)
-                html_content += f"""
-                <div class="achievement-badge" style="border-color: {badge['color']};">
-                    <span class="badge-icon" style="color: {badge['color']};">{badge['icon']}</span>
-                    <span class="badge-title">{badge['title']}</span>
-                </div>
-                """
-        
-        html_content += "</div>"
+                col_idx = i % 3
+                with achievement_cols[col_idx]:
+                    with st.container():
+                        st.markdown(f"**{badge['icon']} {badge['title']}**")
     
     # Next milestone
     next_milestone = summary['next_milestone']
-    html_content += f"""
-        <div class="next-milestone">
-            <h4>🎯 Siguiente Meta:</h4>
-            <p><strong>{next_milestone['title']}</strong></p>
-            <p>{next_milestone['description']}</p>
-        </div>
-    </div>
-    """
-    
-    st.markdown(html_content, unsafe_allow_html=True)
+    st.markdown("#### 🎯 Siguiente Meta:")
+    st.markdown(f"**{next_milestone['title']}**")
+    st.markdown(next_milestone['description'])
 
 def create_data_quality_insight(level, data_type):
     """Create data quality insight display"""

@@ -70,11 +70,7 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    Ahora que ya entiendes qué son los datos, en este nivel aprenderás los pasos prácticos para 
-    preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico 
-    para trabajar con datos reales.
-    """)
+    st.markdown("Ahora que ya entiendes qué son los datos, en este nivel aprenderás los pasos prácticos para preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico para trabajar con datos reales.")
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Preparar y Cargar Datos")
@@ -251,15 +247,12 @@ def main():
     with col2:
         st.markdown("**📚 ¿Qué significa cada tipo de dato?**")
         
-        st.markdown("""
-        <div class="info-box">
-            <p><strong>🔤 object:</strong> Texto, nombres, categorías</p>
-            <p><strong>🔢 int64:</strong> Números enteros</p>
-            <p><strong>📊 float64:</strong> Números decimales</p>
-            <p><strong>📅 datetime64:</strong> Fechas y horas</p>
-            <p><strong>✅ bool:</strong> Verdadero o Falso</p>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container():
+            st.markdown("**🔤 object:** Texto, nombres, categorías")
+            st.markdown("**🔢 int64:** Números enteros")
+            st.markdown("**📊 float64:** Números decimales")
+            st.markdown("**📅 datetime64:** Fechas y horas")
+            st.markdown("**✅ bool:** Verdadero o Falso")
     
     # Show dirty vs clean data comparison
     st.subheader("🔄 Comparación: Datos Sin Procesar vs Datos Limpios")
@@ -328,56 +321,38 @@ def main():
     # Tips section
     st.header("💡 Consejos Importantes")
     
-    st.markdown("""
-    <div class="warning-box">
-        <h3>⚠️ Errores comunes al preparar datos:</h3>
-        <ul>
-            <li><strong>Formato incorrecto:</strong> Elegir un formato que no es compatible con la herramienta</li>
-            <li><strong>Estructura inconsistente:</strong> Mezclar diferentes tipos de información en una columna</li>
-            <li><strong>Nombres confusos:</strong> Usar abreviaciones o nombres poco claros en las columnas</li>
-            <li><strong>Datos incompletos:</strong> No verificar que todos los datos se cargaron correctamente</li>
-            <li><strong>Archivos corruptos:</strong> Intentar cargar archivos dañados o incompletos</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### ⚠️ Errores comunes al preparar datos:")
+        st.markdown("- **Formato incorrecto:** Elegir un formato que no es compatible con la herramienta")
+        st.markdown("- **Estructura inconsistente:** Mezclar diferentes tipos de información en una columna")
+        st.markdown("- **Nombres confusos:** Usar abreviaciones o nombres poco claros en las columnas")
+        st.markdown("- **Datos incompletos:** No verificar que todos los datos se cargaron correctamente")
+        st.markdown("- **Archivos corruptos:** Intentar cargar archivos dañados o incompletos")
     
-    st.markdown("""
-    <div class="success-box">
-        <h3>✅ Buenas prácticas para preparar datos:</h3>
-        <ul>
-            <li><strong>Planifica antes de empezar:</strong> Decide qué formato usar según tus necesidades</li>
-            <li><strong>Organiza la estructura:</strong> Una fila = un registro, una columna = un tipo de información</li>
-            <li><strong>Usa nombres descriptivos:</strong> Las columnas deben tener nombres claros y específicos</li>
-            <li><strong>Verifica la calidad:</strong> Siempre revisa que los datos se cargaron sin errores</li>
-            <li><strong>Mantén copias de seguridad:</strong> Guarda una copia de tus datos originales</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### ✅ Buenas prácticas para preparar datos:")
+        st.markdown("- **Planifica antes de empezar:** Decide qué formato usar según tus necesidades")
+        st.markdown("- **Organiza la estructura:** Una fila = un registro, una columna = un tipo de información")
+        st.markdown("- **Usa nombres descriptivos:** Las columnas deben tener nombres claros y específicos")
+        st.markdown("- **Verifica la calidad:** Siempre revisa que los datos se cargaron sin errores")
+        st.markdown("- **Mantén copias de seguridad:** Guarda una copia de tus datos originales")
     
     # Practice activity
     st.header("🎯 Actividad Práctica")
-    st.markdown("""
-    <div class="card">
-        <h3>📝 Ejercicio para practicar la preparación de datos:</h3>
-        <ol>
-            <li><strong>Elige un formato:</strong> Decide si usar CSV o Excel para tu archivo</li>
-            <li><strong>Diseña la estructura:</strong> Planifica qué columnas necesitas (ej: Fecha, Producto, Cantidad, Precio)</li>
-            <li><strong>Crea el archivo:</strong> Abre Excel o un editor de texto y crea tu tabla</li>
-            <li><strong>Agrega datos de ejemplo:</strong> Incluye al menos 10 registros con información realista</li>
-            <li><strong>Verifica la calidad:</strong> Revisa que no haya errores, datos faltantes o inconsistencias</li>
-            <li><strong>Guarda correctamente:</strong> Guarda en el formato que elegiste (.csv o .xlsx)</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### 📝 Ejercicio para practicar la preparación de datos:")
+        st.markdown("1. **Elige un formato:** Decide si usar CSV o Excel para tu archivo")
+        st.markdown("2. **Diseña la estructura:** Planifica qué columnas necesitas (ej: Fecha, Producto, Cantidad, Precio)")
+        st.markdown("3. **Crea el archivo:** Abre Excel o un editor de texto y crea tu tabla")
+        st.markdown("4. **Agrega datos de ejemplo:** Incluye al menos 10 registros con información realista")
+        st.markdown("5. **Verifica la calidad:** Revisa que no haya errores, datos faltantes o inconsistencias")
+        st.markdown("6. **Guarda correctamente:** Guarda en el formato que elegiste (.csv o .xlsx)")
     
     # Data upload and testing section
     st.header("📤 Prueba lo que Aprendiste")
-    st.markdown("""
-    <div class="info-box">
-        <h3>🚀 Sube tu propio archivo de datos</h3>
-        <p>Ahora puedes poner en práctica lo que aprendiste. Sube un archivo CSV o Excel para ver cómo se cargan y analizan los datos.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### 🚀 Sube tu propio archivo de datos")
+        st.markdown("Ahora puedes poner en práctica lo que aprendiste. Sube un archivo CSV o Excel para ver cómo se cargan y analizan los datos.")
     
     # File uploader
     uploaded_file = st.file_uploader(
@@ -482,51 +457,31 @@ def main():
                 else:
                     st.info("No hay columnas numéricas para mostrar estadísticas")
                 
-                st.markdown("""
-                <div class="info-box">
-                    <h4>📊 Información General del Dataset</h4>
-                </div>
-                """, unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("#### 📊 Información General del Dataset")
                 
                 # Create a nice grid layout for the info
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.markdown("""
-                    <div class="card">
-                        <h5>🔢 Detalles Técnicos</h5>
-                        <p><strong>Memoria utilizada:</strong> {memory_usage}</p>
-                        <p><strong>Rango de índice:</strong> {index_range}</p>
-                        <p><strong>Tipos de datos:</strong> {dtype_count} diferentes</p>
-                    </div>
-                    """.format(
-                        memory_usage=f"{df_uploaded.memory_usage(deep=True).sum() / 1024:.2f} KB",
-                        index_range=f"{df_uploaded.index[0]} a {df_uploaded.index[-1]}",
-                        dtype_count=len(df_uploaded.dtypes.unique())
-                    ), unsafe_allow_html=True)
+                    with st.container():
+                        st.markdown("#### 🔢 Detalles Técnicos")
+                        st.markdown(f"**Memoria utilizada:** {df_uploaded.memory_usage(deep=True).sum() / 1024:.2f} KB")
+                        st.markdown(f"**Rango de índice:** {df_uploaded.index[0]} a {df_uploaded.index[-1]}")
+                        st.markdown(f"**Tipos de datos:** {len(df_uploaded.dtypes.unique())} diferentes")
                 
                 with col2:
-                    st.markdown("""
-                    <div class="card">
-                        <h5>📋 Resumen de Columnas</h5>
-                        <p><strong>Total de columnas:</strong> {total_cols}</p>
-                        <p><strong>Columnas numéricas:</strong> {numeric_count}</p>
-                        <p><strong>Columnas de texto:</strong> {text_count}</p>
-                        {date_cols_info}
-                    </div>
-                    """.format(
-                        total_cols=len(df_uploaded.columns),
-                        numeric_count=len(numeric_cols),
-                        text_count=len(text_cols),
-                        date_cols_info=f"<p><strong>Columnas de fecha:</strong> {len(date_cols)}</p>" if date_cols else ""
-                    ), unsafe_allow_html=True)
+                    with st.container():
+                        st.markdown("#### 📋 Resumen de Columnas")
+                        st.markdown(f"**Total de columnas:** {len(df_uploaded.columns)}")
+                        st.markdown(f"**Columnas numéricas:** {len(numeric_cols)}")
+                        st.markdown(f"**Columnas de texto:** {len(text_cols)}")
+                        if date_cols:
+                            st.markdown(f"**Columnas de fecha:** {len(date_cols)}")
                 
                 # Show detailed column information in a nice format
-                st.markdown("""
-                <div class="card">
-                    <h5>📚 Detalle por Columna</h5>
-                </div>
-                """, unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("#### 📚 Detalle por Columna")
                 
                 # Create a table-like display for column details
                 col_details = []
@@ -559,12 +514,9 @@ def main():
                 st.dataframe(col_details_df, use_container_width=True, hide_index=True)
             
             # Congratulations message
-            st.markdown("""
-            <div class="success-box">
-                <h3>🎉 ¡Excelente trabajo!</h3>
-                <p>Has cargado y analizado exitosamente tu propio archivo de datos. Esto demuestra que has dominado los conceptos básicos del Nivel 1.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            with st.container():
+                st.markdown("### 🎉 ¡Excelente trabajo!")
+                st.markdown("Has cargado y analizado exitosamente tu propio archivo de datos. Esto demuestra que has dominado los conceptos básicos del Nivel 1.")
             
         except Exception as e:
             st.error(f"❌ Error al cargar el archivo: {str(e)}")

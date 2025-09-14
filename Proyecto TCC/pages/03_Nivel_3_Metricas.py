@@ -69,10 +69,7 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y 
-    cómo usarlas para tomar mejores decisiones basadas en datos.
-    """)
+    st.markdown("En este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y cómo usarlas para tomar mejores decisiones basadas en datos.")
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Entender Métricas y KPIs")
@@ -225,9 +222,7 @@ def main():
     # 6. Interactive Practice Section
     st.header("🎯 Práctica Interactiva")
     
-    st.markdown("""
-    Ahora es tu turno de practicar. Usa los filtros de abajo para analizar diferentes aspectos de los datos.
-    """)
+    st.markdown("Ahora es tu turno de practicar. Usa los filtros de abajo para analizar diferentes aspectos de los datos.")
     
     # Filters
     col1, col2 = st.columns(2)
@@ -297,9 +292,7 @@ def main():
     # 7. Quiz Section
     st.header("🧠 Quiz de Comprensión")
     
-    st.markdown("""
-    Responde estas preguntas para verificar que entiendes los conceptos del nivel.
-    """)
+    st.markdown("Responde estas preguntas para verificar que entiendes los conceptos del nivel.")
     
     # Quiz questions
     quiz_questions = [

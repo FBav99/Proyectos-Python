@@ -6,7 +6,7 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
 from utils.learning.learning_progress import save_level_progress
-from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
 
 # Page config
@@ -57,10 +57,7 @@ def main():
     
     # 5. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, 
-    y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.
-    """)
+    st.markdown("En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.")
     
     # 6. Steps Section (clear, actionable instructions)
     st.header("📋 Conceptos Fundamentales de Datos")
@@ -215,9 +212,6 @@ def main():
         "<p>Te mostraré cómo se ven los datos en la vida real y qué información puedes obtener de ellos.</p>"
     )
     
-    # Show data quality insight for this level
-    create_data_quality_insight('nivel0', 'clean')
-    
     df = create_sample_data('clean')  # Use clean data for Level 0
     st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
     
@@ -251,19 +245,94 @@ def main():
             "<h4>📈 Descubrir tendencias:</h4><p>• Ver si las ventas suben o bajan con el tiempo</p><p>• Identificar qué días hay más ventas</p><h4>🔍 Hacer comparaciones:</h4><p>• Comparar ventas entre regiones</p><p>• Ver qué categorías venden más</p><h4>🎯 Encontrar patrones:</h4><p>• Productos con mejores calificaciones</p><p>• Relación entre cantidad y ventas</p>"
         )
     
+    # Add dirty vs clean data comparison
+    st.subheader("🔄 Comparación: Datos Limpios vs Datos con Problemas")
+    
+    create_info_box(
+        "info-box",
+        "📚 ¿Por qué es importante ver ambos tipos?",
+        "<p>En la vida real, los datos no siempre vienen perfectos. Es importante entender qué problemas pueden tener los datos y cómo afectan el análisis.</p>"
+    )
+    
+    # Get both dirty and clean data
+    df_clean = create_sample_data('clean')
+    df_dirty = create_sample_data('dirty')
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**✨ Datos Limpios (Como los que viste arriba):**")
+        st.dataframe(df_clean.head(6), use_container_width=True)
+        
+        st.markdown("**✅ Características de datos limpios:**")
+        clean_features = [
+            "✅ Todos los datos están completos",
+            "✅ Nombres consistentes (Electronica, no 'ELECTRONICA')",
+            "✅ Calificaciones válidas (1-5)",
+            "✅ Fechas en formato correcto",
+            "✅ Sin filas duplicadas",
+            "✅ Valores realistas"
+        ]
+        for feature in clean_features:
+            st.markdown(f"- {feature}")
+    
+    with col2:
+        st.markdown("**⚠️ Datos con Problemas (Como vienen en la vida real):**")
+        st.dataframe(df_dirty.head(6), use_container_width=True)
+        
+        st.markdown("**❌ Problemas comunes en datos reales:**")
+        dirty_features = [
+            "❌ Datos faltantes (celdas vacías)",
+            "❌ Nombres inconsistentes (Electronica vs ELECTRONICA)",
+            "❌ Calificaciones inválidas (6, 0, -1)",
+            "❌ Fechas en diferentes formatos",
+            "❌ Filas duplicadas",
+            "❌ Valores atípicos o imposibles"
+        ]
+        for feature in dirty_features:
+            st.markdown(f"- {feature}")
+    
+    # Show the impact
+    st.markdown("**📈 ¿Por qué importa esta diferencia?**")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Datos limpios", len(df_clean), "✅ Listos para analizar")
+        st.metric("Datos con problemas", len(df_dirty), "⚠️ Necesitan limpieza")
+    
+    with col2:
+        st.metric("Datos faltantes", df_dirty.isnull().sum().sum(), "❌ En datos problemáticos")
+        st.metric("Filas duplicadas", df_dirty.duplicated().sum(), "❌ En datos problemáticos")
+    
+    with col3:
+        st.metric("Calificaciones válidas", f"{(df_clean['Calificacion'].between(1, 5).sum() / len(df_clean) * 100):.0f}%", "✅ En datos limpios")
+        st.metric("Calificaciones válidas", f"{(df_dirty['Calificacion'].between(1, 5).sum() / len(df_dirty) * 100):.0f}%", "⚠️ En datos problemáticos")
+    
+    create_info_box(
+        "warning-box",
+        "⚠️ ¿Qué pasa si usas datos con problemas?",
+        "<ul><li><strong>Resultados incorrectos:</strong> Los cálculos pueden dar números equivocados</li><li><strong>Decisiones erróneas:</strong> Basar decisiones en datos malos lleva a errores</li><li><strong>Pérdida de tiempo:</strong> Es más difícil trabajar con datos desorganizados</li><li><strong>Frustración:</strong> Los errores constantes hacen el análisis más difícil</li></ul>"
+    )
+    
+    create_info_box(
+        "success-box",
+        "✅ ¿Qué aprendiste sobre la calidad de datos?",
+        "<ul><li><strong>Los datos limpios son más fáciles de analizar</strong> - Todo está organizado y consistente</li><li><strong>Los datos con problemas son comunes</strong> - En la vida real, raramente vienen perfectos</li><li><strong>La calidad afecta los resultados</strong> - Datos malos = análisis malos</li><li><strong>Es importante verificar los datos</strong> - Siempre revisa antes de analizar</li></ul>"
+    )
+    
     # Tips section
     st.header("💡 Consejos Importantes")
     
     create_info_box(
         "warning-box",
         "⚠️ Errores comunes a evitar",
-        "<ul><li><strong>No entender qué son los datos:</strong> Los datos son información, no solo números</li><li><strong>Ignorar el contexto:</strong> Los datos sin contexto no te dicen nada útil</li><li><strong>Buscar solo números grandes:</strong> A veces los datos pequeños son más importantes</li><li><strong>No hacer preguntas:</strong> Sin preguntas claras, los datos no te ayudan</li></ul>"
+        "<ul><li><strong>No entender qué son los datos:</strong> Los datos son información, no solo números</li><li><strong>Ignorar problemas de calidad:</strong> Como viste arriba, los datos con problemas dan resultados incorrectos</li><li><strong>Ignorar el contexto:</strong> Los datos sin contexto no te dicen nada útil</li><li><strong>Buscar solo números grandes:</strong> A veces los datos pequeños son más importantes</li><li><strong>No hacer preguntas:</strong> Sin preguntas claras, los datos no te ayudan</li></ul>"
     )
     
     create_info_box(
         "success-box",
         "✅ Buenas prácticas",
-        "<ul><li><strong>Haz preguntas claras:</strong> Antes de analizar, define qué quieres saber</li><li><strong>Entiende el contexto:</strong> Conoce de dónde vienen los datos y qué representan</li><li><strong>Empieza simple:</strong> Comienza con preguntas básicas antes de las complejas</li><li><strong>Busca patrones:</strong> Los datos te cuentan historias, aprende a escucharlas</li></ul>"
+        "<ul><li><strong>Haz preguntas claras:</strong> Antes de analizar, define qué quieres saber</li><li><strong>Verifica la calidad:</strong> Siempre revisa si los datos tienen problemas como los que viste arriba</li><li><strong>Entiende el contexto:</strong> Conoce de dónde vienen los datos y qué representan</li><li><strong>Empieza simple:</strong> Comienza con preguntas básicas antes de las complejas</li><li><strong>Busca patrones:</strong> Los datos te cuentan historias, aprende a escucharlas</li></ul>"
     )
     
     # Practice activity
@@ -272,7 +341,7 @@ def main():
     create_info_box(
         "card",
         "📝 Ejercicio para practicar",
-        "<ol><li><strong>Observa los datos de ejemplo:</strong> Mira la tabla de ventas de arriba</li><li><strong>Identifica los tipos de datos:</strong> ¿Qué columnas son números? ¿Cuáles son texto?</li><li><strong>Haz preguntas:</strong> ¿Qué quieres saber sobre estos datos?</li><li><strong>Busca patrones:</strong> ¿Ves algo interesante en los números?</li><li><strong>Piensa en aplicaciones:</strong> ¿Cómo podrías usar esta información?</li></ol>"
+        "<ol><li><strong>Observa los datos de ejemplo:</strong> Mira las tablas de ventas de arriba (limpios y con problemas)</li><li><strong>Identifica los tipos de datos:</strong> ¿Qué columnas son números? ¿Cuáles son texto?</li><li><strong>Compara la calidad:</strong> ¿Qué diferencias notas entre los datos limpios y los problemáticos?</li><li><strong>Haz preguntas:</strong> ¿Qué quieres saber sobre estos datos?</li><li><strong>Busca patrones:</strong> ¿Ves algo interesante en los números?</li><li><strong>Piensa en aplicaciones:</strong> ¿Cómo podrías usar esta información?</li></ol>"
     )
     
     # Interactive example
@@ -281,7 +350,7 @@ def main():
     create_info_box(
         "info-box",
         "🚀 Explora los datos por ti mismo",
-        "<p>Usa los controles de abajo para ver diferentes aspectos de los datos y entender mejor cómo funcionan.</p>"
+        "<p>Usa los controles de abajo para ver diferentes aspectos de los datos limpios y entender mejor cómo funcionan. Nota cómo es fácil trabajar con datos organizados.</p>"
     )
     
     # Simple interactive controls

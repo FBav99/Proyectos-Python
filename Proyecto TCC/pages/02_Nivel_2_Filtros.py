@@ -71,10 +71,7 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. 
-    Los filtros te ayudan a organizar y analizar datos de manera más efectiva.
-    """)
+    st.markdown("En este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. Los filtros te ayudan a organizar y analizar datos de manera más efectiva.")
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Organizar y Filtrar Datos")
@@ -318,44 +315,13 @@ def main():
     # Tips section
     st.header("💡 Consejos Importantes")
     
-    st.markdown("""
-    <div class="warning-box">
-        <h3>⚠️ Errores comunes a evitar:</h3>
-        <ul>
-            <li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li>
-            <li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li>
-            <li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li>
-            <li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="warning-box"><h3>⚠️ Errores comunes a evitar:</h3><ul><li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li><li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li><li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li><li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li></ul></div>', unsafe_allow_html=True)
     
-    st.markdown("""
-    <div class="success-box">
-        <h3>✅ Buenas prácticas:</h3>
-        <ul>
-            <li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li>
-            <li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li>
-            <li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li>
-            <li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="success-box"><h3>✅ Buenas prácticas:</h3><ul><li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li><li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li><li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li><li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li></ul></div>', unsafe_allow_html=True)
     
     # Practice activity
     st.header("🎯 Actividad Práctica")
-    st.markdown("""
-    <div class="card">
-        <h3>📝 Ejercicio para practicar:</h3>
-        <ol>
-            <li><strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</li>
-            <li><strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</li>
-            <li><strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</li>
-            <li><strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</li>
-            <li><strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="card"><h3>📝 Ejercicio para practicar:</h3><ol><li><strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</li><li><strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</li><li><strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</li><li><strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</li><li><strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</li></ol></div>', unsafe_allow_html=True)
     
     # 6. Navigation or next steps
     st.header("✅ Verificación del Nivel")

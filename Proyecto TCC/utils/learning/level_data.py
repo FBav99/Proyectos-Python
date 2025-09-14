@@ -16,11 +16,11 @@ def create_sample_data(version='clean'):
         # Create dirty data with common data quality issues
         data = {
             'Fecha': np.random.choice(dates, n_records//2),
-            'Categoria': np.random.choice(['Electronica', 'Ropa', 'Libros', 'Hogar', 'ELECTRONICA', 'ropa', 'libros', 'HOGAR', ''], n_records//2, p=[0.2, 0.2, 0.2, 0.2, 0.05, 0.05, 0.05, 0.05, 0.05]),
-            'Region': np.random.choice(['Norte', 'Sur', 'Este', 'Oeste', 'norte', 'SUR', 'este', 'OESTE', 'Centro'], n_records//2, p=[0.2, 0.2, 0.2, 0.2, 0.05, 0.05, 0.05, 0.05, 0.05]),
+            'Categoria': np.random.choice(['Electronica', 'Ropa', 'Libros', 'Hogar', 'ELECTRONICA', 'ropa', 'libros', 'HOGAR', ''], n_records//2, p=[0.19, 0.19, 0.19, 0.19, 0.05, 0.05, 0.05, 0.05, 0.04]),
+            'Region': np.random.choice(['Norte', 'Sur', 'Este', 'Oeste', 'norte', 'SUR', 'este', 'OESTE', 'Centro'], n_records//2, p=[0.19, 0.19, 0.19, 0.19, 0.05, 0.05, 0.05, 0.05, 0.04]),
             'Ventas': np.random.normal(1000, 300, n_records//2).round(2),
             'Cantidad': np.random.poisson(5, n_records//2),
-            'Calificacion': np.random.choice([1, 2, 3, 4, 5, 6, 0, -1], n_records//2, p=[0.05, 0.1, 0.15, 0.4, 0.25, 0.02, 0.02, 0.01])
+            'Calificacion': np.random.choice([1, 2, 3, 4, 5, 6, 0, -1], n_records//2, p=[0.05, 0.10, 0.15, 0.40, 0.25, 0.02, 0.02, 0.01])
         }
         
         df = pd.DataFrame(data)
