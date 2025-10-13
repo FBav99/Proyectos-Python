@@ -72,7 +72,14 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("En este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas y crear dashboards completos para presentar tu información de manera profesional.")
+    st.markdown("¡Felicidades! Has llegado al nivel más avanzado. Ahora que dominas **conceptos básicos** (Nivel 0), **preparación de datos** (Nivel 1), **filtros** (Nivel 2) y **métricas** (Nivel 3), en este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas y crear dashboards completos para presentar tu información de manera profesional.")
+    
+    # Add connection to all previous levels
+    create_info_box(
+        "success-box",
+        "🎓 Resumen de tu Jornada de Aprendizaje",
+        "<p><strong>Nivel 0:</strong> Aprendiste qué son los datos y cómo se organizan<br/><strong>Nivel 1:</strong> Aprendiste a preparar y cargar datos correctamente<br/><strong>Nivel 2:</strong> Aprendiste a filtrar y organizar información<br/><strong>Nivel 3:</strong> Aprendiste a calcular métricas y KPIs<br/><strong>Nivel 4:</strong> ¡Ahora crearás dashboards profesionales!</p>"
+    )
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Crear Análisis Avanzados")
@@ -171,6 +178,14 @@ def main():
     
     # Show data overview
     st.subheader("📊 Datos de Ejemplo")
+    
+    # Show how all concepts come together
+    create_info_box(
+        "info-box",
+        "🔗 Todos los Conceptos se Unen Aquí",
+        "<p>En este nivel verás cómo todo lo que aprendiste se conecta:<br/>• <strong>Tipos de datos</strong> (Nivel 0) para entender qué columnas usar<br/>• <strong>Datos limpios</strong> (Nivel 1) para cálculos precisos<br/>• <strong>Filtros</strong> (Nivel 2) para análisis específicos<br/>• <strong>Métricas</strong> (Nivel 3) para crear KPIs avanzados<br/>• <strong>Visualizaciones</strong> (Nivel 4) para comunicar insights</p>"
+    )
+    
     st.dataframe(df.head(10), use_container_width=True)
     
     # Advanced calculations

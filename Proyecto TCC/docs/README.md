@@ -45,7 +45,11 @@ Proyecto TCC/
 │   ├── 📋 INTEGRATION_SUMMARY.md  # Resumen de integración
 │   ├── 🎬 IMPLEMENTACION_GIFS.md  # Implementación de GIFs
 │   ├── 🎬 GIF_CREATION_GUIDE.md   # Guía de creación de GIFs
-│   └── 📁 PROJECT_STRUCTURE.md    # Estructura del proyecto
+│   ├── 📁 PROJECT_STRUCTURE.md    # Estructura del proyecto
+│   ├── 🗺️ USER_FLOW_INDEX.md      # Índice de documentación de flujo de usuario
+│   ├── 📘 USER_FLOW_GUIDE.md      # Guía completa de flujo de usuario
+│   ├── 📊 USER_FLOW_SUMMARY.md    # Resumen visual de flujos
+│   └── ⚡ USER_FLOW_QUICK_REFERENCE.md # Referencia rápida de flujos
 │
 └── 📁 assets/                      # Recursos multimedia
     └── 📁 gifs/                    # GIFs de demostración
@@ -78,6 +82,26 @@ Proyecto TCC/
 
 - **Usuario**: `demo_user`
 - **Contraseña**: `demo123`
+
+## 🗺️ Documentación de Flujo de Usuario
+
+**¿Quieres entender el viaje completo de un usuario?** Consulta nuestra documentación de flujo de usuario:
+
+- **[📖 Índice de Flujo de Usuario](USER_FLOW_INDEX.md)** - Comienza aquí para navegar toda la documentación de flujos
+- **[📘 Guía Completa de Flujo](USER_FLOW_GUIDE.md)** - Walkthrough detallado completo del viaje del usuario (15k palabras)
+- **[📊 Resumen Visual de Flujos](USER_FLOW_SUMMARY.md)** - Diagramas y visualizaciones del flujo (5k palabras)
+- **[⚡ Referencia Rápida](USER_FLOW_QUICK_REFERENCE.md)** - Hoja de referencia de una página para consulta rápida
+
+### 🎯 Qué Documento Usar
+
+| Necesitas | Usa Este Documento |
+|-----------|-------------------|
+| Entender el sistema rápidamente | ⚡ Referencia Rápida |
+| Ver flujos visuales | 📊 Resumen Visual |
+| Detalles completos del viaje | 📘 Guía Completa |
+| Navegar toda la documentación | 📖 Índice |
+
+> 💡 **Ejemplo de Usuario**: Todos los documentos siguen el viaje de **María González**, una usuaria sin experiencia previa en análisis de datos, desde su registro hasta la creación de su primer dashboard profesional con el dataset de **TechStore (E-commerce)**.
 
 ## 📚 Sistema de Aprendizaje por Niveles
 

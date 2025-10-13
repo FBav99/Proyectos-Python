@@ -71,7 +71,14 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("En este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. Los filtros te ayudan a organizar y analizar datos de manera más efectiva.")
+    st.markdown("Ahora que ya sabes **preparar y cargar datos** correctamente (como aprendiste en el Nivel 1), en este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. Los filtros te ayudan a organizar y analizar datos de manera más efectiva.")
+    
+    # Add connection to previous level
+    create_info_box(
+        "info-box",
+        "🔗 Conectando con el Nivel 1",
+        "<p>En el nivel anterior aprendiste a cargar y verificar datos. Ahora que tienes datos limpios y bien estructurados, puedes empezar a filtrarlos para encontrar información específica. ¡Es hora de explorar tus datos!</p>"
+    )
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Organizar y Filtrar Datos")
@@ -193,8 +200,15 @@ def main():
     # Show data quality insight for this level
     create_data_quality_insight('nivel2', 'clean')
     
+    # Show data transformation
+    create_info_box(
+        "success-box",
+        "✨ Transformación de Datos Completada",
+        "<p>¡Excelente! Los datos que viste en el <strong>Nivel 1</strong> (con problemas de calidad) ahora están limpios y organizados. Como aprendiste en el Nivel 0, estos datos tienen una estructura clara: cada fila es una venta y cada columna es un tipo de información.</p>"
+    )
+    
     df = create_sample_data('clean')  # Use clean data for Level 2
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda - Datos preparados)")
+    st.subheader("📁 Datos de ejemplo (Ventas de TechStore - Datos preparados)")
     
     col1, col2 = st.columns([2, 1])
     with col1:

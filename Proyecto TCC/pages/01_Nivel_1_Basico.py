@@ -70,7 +70,14 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("Ahora que ya entiendes qué son los datos, en este nivel aprenderás los pasos prácticos para preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico para trabajar con datos reales.")
+    st.markdown("Ahora que ya entiendes **qué son los datos** y **cómo se organizan** (como aprendiste en el Nivel 0), en este nivel aprenderás los pasos prácticos para preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico para trabajar con datos reales.")
+    
+    # Add connection to previous level
+    create_info_box(
+        "info-box",
+        "🔗 Conectando con el Nivel 0",
+        "<p>En el nivel anterior aprendiste que los datos se organizan en tablas con <strong>filas</strong> (registros) y <strong>columnas</strong> (tipos de información). Ahora vamos a ver cómo preparar esos datos para que estén listos para analizar.</p>"
+    )
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Preparar y Cargar Datos")
@@ -226,7 +233,7 @@ def main():
     create_data_quality_insight('nivel1', 'dirty')
     
     df = create_sample_data('dirty')  # Use dirty data for Level 1
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda - Datos sin procesar)")
+    st.subheader("📁 Datos de ejemplo (Ventas de TechStore - Datos sin procesar)")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -256,6 +263,12 @@ def main():
     
     # Show dirty vs clean data comparison
     st.subheader("🔄 Comparación: Datos Sin Procesar vs Datos Limpios")
+    
+    create_info_box(
+        "info-box",
+        "📚 ¿Por qué es importante ver ambos tipos?",
+        "<p>En el <strong>Nivel 0</strong> viste datos organizados y limpios. En la vida real, los datos raramente vienen así. En este nivel aprenderás a identificar y solucionar estos problemas para que los datos estén listos para el análisis.</p>"
+    )
     
     create_info_box(
         "warning-box",

@@ -69,7 +69,14 @@ def main():
     
     # 6. Introduction Section (what the user will learn)
     st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("En este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y cómo usarlas para tomar mejores decisiones basadas en datos.")
+    st.markdown("Ahora que ya sabes **preparar datos** (Nivel 1) y **filtrar información** (Nivel 2), en este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y cómo usarlas para tomar mejores decisiones basadas en datos.")
+    
+    # Add connection to previous levels
+    create_info_box(
+        "info-box",
+        "🔗 Conectando con Niveles Anteriores",
+        "<p>En el <strong>Nivel 0</strong> aprendiste qué son los datos y cómo se organizan. En el <strong>Nivel 1</strong> aprendiste a prepararlos correctamente. En el <strong>Nivel 2</strong> aprendiste a filtrarlos para encontrar información específica. Ahora es hora de calcular métricas importantes con esos datos filtrados.</p>"
+    )
     
     # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Entender Métricas y KPIs")
@@ -172,6 +179,14 @@ def main():
     
     # Show data overview
     st.subheader("📊 Datos de Ejemplo")
+    
+    # Reinforce data types concept
+    create_info_box(
+        "info-box",
+        "📚 Recordando Tipos de Datos",
+        "<p>Como aprendiste en el <strong>Nivel 0</strong>, los datos tienen diferentes tipos. En este análisis usaremos principalmente los datos <strong>numéricos</strong> (Ventas, Cantidad, Calificación) para calcular métricas importantes.</p>"
+    )
+    
     st.dataframe(df.head(10), use_container_width=True)
     
     # Basic metrics calculation

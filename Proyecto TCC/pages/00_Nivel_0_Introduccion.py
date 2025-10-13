@@ -59,6 +59,13 @@ def main():
     st.header("🎯 ¿Qué aprenderás en este nivel?")
     st.markdown("En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.")
     
+    # Add narrative context
+    create_info_box(
+        "info-box",
+        "🏪 Bienvenido a TechStore",
+        "<p>Durante todo el curso, trabajaremos con datos de <strong>TechStore</strong>, una tienda de tecnología que necesita analizar sus ventas para tomar mejores decisiones. En este nivel, aprenderás los conceptos básicos que necesitas para entender estos datos.</p>"
+    )
+    
     # 6. Steps Section (clear, actionable instructions)
     st.header("📋 Conceptos Fundamentales de Datos")
     
@@ -208,12 +215,19 @@ def main():
     
     create_info_box(
         "info-box",
-        "📊 Vamos a ver un ejemplo con datos de una tienda",
-        "<p>Te mostraré cómo se ven los datos en la vida real y qué información puedes obtener de ellos.</p>"
+        "📊 Vamos a ver un ejemplo con datos de TechStore",
+        "<p>Te mostraré cómo se ven los datos de TechStore en la vida real y qué información puedes obtener de ellos. Estos mismos datos los usarás en todos los niveles del curso, pero en diferentes estados de calidad.</p>"
+    )
+    
+    # Show data progression
+    create_info_box(
+        "success-box",
+        "🔄 Progresión de Datos en el Curso",
+        "<p><strong>Nivel 0:</strong> Datos organizados para aprender conceptos<br/><strong>Nivel 1:</strong> Datos con problemas para aprender preparación<br/><strong>Nivel 2-4:</strong> Datos limpios para análisis avanzados</p>"
     )
     
     df = create_sample_data('clean')  # Use clean data for Level 0
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
+    st.subheader("📁 Datos de ejemplo (Ventas de TechStore)")
     
     col1, col2 = st.columns([2, 1])
     with col1:
