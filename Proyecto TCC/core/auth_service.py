@@ -1,32 +1,64 @@
 """
-Authentication service for TCC Data Analysis Platform
-Handles user registration, login, session management, and password operations
+Nombre del Archivo: auth_service.py
+Descripción: Servicio de autenticación - Registro, login, gestión de sesiones y contraseñas
+Autor: Fernando Bavera Villalba
+Fecha: 25/10/2025
 """
 
-import streamlit as st
-import bcrypt
-import secrets
+# Imports estándar
 import logging
+import secrets
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any, Tuple
+from typing import Any, Dict, Optional, Tuple
+
+import bcrypt
+import streamlit as st
+
+# Imports locales
 from core.database import db_manager
-from core.security import security_manager
 from core.progress_tracker import progress_tracker
+from core.security import security_manager
 from core.security_features import security_features
 
 logger = logging.getLogger(__name__)
 
+# ============================================================================
+# AUTH SERVICE CLASS
+# ============================================================================
+
 class AuthService:
-    """Handles user authentication and session management"""
+    """
+    Maneja la autenticación de usuarios y gestión de sesiones.
+    
+    Esta clase proporciona funcionalidad completa para registro de usuarios,
+    autenticación, gestión de sesiones y operaciones relacionadas con contraseñas.
+    """
     
     def __init__(self):
-        self.session_timeout = 3600  # 1 hour in seconds
+        """Inicializa el servicio de autenticación con configuración por defecto"""
+        self.session_timeout = 3600  # 1 hora en segundos
+    
+    # ============================================================================
+    # USER REGISTRATION AND AUTHENTICATION
+    # ============================================================================
     
     def register_user(self, username: str, email: str, password: str, 
                      first_name: str, last_name: str) -> Tuple[bool, str]:
-        """Register a new user"""
+        """
+        Registra un nuevo usuario en el sistema.
+        
+        Args:
+            username: Nombre de usuario único
+            email: Email del usuario
+            password: Contraseña del usuario
+            first_name: Nombre del usuario
+            last_name: Apellido del usuario
+        
+        Returns:
+            Tupla con (éxito, mensaje)
+        """
         try:
-            # Validate inputs
+            # Validar entradas
             if not username or not email or not password:
                 return False, "All fields are required"
             

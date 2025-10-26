@@ -1,8 +1,18 @@
+"""
+Nombre del Archivo: config.py
+Descripción: Configuración general de la aplicación Streamlit
+Autor: Fernando Bavera Villalba
+Fecha: 25/10/2025
+"""
+
 import streamlit as st
 
-# Configuración de página
+# ============================================================================
+# PAGE CONFIGURATION
+# ============================================================================
+
 def setup_page_config():
-    """Configurar la página de Streamlit"""
+    """Configura la página principal de Streamlit con título, icono y layout"""
     st.set_page_config(
         page_title="Dashboard Principal",
         page_icon="📊",
@@ -10,7 +20,11 @@ def setup_page_config():
         initial_sidebar_state="expanded"
     )
 
-# CSS personalizado para mejor estilo
+# ============================================================================
+# CUSTOM STYLES
+# ============================================================================
+
+# CSS personalizado para mejorar el estilo visual de la aplicación
 CUSTOM_CSS = """
 <style>
     .main-header {
@@ -38,5 +52,10 @@ CUSTOM_CSS = """
 """
 
 def apply_custom_css():
-    """Aplicar CSS personalizado"""
+    """
+    Aplica los estilos CSS personalizados a la aplicación.
+    
+    Esta función debe ser llamada después de st.set_page_config() para
+    aplicar los estilos personalizados definidos en CUSTOM_CSS.
+    """
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True) 
