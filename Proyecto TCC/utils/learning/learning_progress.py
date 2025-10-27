@@ -1,11 +1,13 @@
 import streamlit as st
 from core.progress_tracker import progress_tracker
+from utils.ui.icon_system import get_icon, replace_emojis
 
 def get_level_progress(user_id):
     """Get current progress across all levels from database"""
     try:
         progress = progress_tracker.get_user_progress(user_id)
         level_progress = {
+            'nivel0': progress.get('nivel0_completed', False),
             'nivel1': progress.get('nivel1_completed', False),
             'nivel2': progress.get('nivel2_completed', False),
             'nivel3': progress.get('nivel3_completed', False),
@@ -13,19 +15,19 @@ def get_level_progress(user_id):
         }
         
         completed_count = sum(level_progress.values())
-        total_progress = (completed_count / 4) * 100
+        total_progress = (completed_count / 5) * 100
         
         return total_progress, completed_count, level_progress
     except Exception as e:
         st.error(f"Error getting progress: {e}")
-        return 0, 0, {'nivel1': False, 'nivel2': False, 'nivel3': False, 'nivel4': False}
+        return 0, 0, {'nivel0': False, 'nivel1': False, 'nivel2': False, 'nivel3': False, 'nivel4': False}
 
 def show_learning_section(total_progress, completed_count, progress):
     """Show the learning section with progress tracking"""
     st.markdown("---")
-    st.markdown("""
+    st.markdown(f"""
     <div style="background: rgba(255, 193, 7, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #ffc107;">
-        <h3 style="color: #ffc107; margin-bottom: 1rem;">🎓 Sistema de Aprendizaje por Niveles</h3>
+        <h3 style="color: #ffc107; margin-bottom: 1rem;">{get_icon('🎓')} Sistema de Aprendizaje por Niveles</h3>
         <p style="color: #666; margin-bottom: 1rem;">Completa nuestros niveles paso a paso para dominar todas las funcionalidades</p>
     </div>
     """, unsafe_allow_html=True)
@@ -34,27 +36,30 @@ def show_learning_section(total_progress, completed_count, progress):
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso: {total_progress:.0f}% - {completed_count} de 4 niveles completados")
+        st.caption(f"Progreso: {total_progress:.0f}% - {completed_count} de 5 niveles completados")
         
         # Show completion status for each level
         st.markdown("**Estado de Niveles:**")
-        col_a, col_b, col_c, col_d = st.columns(4)
+        col_a, col_b, col_c, col_d, col_e = st.columns(5)
         with col_a:
-            status = "✅" if progress['nivel1'] else "⏳"
-            st.markdown(f"{status} Nivel 1")
+            status = get_icon("✅") if progress['nivel0'] else get_icon("⏳")
+            st.markdown(f"{status} Nivel 0", unsafe_allow_html=True)
         with col_b:
-            status = "✅" if progress['nivel2'] else "⏳"
-            st.markdown(f"{status} Nivel 2")
+            status = get_icon("✅") if progress['nivel1'] else get_icon("⏳")
+            st.markdown(f"{status} Nivel 1", unsafe_allow_html=True)
         with col_c:
-            status = "✅" if progress['nivel3'] else "⏳"
-            st.markdown(f"{status} Nivel 3")
+            status = get_icon("✅") if progress['nivel2'] else get_icon("⏳")
+            st.markdown(f"{status} Nivel 2", unsafe_allow_html=True)
         with col_d:
-            status = "✅" if progress['nivel4'] else "⏳"
-            st.markdown(f"{status} Nivel 4")
+            status = get_icon("✅") if progress['nivel3'] else get_icon("⏳")
+            st.markdown(f"{status} Nivel 3", unsafe_allow_html=True)
+        with col_e:
+            status = get_icon("✅") if progress['nivel4'] else get_icon("⏳")
+            st.markdown(f"{status} Nivel 4", unsafe_allow_html=True)
     
     # Add progress reset button in learning section
     st.markdown("---")
-    st.markdown("### 🔄 Opciones de Progreso")
+    st.markdown(f"### {get_icon('🔄')} Opciones de Progreso", unsafe_allow_html=True)
     
     # Get user ID for reset functionality
     user = st.session_state.get('user')
@@ -64,11 +69,11 @@ def show_learning_section(total_progress, completed_count, progress):
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            if st.button("🔄 Reiniciar Progreso", type="secondary", use_container_width=True):
+            if st.button(f"{get_icon('🔄')} Reiniciar Progreso", type="secondary", use_container_width=True):
                 st.session_state.show_reset_confirmation = True
         
         with col2:
-            if st.button("📊 Ver Progreso Detallado", use_container_width=True):
+            if st.button(f"{get_icon('📊')} Ver Progreso Detallado", use_container_width=True):
                 st.session_state.show_detailed_progress = True
         
         # Reset confirmation dialog
@@ -183,7 +188,7 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("📊 Niveles Completados", f"{completed_count}/4")
+        st.metric("📊 Niveles Completados", f"{completed_count}/5")
     with col2:
         st.metric("📈 Progreso Total", f"{total_progress:.1f}%")
     with col3:
@@ -216,7 +221,9 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
 def save_level_progress(user_id, level_name, completed=True):
     """Save level completion progress to database"""
     try:
-        if level_name == 'nivel1':
+        if level_name == 'nivel0':
+            progress_tracker.update_user_progress(user_id, nivel0_completed=completed)
+        elif level_name == 'nivel1':
             progress_tracker.update_user_progress(user_id, nivel1_completed=completed)
         elif level_name == 'nivel2':
             progress_tracker.update_user_progress(user_id, nivel2_completed=completed)
@@ -237,6 +244,7 @@ def reset_all_progress(user_id):
     try:
         progress_tracker.update_user_progress(
             user_id, 
+            nivel0_completed=False,
             nivel1_completed=False,
             nivel2_completed=False,
             nivel3_completed=False,
@@ -244,7 +252,7 @@ def reset_all_progress(user_id):
         )
         
         # Clear session state
-        for level in ['nivel1', 'nivel2', 'nivel3', 'nivel4']:
+        for level in ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']:
             if f'{level}_completed' in st.session_state:
                 del st.session_state[f'{level}_completed']
         

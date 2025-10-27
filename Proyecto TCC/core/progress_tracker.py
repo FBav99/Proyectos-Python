@@ -15,7 +15,7 @@ class ProgressTracker:
     """Handles user learning progress tracking"""
     
     def __init__(self):
-        self.levels = ['nivel1', 'nivel2', 'nivel3', 'nivel4']
+        self.levels = ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']
     
     def get_user_progress(self, user_id: int) -> Dict[str, Any]:
         """Get complete user progress information"""
@@ -50,9 +50,9 @@ class ProgressTracker:
         try:
             with db_manager.get_connection() as conn:
                 conn.execute("""
-                    INSERT INTO user_progress (user_id, created_at, last_updated)
-                    VALUES (?, ?, ?)
-                """, (user_id, datetime.now().isoformat(), datetime.now().isoformat()))
+                    INSERT INTO user_progress (user_id, last_updated)
+                    VALUES (?, ?)
+                """, (user_id, datetime.now().isoformat()))
                 conn.commit()
             return True
         except Exception as e:
@@ -67,7 +67,11 @@ class ProgressTracker:
             values = []
             
             for field, value in kwargs.items():
-                if field in self.levels or field in ['total_time_spent', 'data_analyses_created']:
+                # Check if field is a level completion field or other allowed fields
+                is_level_field = any(field.startswith(level) for level in self.levels)
+                is_allowed_field = field in ['total_time_spent', 'data_analyses_created']
+                
+                if is_level_field or is_allowed_field:
                     update_fields.append(f"{field} = ?")
                     values.append(value)
             
@@ -109,11 +113,8 @@ class ProgressTracker:
             )
             
             if success:
-                # Update completion timestamp
-                self.update_user_progress(
-                    user_id,
-                    **{f"{level_name}_completed_at": datetime.now().isoformat()}
-                )
+                # Note: Completion timestamp columns don't exist in current schema
+                # Update completion timestamp when schema is updated
                 
                 # Log completion
                 self.log_progress_activity(user_id, 'level_completed', {
@@ -141,11 +142,8 @@ class ProgressTracker:
             )
             
             if success:
-                # Clear completion timestamp
-                self.update_user_progress(
-                    user_id,
-                    **{f"{level_name}_completed_at": None}
-                )
+                # Note: Completion timestamp columns don't exist in current schema
+                # Clear completion timestamp when schema is updated
                 
                 # Log reset
                 self.log_progress_activity(user_id, 'level_reset', {
@@ -165,7 +163,8 @@ class ProgressTracker:
             reset_fields = {}
             for level in self.levels:
                 reset_fields[f"{level}_completed"] = False
-                reset_fields[f"{level}_completed_at"] = None
+                # Only reset completion timestamp if the column exists
+                # Note: The database schema doesn't include *_completed_at columns yet
             
             success = self.update_user_progress(user_id, **reset_fields)
             
@@ -281,7 +280,6 @@ class ProgressTracker:
         """Get default progress structure"""
         default_progress = {
             'user_id': None,
-            'created_at': datetime.now().isoformat(),
             'last_updated': datetime.now().isoformat(),
             'total_time_spent': 0,
             'data_analyses_created': 0

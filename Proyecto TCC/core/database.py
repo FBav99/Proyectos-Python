@@ -1,34 +1,48 @@
 """
-Database utilities for TCC Data Analysis Platform
-Handles SQLite database connections, migrations, and basic operations
+Nombre del Archivo: database.py
+Descripción: Utilidades de base de datos SQLite - Conexiones, migraciones y operaciones básicas
+Autor: Fernando Bavera Villalba
+Fecha: 25/10/2025
 """
 
-import sqlite3
-import os
+# Imports estándar
 import json
 import logging
+import os
+import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Any
+from typing import Any, Dict, List, Optional
+
 import bcrypt
 
-# Configure logging
+# Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Database configuration
+# Configuración de base de datos
 DB_PATH = 'tcc_database.db'
 MIGRATIONS_DIR = 'migrations'
 
+# ============================================================================
+# DATABASE MANAGER CLASS
+# ============================================================================
+
 class DatabaseManager:
-    """Manages database connections and operations"""
+    """
+    Administra conexiones de base de datos y operaciones.
+    
+    Esta clase gestiona todas las operaciones de base de datos incluyendo
+    conexiones, creación de tablas, y operaciones CRUD básicas.
+    """
     
     def __init__(self, db_path: str = DB_PATH):
+        """Inicializa el gestor de base de datos con la ruta especificada"""
         self.db_path = db_path
         self.ensure_migrations_dir()
     
     def ensure_migrations_dir(self):
-        """Ensure migrations directory exists"""
+        """Asegura que el directorio de migraciones existe"""
         if not os.path.exists(MIGRATIONS_DIR):
             os.makedirs(MIGRATIONS_DIR)
             logger.info(f"Created migrations directory: {MIGRATIONS_DIR}")
@@ -122,6 +136,7 @@ class DatabaseManager:
                 CREATE TABLE IF NOT EXISTS user_progress (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
+                    nivel0_completed BOOLEAN DEFAULT 0,
                     nivel1_completed BOOLEAN DEFAULT 0,
                     nivel2_completed BOOLEAN DEFAULT 0,
                     nivel3_completed BOOLEAN DEFAULT 0,

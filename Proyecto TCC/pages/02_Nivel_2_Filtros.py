@@ -5,6 +5,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -47,7 +49,7 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Verificar que el nivel anterior esté completado
@@ -57,14 +59,28 @@ def main():
             st.switch_page("pages/01_Nivel_1_Basico.py")
         return
     
-    # 3. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. 
-    Los filtros te ayudan a organizar y analizar datos de manera más efectiva.
-    """)
+    # 3. Progression Summary
+    create_progression_summary(progress)
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 4. Show achievement for previous level if completed
+    if progress.get('nivel1', False):
+        create_achievement_display('nivel1', progress)
+    
+    # 5. Level Preview
+    create_level_preview('nivel2')
+    
+    # 6. Introduction Section (what the user will learn)
+    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.markdown("Ahora que ya sabes **preparar y cargar datos** correctamente (como aprendiste en el Nivel 1), en este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. Los filtros te ayudan a organizar y analizar datos de manera más efectiva.")
+    
+    # Add connection to previous level
+    create_info_box(
+        "info-box",
+        "🔗 Conectando con el Nivel 1",
+        "<p>En el nivel anterior aprendiste a cargar y verificar datos. Ahora que tienes datos limpios y bien estructurados, puedes empezar a filtrarlos para encontrar información específica. ¡Es hora de explorar tus datos!</p>"
+    )
+    
+    # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Organizar y Filtrar Datos")
     
     # Step 1
@@ -181,8 +197,18 @@ def main():
         "<p>Te mostraré cómo aplicar diferentes tipos de filtros y ver cómo cambian los resultados.</p>"
     )
     
-    df = create_sample_data()
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel2', 'clean')
+    
+    # Show data transformation
+    create_info_box(
+        "success-box",
+        "✨ Transformación de Datos Completada",
+        "<p>¡Excelente! Los datos que viste en el <strong>Nivel 1</strong> (con problemas de calidad) ahora están limpios y organizados. Como aprendiste en el Nivel 0, estos datos tienen una estructura clara: cada fila es una venta y cada columna es un tipo de información.</p>"
+    )
+    
+    df = create_sample_data('clean')  # Use clean data for Level 2
+    st.subheader("📁 Datos de ejemplo (Ventas de TechStore - Datos preparados)")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -303,44 +329,13 @@ def main():
     # Tips section
     st.header("💡 Consejos Importantes")
     
-    st.markdown("""
-    <div class="warning-box">
-        <h3>⚠️ Errores comunes a evitar:</h3>
-        <ul>
-            <li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li>
-            <li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li>
-            <li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li>
-            <li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="warning-box"><h3>⚠️ Errores comunes a evitar:</h3><ul><li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li><li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li><li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li><li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li></ul></div>', unsafe_allow_html=True)
     
-    st.markdown("""
-    <div class="success-box">
-        <h3>✅ Buenas prácticas:</h3>
-        <ul>
-            <li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li>
-            <li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li>
-            <li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li>
-            <li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="success-box"><h3>✅ Buenas prácticas:</h3><ul><li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li><li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li><li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li><li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li></ul></div>', unsafe_allow_html=True)
     
     # Practice activity
     st.header("🎯 Actividad Práctica")
-    st.markdown("""
-    <div class="card">
-        <h3>📝 Ejercicio para practicar:</h3>
-        <ol>
-            <li><strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</li>
-            <li><strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</li>
-            <li><strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</li>
-            <li><strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</li>
-            <li><strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="card"><h3>📝 Ejercicio para practicar:</h3><ol><li><strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</li><li><strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</li><li><strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</li><li><strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</li><li><strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</li></ol></div>', unsafe_allow_html=True)
     
     # 6. Navigation or next steps
     st.header("✅ Verificación del Nivel")
@@ -359,6 +354,9 @@ def main():
             st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
             return
         
+        # Show achievement
+        create_achievement_display('nivel2', progress)
+        
         create_info_box(
             "success-box",
             "🎉 ¡Felicidades! Has completado el Nivel 2",
@@ -367,6 +365,9 @@ def main():
         
         st.subheader("🚀 ¿Qué sigue?")
         st.markdown("En el **Nivel 3** aprenderás a calcular métricas y estadísticas.")
+        
+        # Show next level preview
+        create_level_preview('nivel3')
         
         if st.button("Continuar al Nivel 3", type="primary"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")

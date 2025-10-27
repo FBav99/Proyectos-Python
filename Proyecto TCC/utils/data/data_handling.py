@@ -8,6 +8,13 @@ def show_upload_section():
     st.markdown("---")
     st.markdown("### 📤 Subir tus Propios Datos")
     
+    # Show current data info if exists
+    if 'uploaded_data' in st.session_state and st.session_state.uploaded_data is not None:
+        st.info(f"📊 Datos actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas")
+        if st.button("⬅️ Volver a Datos Actuales", type="secondary"):
+            st.rerun()
+        st.markdown("---")
+    
     uploaded_file = st.file_uploader(
         "📁 Sube tu archivo de datos",
         type=['csv', 'xlsx', 'xls'],

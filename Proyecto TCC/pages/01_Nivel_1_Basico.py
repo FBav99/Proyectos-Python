@@ -6,6 +6,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -46,33 +48,60 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # 3. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás los pasos básicos para preparar y cargar datos en herramientas de análisis. 
-    Es el primer paso fundamental para cualquier análisis de datos.
-    """)
+    # Verificar que el nivel anterior esté completado
+    if not progress.get('nivel0', False):
+        st.warning("⚠️ Primero debes completar el Nivel 0 (Introducción) antes de continuar con este nivel.")
+        if st.button("Ir al Nivel 0", type="primary"):
+            st.switch_page("pages/00_Nivel_0_Introduccion.py")
+        return
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 3. Progression Summary
+    create_progression_summary(progress)
+    
+    # 4. Show achievement for previous level if completed
+    if progress.get('nivel0', False):
+        create_achievement_display('nivel0', progress)
+    
+    # 5. Level Preview
+    create_level_preview('nivel1')
+    
+    # 6. Introduction Section (what the user will learn)
+    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.markdown("Ahora que ya entiendes **qué son los datos** y **cómo se organizan** (como aprendiste en el Nivel 0), en este nivel aprenderás los pasos prácticos para preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico para trabajar con datos reales.")
+    
+    # Add connection to previous level
+    create_info_box(
+        "info-box",
+        "🔗 Conectando con el Nivel 0",
+        "<p>En el nivel anterior aprendiste que los datos se organizan en tablas con <strong>filas</strong> (registros) y <strong>columnas</strong> (tipos de información). Ahora vamos a ver cómo preparar esos datos para que estén listos para analizar.</p>"
+    )
+    
+    # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Preparar y Cargar Datos")
     
     # Step 1
     create_step_card(
         step_number="1",
-        title="Preparar tu archivo de datos",
-        description="<strong>¿Por qué es importante?</strong> Los datos bien organizados son más fáciles de analizar y te dan resultados más confiables.",
+        title="Elegir el formato correcto para tus datos",
+        description="<strong>¿Por qué es importante el formato?</strong> El formato correcto asegura que tus datos se carguen sin errores y sean fáciles de trabajar.",
         sections={
             "📁 Formatos recomendados:": [
-                "<strong>CSV</strong> - Para datos simples en tablas",
-                "<strong>Excel (.xlsx)</strong> - Para datos con formato y múltiples hojas"
+                "<strong>CSV (.csv)</strong> - Para datos simples, se abre en cualquier programa",
+                "<strong>Excel (.xlsx)</strong> - Para datos con formato, colores y múltiples hojas",
+                "<strong>JSON (.json)</strong> - Para datos estructurados complejos"
             ],
-            "✅ Consejos para organizar datos:": [
-                "Cada columna debe tener un título claro",
-                "Los datos deben estar en filas y columnas ordenadas",
-                "Evita celdas vacías o datos mezclados"
+            "🔧 Cómo elegir el formato:": [
+                "<strong>Usa CSV si:</strong> Tienes datos simples en tabla, quieres compatibilidad máxima",
+                "<strong>Usa Excel si:</strong> Tienes formato, colores, o múltiples hojas de datos",
+                "<strong>Usa JSON si:</strong> Tienes datos anidados o estructuras complejas"
+            ],
+            "⚠️ Formatos a evitar:": [
+                "<strong>PDF:</strong> No se puede analizar directamente",
+                "<strong>Imágenes:</strong> Necesitan procesamiento especial",
+                "<strong>Word:</strong> No está diseñado para datos tabulares"
             ]
         }
     )
@@ -80,29 +109,52 @@ def main():
     # Step 2
     create_step_card(
         step_number="2",
-        title="Cargar el archivo en la herramienta",
-        description="<strong>¿Qué significa?</strong> Subir tu archivo de datos para que la herramienta pueda leerlo y analizarlo.",
+        title="Preparar la estructura de datos correctamente",
+        description="<strong>¿Por qué es importante la estructura?</strong> Una estructura bien organizada hace que el análisis sea más fácil y preciso.",
         sections={
-            "🔧 Proceso de carga:": {
-                "Haz clic en 'Cargar archivo' o 'Subir datos'",
-                "Selecciona tu archivo desde tu computadora",
-                "Espera a que se complete la carga",
-                "Verifica que los datos se cargaron correctamente"
-            }
+            "📋 Reglas para organizar datos:": [
+                "<strong>Una fila = un registro:</strong> Cada fila debe representar una sola cosa (una venta, un cliente, un producto)",
+                "<strong>Una columna = un tipo de información:</strong> Cada columna debe tener el mismo tipo de dato",
+                "<strong>Encabezados claros:</strong> Usa nombres descriptivos para las columnas",
+                "<strong>Sin filas vacías:</strong> Evita filas completamente vacías en el medio de los datos"
+            ],
+            "✅ Ejemplo de estructura correcta:": [
+                "| Fecha | Producto | Cantidad | Precio |",
+                "|-------|----------|----------|--------|",
+                "| 15/03 | Laptop   | 1        | 800    |",
+                "| 15/03 | Mouse    | 2        | 25     |"
+            ],
+            "❌ Ejemplo de estructura incorrecta:": [
+                "| Fecha | Producto | Cantidad | Precio |",
+                "|-------|----------|----------|--------|",
+                "| 15/03 | Laptop   | 1        | 800    |",
+                "|       |          |          |        | ← Fila vacía",
+                "| 15/03 | Mouse    | 2        | 25     |"
+            ]
         }
     )
     
     # Step 3
     create_step_card(
         step_number="3",
-        title="Verificar que los datos se cargaron correctamente",
-        description="<strong>¿Por qué verificar?</strong> Es importante asegurarse de que todos los datos se cargaron sin errores.",
+        title="Cargar el archivo en la herramienta",
+        description="<strong>¿Cómo cargar datos?</strong> Una vez que tienes tu archivo preparado, necesitas subirlo a la herramienta de análisis.",
         sections={
-            "👀 Qué revisar:": [
-                "¿Se ven todos los números y texto?",
-                "¿Las fechas se muestran correctamente?",
-                "¿No hay datos faltantes o extraños?",
-                "¿El número de filas y columnas es el esperado?"
+            "🔧 Proceso de carga paso a paso:": [
+                "<strong>1. Localiza el botón de carga:</strong> Busca 'Cargar archivo', 'Subir datos' o 'Importar'",
+                "<strong>2. Selecciona tu archivo:</strong> Navega hasta donde guardaste tu archivo",
+                "<strong>3. Confirma la carga:</strong> Haz clic en 'Abrir' o 'Subir'",
+                "<strong>4. Espera la confirmación:</strong> La herramienta te dirá si la carga fue exitosa"
+            ],
+            "📁 Tipos de carga disponibles:": [
+                "<strong>Arrastrar y soltar:</strong> Arrastra el archivo directamente a la zona de carga",
+                "<strong>Explorador de archivos:</strong> Haz clic en 'Examinar' y selecciona el archivo",
+                "<strong>URL o enlace:</strong> Si tienes un enlace a los datos en internet"
+            ],
+            "⚠️ Problemas comunes al cargar:": [
+                "<strong>Archivo muy grande:</strong> Algunas herramientas tienen límites de tamaño",
+                "<strong>Formato no soportado:</strong> Verifica que el formato sea compatible",
+                "<strong>Archivo corrupto:</strong> Intenta abrirlo en otro programa primero"
             ]
         }
     )
@@ -110,14 +162,53 @@ def main():
     # Step 4
     create_step_card(
         step_number="4",
-        title="Explorar la estructura básica de los datos",
-        description="<strong>¿Qué es la estructura?</strong> Es cómo están organizados tus datos: qué columnas tienes, qué tipo de información contienen, y cuántos registros hay.",
+        title="Verificar que los datos se cargaron correctamente",
+        description="<strong>¿Por qué verificar?</strong> Es crucial asegurarse de que todos los datos se cargaron sin errores antes de continuar con el análisis.",
+        sections={
+            "👀 Checklist de verificación:": [
+                "<strong>¿Se ven todos los datos?</strong> Revisa que no falten números o texto",
+                "<strong>¿Las fechas se ven correctas?</strong> Verifica que el formato de fechas sea el esperado",
+                "<strong>¿No hay datos extraños?</strong> Busca símbolos raros, errores de tipeo, o valores imposibles",
+                "<strong>¿El conteo es correcto?</strong> Confirma que el número de filas y columnas sea el esperado"
+            ],
+            "🔍 Qué buscar específicamente:": [
+                "<strong>Datos faltantes:</strong> Celdas vacías donde no debería haberlas",
+                "<strong>Formato incorrecto:</strong> Números que se ven como texto, fechas mal formateadas",
+                "<strong>Datos duplicados:</strong> Filas que aparecen más de una vez",
+                "<strong>Valores atípicos:</strong> Números que parecen demasiado grandes o pequeños"
+            ],
+            "✅ Señales de que todo está bien:": [
+                "Los números se ven como números (alineados a la derecha)",
+                "Las fechas tienen un formato consistente",
+                "No hay celdas con errores (#N/A, #ERROR, etc.)",
+                "El número total de registros coincide con lo esperado"
+            ]
+        }
+    )
+    
+    # Step 5
+    create_step_card(
+        step_number="5",
+        title="Entender la estructura de tus datos cargados",
+        description="<strong>¿Por qué es importante?</strong> Conocer la estructura te ayuda a entender qué puedes hacer con los datos y cómo organizarlos para el análisis.",
         sections={
             "📊 Información básica a revisar:": [
-                "<strong>Número de filas:</strong> Cuántos registros tienes",
-                "<strong>Número de columnas:</strong> Qué tipos de información tienes",
-                "<strong>Tipos de datos:</strong> Números, texto, fechas",
-                "<strong>Valores únicos:</strong> Qué categorías o rangos tienes"
+                "<strong>Número de filas:</strong> Cuántos registros tienes en total",
+                "<strong>Número de columnas:</strong> Qué tipos de información tienes disponibles",
+                "<strong>Tipos de datos:</strong> Qué columnas son números, texto, fechas, etc.",
+                "<strong>Valores únicos:</strong> Cuántas categorías diferentes tienes en cada columna"
+            ],
+            "🔍 Cómo interpretar la información:": [
+                "<strong>Filas:</strong> Cada fila representa un evento, transacción, o registro individual",
+                "<strong>Columnas:</strong> Cada columna representa una característica o medida",
+                "<strong>Tipos de datos:</strong> Te dicen qué operaciones puedes hacer (sumar números, contar categorías)",
+                "<strong>Valores únicos:</strong> Te muestran la diversidad de tus datos"
+            ],
+            "💡 Preguntas útiles para hacerte:": [
+                "¿Tengo suficientes datos para hacer análisis confiables?",
+                "¿Qué columnas contienen la información más importante?",
+                "¿Hay columnas que no necesito para mi análisis?",
+                "¿Los tipos de datos son correctos para lo que quiero hacer?"
             ]
         }
     )
@@ -134,12 +225,15 @@ def main():
     
     create_info_box(
         "info-box",
-        "📊 Vamos a ver un ejemplo con datos de ventas",
-        "<p>Te mostraré cómo se ven los datos cuando están bien organizados y qué información puedes obtener de ellos.</p>"
+        "📊 Vamos a practicar la preparación y carga de datos",
+        "<p>Te mostraré cómo preparar datos correctamente y qué verificar después de cargarlos.</p>"
     )
     
-    df = create_sample_data()
-    st.subheader("📁 Datos de ejemplo (Ventas de una tienda)")
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel1', 'dirty')
+    
+    df = create_sample_data('dirty')  # Use dirty data for Level 1
+    st.subheader("📁 Datos de ejemplo (Ventas de TechStore - Datos sin procesar)")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -160,66 +254,118 @@ def main():
     with col2:
         st.markdown("**📚 ¿Qué significa cada tipo de dato?**")
         
-        st.markdown("""
-        <div class="info-box">
-            <p><strong>🔤 object:</strong> Texto, nombres, categorías</p>
-            <p><strong>🔢 int64:</strong> Números enteros</p>
-            <p><strong>📊 float64:</strong> Números decimales</p>
-            <p><strong>📅 datetime64:</strong> Fechas y horas</p>
-            <p><strong>✅ bool:</strong> Verdadero o Falso</p>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container():
+            st.markdown("**🔤 object:** Texto, nombres, categorías")
+            st.markdown("**🔢 int64:** Números enteros")
+            st.markdown("**📊 float64:** Números decimales")
+            st.markdown("**📅 datetime64:** Fechas y horas")
+            st.markdown("**✅ bool:** Verdadero o Falso")
+    
+    # Show dirty vs clean data comparison
+    st.subheader("🔄 Comparación: Datos Sin Procesar vs Datos Limpios")
+    
+    create_info_box(
+        "info-box",
+        "📚 ¿Por qué es importante ver ambos tipos?",
+        "<p>En el <strong>Nivel 0</strong> viste datos organizados y limpios. En la vida real, los datos raramente vienen así. En este nivel aprenderás a identificar y solucionar estos problemas para que los datos estén listos para el análisis.</p>"
+    )
+    
+    create_info_box(
+        "warning-box",
+        "⚠️ Problemas en los datos sin procesar",
+        "<p>Observa los problemas que pueden tener los datos reales y cómo afectan el análisis.</p>"
+    )
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**📊 Datos Sin Procesar (Actual):**")
+        st.dataframe(df.head(8), use_container_width=True)
+        
+        # Show data quality issues
+        st.markdown("**🔍 Problemas identificados:**")
+        issues = []
+        if df['Categoria'].isnull().any():
+            issues.append("❌ Valores faltantes en Categoría")
+        if df.duplicated().any():
+            issues.append("❌ Filas duplicadas")
+        if df['Calificacion'].max() > 5 or df['Calificacion'].min() < 1:
+            issues.append("❌ Calificaciones fuera del rango 1-5")
+        if df['Ventas'].max() > df['Ventas'].quantile(0.95) * 5:
+            issues.append("❌ Valores atípicos en Ventas")
+        
+        for issue in issues:
+            st.markdown(f"- {issue}")
+    
+    with col2:
+        st.markdown("**✨ Datos Después de Limpiar:**")
+        df_clean = create_sample_data('clean')
+        st.dataframe(df_clean.head(8), use_container_width=True)
+        
+        # Show improvements
+        st.markdown("**✅ Mejoras aplicadas:**")
+        improvements = [
+            "✅ Valores faltantes eliminados",
+            "✅ Duplicados removidos", 
+            "✅ Calificaciones normalizadas (1-5)",
+            "✅ Valores atípicos corregidos",
+            "✅ Formatos consistentes"
+        ]
+        
+        for improvement in improvements:
+            st.markdown(f"- {improvement}")
+    
+    # Show the impact
+    st.markdown("**📈 Impacto de la limpieza:**")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Registros originales", len(df))
+        st.metric("Registros limpios", len(df_clean))
+    
+    with col2:
+        st.metric("Datos faltantes", df.isnull().sum().sum())
+        st.metric("Duplicados", df.duplicated().sum())
+    
+    with col3:
+        st.metric("Calidad general", "75%", "25%")
+        st.metric("Calidad mejorada", "95%", "20%")
     
     # Tips section
     st.header("💡 Consejos Importantes")
     
-    st.markdown("""
-    <div class="warning-box">
-        <h3>⚠️ Errores comunes a evitar:</h3>
-        <ul>
-            <li><strong>Datos mezclados:</strong> No mezcles texto y números en la misma columna</li>
-            <li><strong>Formato de fechas:</strong> Usa un formato consistente</li>
-            <li><strong>Caracteres especiales:</strong> Evita símbolos extraños</li>
-            <li><strong>Datos vacíos:</strong> Es mejor dejar celdas vacías que poner "0" o "N/A"</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### ⚠️ Errores comunes al preparar datos:")
+        st.markdown("- **Formato incorrecto:** Elegir un formato que no es compatible con la herramienta")
+        st.markdown("- **Estructura inconsistente:** Mezclar diferentes tipos de información en una columna")
+        st.markdown("- **Nombres confusos:** Usar abreviaciones o nombres poco claros en las columnas")
+        st.markdown("- **Datos incompletos:** No verificar que todos los datos se cargaron correctamente")
+        st.markdown("- **Archivos corruptos:** Intentar cargar archivos dañados o incompletos")
     
-    st.markdown("""
-    <div class="success-box">
-        <h3>✅ Buenas prácticas:</h3>
-        <ul>
-            <li><strong>Nombres claros:</strong> Usa nombres descriptivos</li>
-            <li><strong>Consistencia:</strong> Mantén el mismo formato en toda la columna</li>
-            <li><strong>Organización:</strong> Agrupa información relacionada</li>
-            <li><strong>Documentación:</strong> Describe cada columna</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### ✅ Buenas prácticas para preparar datos:")
+        st.markdown("- **Planifica antes de empezar:** Decide qué formato usar según tus necesidades")
+        st.markdown("- **Organiza la estructura:** Una fila = un registro, una columna = un tipo de información")
+        st.markdown("- **Usa nombres descriptivos:** Las columnas deben tener nombres claros y específicos")
+        st.markdown("- **Verifica la calidad:** Siempre revisa que los datos se cargaron sin errores")
+        st.markdown("- **Mantén copias de seguridad:** Guarda una copia de tus datos originales")
     
     # Practice activity
     st.header("🎯 Actividad Práctica")
-    st.markdown("""
-    <div class="card">
-        <h3>📝 Ejercicio para practicar:</h3>
-        <ol>
-            <li><strong>Prepara un archivo:</strong> Crea una tabla simple en Excel con información de ventas</li>
-            <li><strong>Organiza los datos:</strong> Usa columnas para: Fecha, Producto, Cantidad, Precio</li>
-            <li><strong>Agrega algunos datos:</strong> Incluye al menos 10 registros</li>
-            <li><strong>Guarda el archivo:</strong> Como .xlsx o .csv</li>
-            <li><strong>Verifica la estructura:</strong> Asegúrate de que esté ordenado</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### 📝 Ejercicio para practicar la preparación de datos:")
+        st.markdown("1. **Elige un formato:** Decide si usar CSV o Excel para tu archivo")
+        st.markdown("2. **Diseña la estructura:** Planifica qué columnas necesitas (ej: Fecha, Producto, Cantidad, Precio)")
+        st.markdown("3. **Crea el archivo:** Abre Excel o un editor de texto y crea tu tabla")
+        st.markdown("4. **Agrega datos de ejemplo:** Incluye al menos 10 registros con información realista")
+        st.markdown("5. **Verifica la calidad:** Revisa que no haya errores, datos faltantes o inconsistencias")
+        st.markdown("6. **Guarda correctamente:** Guarda en el formato que elegiste (.csv o .xlsx)")
     
     # Data upload and testing section
     st.header("📤 Prueba lo que Aprendiste")
-    st.markdown("""
-    <div class="info-box">
-        <h3>🚀 Sube tu propio archivo de datos</h3>
-        <p>Ahora puedes poner en práctica lo que aprendiste. Sube un archivo CSV o Excel para ver cómo se cargan y analizan los datos.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### 🚀 Sube tu propio archivo de datos")
+        st.markdown("Ahora puedes poner en práctica lo que aprendiste. Sube un archivo CSV o Excel para ver cómo se cargan y analizan los datos.")
     
     # File uploader
     uploaded_file = st.file_uploader(
@@ -324,51 +470,31 @@ def main():
                 else:
                     st.info("No hay columnas numéricas para mostrar estadísticas")
                 
-                st.markdown("""
-                <div class="info-box">
-                    <h4>📊 Información General del Dataset</h4>
-                </div>
-                """, unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("#### 📊 Información General del Dataset")
                 
                 # Create a nice grid layout for the info
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.markdown("""
-                    <div class="card">
-                        <h5>🔢 Detalles Técnicos</h5>
-                        <p><strong>Memoria utilizada:</strong> {memory_usage}</p>
-                        <p><strong>Rango de índice:</strong> {index_range}</p>
-                        <p><strong>Tipos de datos:</strong> {dtype_count} diferentes</p>
-                    </div>
-                    """.format(
-                        memory_usage=f"{df_uploaded.memory_usage(deep=True).sum() / 1024:.2f} KB",
-                        index_range=f"{df_uploaded.index[0]} a {df_uploaded.index[-1]}",
-                        dtype_count=len(df_uploaded.dtypes.unique())
-                    ), unsafe_allow_html=True)
+                    with st.container():
+                        st.markdown("#### 🔢 Detalles Técnicos")
+                        st.markdown(f"**Memoria utilizada:** {df_uploaded.memory_usage(deep=True).sum() / 1024:.2f} KB")
+                        st.markdown(f"**Rango de índice:** {df_uploaded.index[0]} a {df_uploaded.index[-1]}")
+                        st.markdown(f"**Tipos de datos:** {len(df_uploaded.dtypes.unique())} diferentes")
                 
                 with col2:
-                    st.markdown("""
-                    <div class="card">
-                        <h5>📋 Resumen de Columnas</h5>
-                        <p><strong>Total de columnas:</strong> {total_cols}</p>
-                        <p><strong>Columnas numéricas:</strong> {numeric_count}</p>
-                        <p><strong>Columnas de texto:</strong> {text_count}</p>
-                        {date_cols_info}
-                    </div>
-                    """.format(
-                        total_cols=len(df_uploaded.columns),
-                        numeric_count=len(numeric_cols),
-                        text_count=len(text_cols),
-                        date_cols_info=f"<p><strong>Columnas de fecha:</strong> {len(date_cols)}</p>" if date_cols else ""
-                    ), unsafe_allow_html=True)
+                    with st.container():
+                        st.markdown("#### 📋 Resumen de Columnas")
+                        st.markdown(f"**Total de columnas:** {len(df_uploaded.columns)}")
+                        st.markdown(f"**Columnas numéricas:** {len(numeric_cols)}")
+                        st.markdown(f"**Columnas de texto:** {len(text_cols)}")
+                        if date_cols:
+                            st.markdown(f"**Columnas de fecha:** {len(date_cols)}")
                 
                 # Show detailed column information in a nice format
-                st.markdown("""
-                <div class="card">
-                    <h5>📚 Detalle por Columna</h5>
-                </div>
-                """, unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("#### 📚 Detalle por Columna")
                 
                 # Create a table-like display for column details
                 col_details = []
@@ -401,12 +527,9 @@ def main():
                 st.dataframe(col_details_df, use_container_width=True, hide_index=True)
             
             # Congratulations message
-            st.markdown("""
-            <div class="success-box">
-                <h3>🎉 ¡Excelente trabajo!</h3>
-                <p>Has cargado y analizado exitosamente tu propio archivo de datos. Esto demuestra que has dominado los conceptos básicos del Nivel 1.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            with st.container():
+                st.markdown("### 🎉 ¡Excelente trabajo!")
+                st.markdown("Has cargado y analizado exitosamente tu propio archivo de datos. Esto demuestra que has dominado los conceptos básicos del Nivel 1.")
             
         except Exception as e:
             st.error(f"❌ Error al cargar el archivo: {str(e)}")
@@ -432,6 +555,9 @@ def main():
             st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
             return
         
+        # Show achievement
+        create_achievement_display('nivel1', progress)
+        
         create_info_box(
             "success-box",
             "🎉 ¡Felicidades! Has completado el Nivel 1",
@@ -439,7 +565,10 @@ def main():
         )
         
         st.subheader("🚀 ¿Qué sigue?")
-        st.markdown("En el **Nivel 2** aprenderás a organizar y filtrar la información.")
+        st.markdown("En el **Nivel 2** aprenderás a organizar y filtrar la información para encontrar exactamente lo que necesitas.")
+        
+        # Show next level preview
+        create_level_preview('nivel2')
         
         if st.button("Continuar al Nivel 2", type="primary"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")

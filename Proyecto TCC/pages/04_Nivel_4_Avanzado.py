@@ -8,6 +8,8 @@ from datetime import datetime
 from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data
 from utils.learning.learning_progress import save_level_progress
+from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
+from utils.learning.level_data import get_data_progression_info
 
 # Page config
 st.set_page_config(
@@ -48,7 +50,7 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
-        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/4 niveles)")
+        st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Verificar que los niveles anteriores estén completados
@@ -58,14 +60,28 @@ def main():
             st.switch_page("pages/01_Nivel_1_Basico.py")
         return
     
-    # 3. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
-    st.markdown("""
-    En este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas 
-    y crear dashboards completos para presentar tu información de manera profesional.
-    """)
+    # 3. Progression Summary
+    create_progression_summary(progress)
     
-    # 4. Steps Section (clear, actionable instructions)
+    # 4. Show achievement for previous level if completed
+    if progress.get('nivel3', False):
+        create_achievement_display('nivel3', progress)
+    
+    # 5. Level Preview
+    create_level_preview('nivel4')
+    
+    # 6. Introduction Section (what the user will learn)
+    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.markdown("¡Felicidades! Has llegado al nivel más avanzado. Ahora que dominas **conceptos básicos** (Nivel 0), **preparación de datos** (Nivel 1), **filtros** (Nivel 2) y **métricas** (Nivel 3), en este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas y crear dashboards completos para presentar tu información de manera profesional.")
+    
+    # Add connection to all previous levels
+    create_info_box(
+        "success-box",
+        "🎓 Resumen de tu Jornada de Aprendizaje",
+        "<p><strong>Nivel 0:</strong> Aprendiste qué son los datos y cómo se organizan<br/><strong>Nivel 1:</strong> Aprendiste a preparar y cargar datos correctamente<br/><strong>Nivel 2:</strong> Aprendiste a filtrar y organizar información<br/><strong>Nivel 3:</strong> Aprendiste a calcular métricas y KPIs<br/><strong>Nivel 4:</strong> ¡Ahora crearás dashboards profesionales!</p>"
+    )
+    
+    # 7. Steps Section (clear, actionable instructions)
     st.header("📋 Pasos para Crear Análisis Avanzados")
     
     # Step 1
@@ -154,11 +170,22 @@ def main():
     # 5. Practical Example Section
     st.header("💡 Ejemplo Práctico: Dashboard Avanzado")
     
+    # Show data quality insight for this level
+    create_data_quality_insight('nivel4', 'clean')
+    
     # Create sample data
-    df = create_sample_data()
+    df = create_sample_data('clean')  # Use clean data for Level 4
     
     # Show data overview
     st.subheader("📊 Datos de Ejemplo")
+    
+    # Show how all concepts come together
+    create_info_box(
+        "info-box",
+        "🔗 Todos los Conceptos se Unen Aquí",
+        "<p>En este nivel verás cómo todo lo que aprendiste se conecta:<br/>• <strong>Tipos de datos</strong> (Nivel 0) para entender qué columnas usar<br/>• <strong>Datos limpios</strong> (Nivel 1) para cálculos precisos<br/>• <strong>Filtros</strong> (Nivel 2) para análisis específicos<br/>• <strong>Métricas</strong> (Nivel 3) para crear KPIs avanzados<br/>• <strong>Visualizaciones</strong> (Nivel 4) para comunicar insights</p>"
+    )
+    
     st.dataframe(df.head(10), use_container_width=True)
     
     # Advanced calculations
@@ -283,12 +310,7 @@ def main():
         st.plotly_chart(fig_corr, use_container_width=True)
         
         # Show correlation insights
-        st.markdown("""
-        **💡 Insights de Correlación:**
-        - Los valores cercanos a 1 indican correlación positiva fuerte
-        - Los valores cercanos a -1 indican correlación negativa fuerte
-        - Los valores cercanos a 0 indican poca o ninguna correlación
-        """)
+        st.markdown("**💡 Insights de Correlación:** - Los valores cercanos a 1 indican correlación positiva fuerte - Los valores cercanos a -1 indican correlación negativa fuerte - Los valores cercanos a 0 indican poca o ninguna correlación")
     
     else:
         st.warning("No hay datos que coincidan con los filtros seleccionados.")
@@ -296,9 +318,7 @@ def main():
     # 6. Dashboard Creation Section
     st.header("🏗️ Crear tu Propio Dashboard")
     
-    st.markdown("""
-    Ahora puedes crear tu propio dashboard personalizado. Selecciona las métricas y visualizaciones que quieras incluir.
-    """)
+    st.markdown("Ahora puedes crear tu propio dashboard personalizado. Selecciona las métricas y visualizaciones que quieras incluir.")
     
     # Dashboard configuration
     col1, col2 = st.columns(2)
@@ -360,9 +380,7 @@ def main():
     # 7. Quiz Section
     st.header("🧠 Quiz de Comprensión")
     
-    st.markdown("""
-    Responde estas preguntas para verificar que entiendes los conceptos avanzados del nivel.
-    """)
+    st.markdown("Responde estas preguntas para verificar que entiendes los conceptos avanzados del nivel.")
     
     # Quiz questions
     quiz_questions = [
@@ -441,6 +459,12 @@ def main():
     
     # Show completion status
     if st.session_state.get('quiz_completed', False):
+        # Show final achievement
+        create_achievement_display('nivel4', progress)
+        
+        # Show final progression summary
+        create_progression_summary(progress)
+        
         st.success("🎉 ¡Felicidades! Has completado todos los niveles del curso. ¡Eres un experto en análisis de datos!")
         
         col1, col2 = st.columns(2)
