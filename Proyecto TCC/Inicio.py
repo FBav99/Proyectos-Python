@@ -10,6 +10,7 @@ import streamlit as st
 # Imports de módulos core
 from core.config import apply_custom_css
 from core.data_quality_analyzer import data_quality_page
+from core.database import init_database, check_database_exists
 
 # Imports de módulos utils
 from utils.dashboard import show_dashboard_selection
@@ -28,6 +29,10 @@ from utils.ui import (clear_selected_template, get_current_user,
 
 def main():
     """Función principal de la aplicación - Punto de entrada principal"""
+    
+    # Inicializar base de datos si no existe (necesario para despliegue en Streamlit Cloud)
+    if not check_database_exists():
+        init_database()
     
     # Configurar página para Inicio
     st.set_page_config(

@@ -1,6 +1,6 @@
 """
 Nombre del Archivo: database.py
-Descripción: Utilidades de base de datos SQLite - Conexiones, migraciones y operaciones básicas
+Descripción: Utilidades de base de datos SQLite/PostgreSQL - Conexiones, migraciones y operaciones básicas
 Autor: Fernando Bavera Villalba
 Fecha: 25/10/2025
 """
@@ -16,6 +16,14 @@ from typing import Any, Dict, List, Optional
 
 import bcrypt
 
+# Try to import PostgreSQL support (optional - for Supabase)
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    POSTGRES_AVAILABLE = True
+except ImportError:
+    POSTGRES_AVAILABLE = False
+
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,6 +31,24 @@ logger = logging.getLogger(__name__)
 # Configuración de base de datos
 DB_PATH = 'tcc_database.db'
 MIGRATIONS_DIR = 'migrations'
+
+# Detectar tipo de base de datos desde secrets (Streamlit Cloud)
+def get_db_type():
+    """Detecta el tipo de base de datos desde secrets"""
+    try:
+        import streamlit as st
+        db_type = st.secrets.get("database", {}).get("db_type", "sqlite")
+        return db_type.lower()
+    except:
+        return "sqlite"  # Default a SQLite
+
+def get_supabase_connection_string():
+    """Obtiene el connection string de Supabase desde secrets"""
+    try:
+        import streamlit as st
+        return st.secrets.get("supabase", {}).get("connection_string", "")
+    except:
+        return ""
 
 # ============================================================================
 # DATABASE MANAGER CLASS
@@ -39,7 +65,15 @@ class DatabaseManager:
     def __init__(self, db_path: str = DB_PATH):
         """Inicializa el gestor de base de datos con la ruta especificada"""
         self.db_path = db_path
+        self.db_type = get_db_type()
+        self.connection_string = get_supabase_connection_string() if self.db_type == "supabase" else None
         self.ensure_migrations_dir()
+        
+        # Verificar disponibilidad de PostgreSQL si se requiere
+        if self.db_type == "supabase" and not POSTGRES_AVAILABLE:
+            logger.warning("Supabase configurado pero psycopg2 no está instalado. Usando SQLite.")
+            logger.warning("Instala con: pip install psycopg2-binary")
+            self.db_type = "sqlite"
     
     def ensure_migrations_dir(self):
         """Asegura que el directorio de migraciones existe"""
@@ -47,21 +81,46 @@ class DatabaseManager:
             os.makedirs(MIGRATIONS_DIR)
             logger.info(f"Created migrations directory: {MIGRATIONS_DIR}")
     
+    def _execute_sql(self, conn, sql):
+        """Helper method to execute SQL for both SQLite and PostgreSQL"""
+        if self.db_type == "supabase":
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            return cursor
+        else:
+            return conn.execute(sql)
+    
     @contextmanager
     def get_connection(self):
-        """Get database connection with proper configuration"""
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row  # Enable dict-like access
-        conn.execute("PRAGMA foreign_keys = ON")  # Enable foreign key constraints
-        
-        try:
-            yield conn
-        except Exception as e:
-            logger.error(f"Database error: {e}")
-            conn.rollback()
-            raise
-        finally:
-            conn.close()
+        """Get database connection with proper configuration (SQLite or PostgreSQL)"""
+        if self.db_type == "supabase" and POSTGRES_AVAILABLE and self.connection_string:
+            # PostgreSQL/Supabase connection
+            try:
+                conn = psycopg2.connect(self.connection_string)
+                conn.autocommit = False  # Use transactions
+                yield conn
+            except Exception as e:
+                logger.error(f"PostgreSQL connection error: {e}")
+                if conn:
+                    conn.rollback()
+                raise
+            finally:
+                if conn:
+                    conn.close()
+        else:
+            # SQLite connection (default)
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row  # Enable dict-like access
+            conn.execute("PRAGMA foreign_keys = ON")  # Enable foreign key constraints
+            
+            try:
+                yield conn
+            except Exception as e:
+                logger.error(f"Database error: {e}")
+                conn.rollback()
+                raise
+            finally:
+                conn.close()
     
     def init_database(self):
         """Initialize database with essential tables including file uploads"""
@@ -90,43 +149,84 @@ class DatabaseManager:
     def create_users_table(self):
         """Create users table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username VARCHAR(50) UNIQUE NOT NULL,
-                    email VARCHAR(100) UNIQUE NOT NULL,
-                    password_hash VARCHAR(255) NOT NULL,
-                    first_name VARCHAR(50) NOT NULL,
-                    last_name VARCHAR(50) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_login TIMESTAMP,
-                    is_active BOOLEAN DEFAULT 1,
-                    failed_login_attempts INTEGER DEFAULT 0,
-                    locked_until TIMESTAMP,
-                    email_verified BOOLEAN DEFAULT 0,
-                    verification_token VARCHAR(255),
-                    reset_token VARCHAR(255),
-                    reset_token_expires TIMESTAMP
-                )
-            """)
+            cursor = conn.cursor()
+            
+            # SQL syntax differs slightly between SQLite and PostgreSQL
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id SERIAL PRIMARY KEY,
+                        username VARCHAR(50) UNIQUE NOT NULL,
+                        email VARCHAR(100) UNIQUE NOT NULL,
+                        password_hash VARCHAR(255) NOT NULL,
+                        first_name VARCHAR(50) NOT NULL,
+                        last_name VARCHAR(50) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_login TIMESTAMP,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        failed_login_attempts INTEGER DEFAULT 0,
+                        locked_until TIMESTAMP,
+                        email_verified BOOLEAN DEFAULT FALSE,
+                        verification_token VARCHAR(255),
+                        reset_token VARCHAR(255),
+                        reset_token_expires TIMESTAMP
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username VARCHAR(50) UNIQUE NOT NULL,
+                        email VARCHAR(100) UNIQUE NOT NULL,
+                        password_hash VARCHAR(255) NOT NULL,
+                        first_name VARCHAR(50) NOT NULL,
+                        last_name VARCHAR(50) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_login TIMESTAMP,
+                        is_active BOOLEAN DEFAULT 1,
+                        failed_login_attempts INTEGER DEFAULT 0,
+                        locked_until TIMESTAMP,
+                        email_verified BOOLEAN DEFAULT 0,
+                        verification_token VARCHAR(255),
+                        reset_token VARCHAR(255),
+                        reset_token_expires TIMESTAMP
+                    )
+                """)
             conn.commit()
     
     def create_user_sessions_table(self):
         """Create user sessions table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS user_sessions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    session_token VARCHAR(255) UNIQUE NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    expires_at TIMESTAMP NOT NULL,
-                    ip_address VARCHAR(45),
-                    user_agent TEXT,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS user_sessions (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        session_token VARCHAR(255) UNIQUE NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        expires_at TIMESTAMP NOT NULL,
+                        ip_address VARCHAR(45),
+                        user_agent TEXT,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS user_sessions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        session_token VARCHAR(255) UNIQUE NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        expires_at TIMESTAMP NOT NULL,
+                        ip_address VARCHAR(45),
+                        user_agent TEXT,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_user_progress_table(self):
@@ -362,8 +462,25 @@ class DatabaseManager:
             conn.commit()
     
     def check_database_exists(self) -> bool:
-        """Check if database file exists"""
-        return os.path.exists(self.db_path)
+        """Check if database exists (SQLite file or PostgreSQL connection)"""
+        if self.db_type == "supabase":
+            # For PostgreSQL, check if we can connect and if tables exist
+            try:
+                with self.get_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM information_schema.tables 
+                            WHERE table_schema = 'public' 
+                            AND table_name = 'users'
+                        )
+                    """)
+                    return cursor.fetchone()[0]
+            except:
+                return False
+        else:
+            # SQLite - check if file exists
+            return os.path.exists(self.db_path)
     
     def get_database_info(self) -> Dict[str, Any]:
         """Get database information"""
@@ -371,24 +488,46 @@ class DatabaseManager:
             return {"exists": False}
         
         with self.get_connection() as conn:
-            # Get table count
-            cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            tables = [row['name'] for row in cursor.fetchall()]
+            cursor = conn.cursor()
             
-            # Get user count
-            cursor = conn.execute("SELECT COUNT(*) as count FROM users")
-            user_count = cursor.fetchone()['count']
-            
-            # Get file size
-            file_size = os.path.getsize(self.db_path)
-            
-            return {
-                "exists": True,
-                "tables": tables,
-                "user_count": user_count,
-                "file_size_bytes": file_size,
-                "file_size_mb": round(file_size / (1024 * 1024), 2)
-            }
+            if self.db_type == "supabase":
+                # PostgreSQL query
+                cursor.execute("""
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public'
+                """)
+                tables = [row[0] for row in cursor.fetchall()]
+                
+                cursor.execute("SELECT COUNT(*) FROM users")
+                user_count = cursor.fetchone()[0]
+                
+                return {
+                    "exists": True,
+                    "db_type": "PostgreSQL/Supabase",
+                    "tables": tables,
+                    "user_count": user_count,
+                    "file_size_bytes": 0,  # Not applicable for PostgreSQL
+                    "file_size_mb": 0
+                }
+            else:
+                # SQLite query
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                tables = [row['name'] for row in cursor.fetchall()]
+                
+                cursor.execute("SELECT COUNT(*) as count FROM users")
+                user_count = cursor.fetchone()['count']
+                
+                file_size = os.path.getsize(self.db_path) if os.path.exists(self.db_path) else 0
+                
+                return {
+                    "exists": True,
+                    "db_type": "SQLite",
+                    "tables": tables,
+                    "user_count": user_count,
+                    "file_size_bytes": file_size,
+                    "file_size_mb": round(file_size / (1024 * 1024), 2)
+                }
 
 # Global database manager instance
 db_manager = DatabaseManager()
