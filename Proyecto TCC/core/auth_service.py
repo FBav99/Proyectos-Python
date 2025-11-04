@@ -8,6 +8,7 @@ Fecha: 25/10/2025
 # Imports estándar
 import logging
 import secrets
+import string
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Tuple
 
@@ -306,7 +307,65 @@ class AuthService:
             logger.info(f"User activity - User {user_id}: {activity_type} - {details}")
         except Exception as e:
             logger.error(f"Error logging user activity: {e}")
-    
+
+    def forgot_password(self, username: str) -> Tuple[bool, Optional[str], Optional[str], Optional[str]]:
+        """
+        Generate a new random password for a user (password recovery).
+        
+        Args:
+            username: Username of the account to recover
+            
+        Returns:
+            Tuple of (success, username, email, new_password)
+            Returns (False, None, None, None) if user not found
+        """
+        try:
+            # Sanitize input
+            username = security_features.sanitize_input(username)
+            
+            # Find user by username
+            with db_manager.get_connection() as conn:
+                cursor = conn.execute("""
+                    SELECT id, username, email, first_name, last_name, is_active
+                    FROM users 
+                    WHERE username = ? AND is_active = 1
+                """, (username,))
+                user = cursor.fetchone()
+            
+            if not user:
+                return False, None, None, None
+            
+            # Generate a secure random password
+            # Using a mix of letters, numbers, and special characters
+            alphabet = string.ascii_letters + string.digits + "!@#$%"
+            new_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+            
+            # Hash the new password
+            password_hash = self.hash_password(new_password)
+            
+            # Update password in database and reset failed attempts
+            with db_manager.get_connection() as conn:
+                conn.execute("""
+                    UPDATE users 
+                    SET password_hash = ?, 
+                        failed_login_attempts = 0,
+                        locked_until = NULL
+                    WHERE id = ?
+                """, (password_hash, user['id']))
+                conn.commit()
+            
+            # Log activity
+            self.log_activity(user['id'], 'password_reset', {
+                'username': username,
+                'reset_type': 'forgot_password'
+            })
+            
+            return True, user['username'], user['email'], new_password
+            
+        except Exception as e:
+            logger.error(f"Password recovery error: {e}")
+            return False, None, None, None
+
     def verify_session(self, session_token: str) -> Tuple[bool, Optional[Dict]]:
         """Verify if a session is valid and return user data"""
         try:
