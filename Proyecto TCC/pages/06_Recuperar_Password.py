@@ -1,8 +1,5 @@
 import streamlit as st
-import yaml
-from yaml.loader import SafeLoader
-import os
-from core.auth_config import init_authentication, load_auth_config
+from core.auth_service import auth_service
 
 def main():
     """Página de recuperación de contraseña"""
@@ -19,65 +16,57 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize authentication
-    authenticator = init_authentication()
-    
     # Create password recovery form
     st.markdown("### 🔐 Recuperar Contraseña")
     
-    try:
-        # Use the forgot_password method from Streamlit-Authenticator
-        username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password(
-            location='main',
-            fields={
-                'Form name': 'Recuperar Contraseña',
-                'Username': 'Nombre de Usuario',
-                'Captcha': 'Captcha',
-                'Submit': 'Recuperar Contraseña'
-            },
-            captcha=True,  # Enable CAPTCHA for security
-            clear_on_submit=True
+    # Password recovery form
+    with st.form("password_recovery_form", clear_on_submit=True):
+        username = st.text_input(
+            "Nombre de Usuario",
+            placeholder="Ingresa tu nombre de usuario",
+            help="Ingresa el nombre de usuario de tu cuenta"
         )
         
-        if username_of_forgotten_password:
-            st.success('✅ Nueva contraseña generada exitosamente!')
-            st.info(f'👤 Usuario: {username_of_forgotten_password}')
-            st.info(f'📧 Email: {email_of_forgotten_password}')
-            st.warning(f'🔑 Nueva contraseña: {new_random_password}')
-            
-            st.markdown("""
-            ### ⚠️ Importante:
-            - **Guarda esta contraseña en un lugar seguro**
-            - **Cámbiala después de iniciar sesión**
-            - **Esta contraseña es temporal**
-            """)
-            
-            # Update the config file
-            config = load_auth_config()
-            with open('config/config.yaml', 'w') as file:
-                yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
-            
-            st.markdown("---")
-            st.markdown("### 🎉 ¡Contraseña Recuperada!")
-            st.markdown("""
-            Tu nueva contraseña ha sido generada. Ahora puedes:
-            
-            - 🔐 **Iniciar sesión** con tu usuario y la nueva contraseña
-            - 🔒 **Cambiar la contraseña** desde tu perfil
-            - 📚 **Continuar con tu aprendizaje**
-            """)
-            
-            col1, col2, col3 = st.columns(3)
-            with col2:
-                if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
-                    st.switch_page("Inicio.py")
+        submitted = st.form_submit_button("🔑 Recuperar Contraseña", type="primary", use_container_width=True)
+        
+        if submitted:
+            if not username:
+                st.error("❌ Por favor ingresa tu nombre de usuario")
+            else:
+                # Use database auth service for password recovery
+                success, recovered_username, email, new_password = auth_service.forgot_password(username)
+                
+                if success and recovered_username:
+                    st.success('✅ Nueva contraseña generada exitosamente!')
+                    st.info(f'👤 Usuario: {recovered_username}')
+                    st.info(f'📧 Email: {email}')
+                    st.warning(f'🔑 Nueva contraseña: **{new_password}**')
                     
-        elif username_of_forgotten_password == False:
-            st.error('❌ Usuario no encontrado')
-            st.info("Verifica que el nombre de usuario sea correcto")
+                    st.markdown("""
+                    ### ⚠️ Importante:
+                    - **Guarda esta contraseña en un lugar seguro**
+                    - **Cámbiala después de iniciar sesión**
+                    - **Esta contraseña es temporal**
+                    - **Los cambios se guardan permanentemente en la base de datos**
+                    """)
                     
-    except Exception as e:
-        st.error(f'❌ Error durante la recuperación: {str(e)}')
+                    st.markdown("---")
+                    st.markdown("### 🎉 ¡Contraseña Recuperada!")
+                    st.markdown("""
+                    Tu nueva contraseña ha sido generada y guardada en la base de datos. Ahora puedes:
+                    
+                    - 🔐 **Iniciar sesión** con tu usuario y la nueva contraseña
+                    - 🔒 **Cambiar la contraseña** desde tu perfil después de iniciar sesión
+                    - 📚 **Continuar con tu aprendizaje**
+                    """)
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col2:
+                        if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
+                            st.switch_page("Inicio.py")
+                else:
+                    st.error('❌ Usuario no encontrado')
+                    st.info("Verifica que el nombre de usuario sea correcto y que tu cuenta esté activa")
     
     # Navigation
     st.markdown("---")

@@ -8,39 +8,54 @@ def load_auth_config():
     """Load authentication configuration from YAML file"""
     config_path = 'config/config.yaml'
     
-    # Create default config if it doesn't exist
-    if not os.path.exists(config_path):
-        # Create config structure as per official GitHub documentation
-        default_config = {
-            'credentials': {
-                'usernames': {
-                    'demo_user': {
-                        'email': 'demo@example.com',
-                        'failed_login_attempts': 0,
-                        'first_name': 'Demo',
-                        'last_name': 'User',
-                        'logged_in': False,
-                        'password': 'demo123'  # Plain text password - will be hashed
-                    }
+    # Default config structure as per official GitHub documentation
+    default_config = {
+        'credentials': {
+            'usernames': {
+                'demo_user': {
+                    'email': 'demo@example.com',
+                    'failed_login_attempts': 0,
+                    'first_name': 'Demo',
+                    'last_name': 'User',
+                    'logged_in': False,
+                    'password': 'demo123'  # Plain text password - will be hashed
                 }
-            },
-            'cookie': {
-                'expiry_days': 30,
-                'key': 'some_signature_key',
-                'name': 'some_cookie_name'
-            },
-            'pre-authorized': {
-                'emails': []
             }
+        },
+        'cookie': {
+            'expiry_days': 30,
+            'key': 'some_signature_key',
+            'name': 'some_cookie_name'
+        },
+        'pre-authorized': {
+            'emails': []
         }
-        
+    }
+    
+    # Try to load existing config file
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r') as file:
+                config = yaml.load(file, Loader=SafeLoader)
+                if config:
+                    return config
+        except Exception as e:
+            # If reading fails, use default config
+            st.warning(f"⚠️ No se pudo leer el archivo de configuración: {str(e)}. Usando configuración por defecto.")
+            return default_config
+    
+    # If file doesn't exist, try to create it (will fail on Streamlit Cloud, but that's OK)
+    try:
+        # Try to create directory if it doesn't exist
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
         with open(config_path, 'w') as file:
             yaml.dump(default_config, file, default_flow_style=False)
+    except (OSError, PermissionError, IOError):
+        # On Streamlit Cloud, we can't write to the file system
+        # This is expected behavior - we'll use the default config in memory
+        pass
     
-    with open(config_path) as file:
-        config = yaml.load(file, Loader=SafeLoader)
-    
-    return config
+    return default_config
 
 def init_authentication():
     """Initialize authentication system"""
