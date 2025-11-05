@@ -36,8 +36,8 @@ def main():
     )
     
     # Initialize sidebar with user info (always visible)
-    from utils.ui.auth_ui import init_sidebar
-    current_user = init_sidebar()
+    from utils.ui import auth_ui
+    current_user = auth_ui.init_sidebar()
     
     # Check if user is already authenticated
     if not current_user:

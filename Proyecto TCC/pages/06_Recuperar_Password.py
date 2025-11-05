@@ -2,8 +2,11 @@ import streamlit as st
 from core.auth_service import auth_service
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 from core.database import db_manager
-from utils.ui.auth_ui import init_sidebar
+from utils.ui import auth_ui
 import re
+
+# Import init_sidebar - using module import for better compatibility
+init_sidebar = auth_ui.init_sidebar
 
 # Configure error handling at module level
 configure_streamlit_error_handling()

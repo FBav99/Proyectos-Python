@@ -24,7 +24,8 @@ from utils.learning import (
     create_learning_resources,
     create_navigation_section
 )
-from utils.ui.auth_ui import init_sidebar
+from utils.ui import auth_ui
+init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 # Configure error handling

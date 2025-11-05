@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 from utils.data import create_data_cleaning_interface, show_upload_section, show_examples_section
-from utils.ui.auth_ui import init_sidebar
+from utils.ui import auth_ui
+init_sidebar = auth_ui.init_sidebar
 from core.config import setup_page_config, apply_custom_css
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 

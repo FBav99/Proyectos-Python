@@ -4,8 +4,16 @@ UI utilities package for TCC Data Analysis Platform
 
 from .ui_components import *
 from .main_ui import *
-from .auth_ui import *
 from .error_handler import *
+
+# Explicit imports from auth_ui to ensure they're available
+from .auth_ui import (
+    show_login_form,
+    show_user_sidebar,
+    get_current_user,
+    init_sidebar,
+    handle_authentication
+)
 
 __all__ = [
     'show_header',
@@ -15,6 +23,7 @@ __all__ = [
     'show_login_form',
     'show_user_sidebar',
     'get_current_user',
+    'init_sidebar',
     'handle_authentication',
     'create_sidebar_controls',
     'create_custom_calculations_ui',

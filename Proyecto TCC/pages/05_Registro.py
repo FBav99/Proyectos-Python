@@ -1,8 +1,11 @@
 import streamlit as st
 import re
 from core.auth_service import auth_service
-from utils.ui.auth_ui import init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+
+# Import init_sidebar - using absolute import path
+from utils.ui import auth_ui
+init_sidebar = auth_ui.init_sidebar
 
 # Configure error handling
 configure_streamlit_error_handling()
