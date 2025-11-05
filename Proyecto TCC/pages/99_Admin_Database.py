@@ -18,6 +18,9 @@ configure_streamlit_error_handling()
 # Initialize sidebar
 auth_ui.init_sidebar()
 
+# Import admin utilities
+from utils.admin_utils import check_admin_access, ADMIN_USERS
+
 def get_database_info() -> Dict:
     """Get comprehensive database information"""
     db_path = 'tcc_database.db'
@@ -103,13 +106,34 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Check authentication (optional - you can make this require admin)
+    # Check admin access
+    has_access, error_message = check_admin_access()
+    
+    if not has_access:
+        st.error(f"🚫 **Acceso Denegado**")
+        st.warning(error_message)
+        
+        current_user = auth_ui.get_current_user()
+        if current_user:
+            st.info(f"👤 Usuario actual: **{current_user.get('username', 'Unknown')}**")
+            st.info("💡 Solo los usuarios administradores pueden acceder a esta página.")
+        else:
+            st.info("🔐 Por favor inicia sesión primero.")
+        
+        st.markdown("---")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🏠 Volver al Inicio", use_container_width=True):
+                st.switch_page("Inicio.py")
+        with col2:
+            if not current_user:
+                if st.button("🔐 Iniciar Sesión", use_container_width=True):
+                    st.switch_page("Inicio.py")
+        st.stop()
+    
+    # User is admin - show admin badge
     current_user = auth_ui.get_current_user()
-    if not current_user:
-        st.warning("⚠️ Esta página requiere autenticación")
-        if st.button("🔐 Ir a Iniciar Sesión"):
-            st.switch_page("Inicio.py")
-        return
+    st.success(f"✅ Acceso de administrador - Bienvenido, **{current_user.get('username', 'Admin')}**")
     
     # Tabs for different admin functions
     tab1, tab2, tab3, tab4 = st.tabs([
