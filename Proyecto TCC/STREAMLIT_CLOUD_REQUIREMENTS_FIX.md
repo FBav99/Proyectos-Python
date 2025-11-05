@@ -8,15 +8,48 @@ error: Failed to parse: `TCC/requirements.txt`
 
 Esto indica que Streamlit Cloud está intentando leer el archivo desde una ruta incorrecta.
 
+## 🎯 Causa Probable: Espacio en el Nombre de la Carpeta
+
+Si tu carpeta se llama **"Proyecto TCC"** (con espacio), Streamlit Cloud puede estar truncando el nombre en el espacio y solo viendo "TCC", lo que causa el error `TCC/requirements.txt`.
+
 ## ✅ Solución
 
-### Opción 1: Verificar Configuración de Streamlit Cloud
+### Opción 1: Verificar Configuración de Streamlit Cloud (RECOMENDADO)
 
 1. Ve a tu app en Streamlit Cloud
 2. Click en **Settings** (⚙️)
 3. Verifica el campo **Main file path**
-4. Debe ser: `Inicio.py` (o el nombre de tu archivo principal)
-5. **NO** debe tener subdirectorios como `TCC/Inicio.py`
+4. **Si tu repo root es "Proyecto TCC":**
+   - Main file path debe ser: `Inicio.py` (sin subdirectorios)
+   - **NO** debe ser: `Proyecto TCC/Inicio.py` o `TCC/Inicio.py`
+5. **Si tu repo root es "Proyectos Python":**
+   - Main file path debe ser: `Proyecto TCC/Inicio.py` (con el espacio)
+   - O mejor aún, configura Streamlit Cloud para desplegar desde el subdirectorio "Proyecto TCC"
+
+### Opción 2: Usar Subdirectorio en Streamlit Cloud (SI el repo root es "Proyectos Python")
+
+Si tu repositorio de GitHub es:
+```
+Proyectos Python/
+  Proyecto TCC/
+    Inicio.py
+    requirements.txt
+```
+
+Entonces en Streamlit Cloud:
+1. **Repository**: Selecciona tu repo
+2. **Branch**: `main` (o tu branch)
+3. **Main file path**: `Proyecto TCC/Inicio.py` (con el espacio, tal cual)
+4. Streamlit Cloud buscará `requirements.txt` en `Proyecto TCC/requirements.txt`
+
+### Opción 3: Renombrar la Carpeta (SOLUCIÓN PERMANENTE)
+
+Si puedes renombrar la carpeta para eliminar el espacio:
+1. Renombra `Proyecto TCC` → `ProyectoTCC` (sin espacio)
+2. Actualiza el Main file path en Streamlit Cloud
+3. Haz commit y push
+
+**Nota:** Esto requerirá actualizar todas las referencias en git, así que es mejor verificar primero las opciones 1 y 2.
 
 ### Opción 2: Verificar Estructura del Repositorio
 
