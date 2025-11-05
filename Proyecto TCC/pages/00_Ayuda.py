@@ -24,6 +24,10 @@ from utils.learning import (
     create_learning_resources,
     create_navigation_section
 )
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+
+# Configure error handling
+configure_streamlit_error_handling()
 
 # Page config
 st.set_page_config(
@@ -32,6 +36,7 @@ st.set_page_config(
     layout="wide"
 )
 
+@safe_main
 def main():
     # Load level styles for consistent appearance
     st.markdown(load_level_styles(), unsafe_allow_html=True)

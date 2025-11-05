@@ -39,9 +39,9 @@ def load_auth_config():
                 config = yaml.load(file, Loader=SafeLoader)
                 if config:
                     return config
-        except Exception as e:
+        except Exception:
             # If reading fails, use default config
-            st.warning(f"⚠️ No se pudo leer el archivo de configuración: {str(e)}. Usando configuración por defecto.")
+            # Don't expose error details to user
             return default_config
     
     # If file doesn't exist, try to create it (will fail on Streamlit Cloud, but that's OK)

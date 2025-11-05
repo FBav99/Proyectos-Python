@@ -1,6 +1,10 @@
 import streamlit as st
 import re
 from core.auth_service import auth_service
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+
+# Configure error handling
+configure_streamlit_error_handling()
 
 def validate_email(email):
     """Validate email format"""
@@ -23,6 +27,7 @@ def validate_password(password):
     
     return True, "Contraseña válida"
 
+@safe_main
 def main():
     """Página de registro de usuarios"""
     st.set_page_config(

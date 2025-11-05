@@ -30,7 +30,12 @@ from utils.ui import (
 
 # Import new dashboard modules
 from utils.dashboard import configure_component, render_dashboard, create_dashboard_sidebar, show_dashboard_info
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
+# Configure error handling
+configure_streamlit_error_handling()
+
+@safe_main
 def main():
     """Dashboard en Blanco - Construcción Manual"""
     # Configurar página

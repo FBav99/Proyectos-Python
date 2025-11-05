@@ -22,11 +22,16 @@ from utils.learning.learning_progress import (get_level_progress,
 from utils.ui import (clear_selected_template, get_current_user,
                       handle_authentication, should_show_main_content,
                       show_header, show_quick_start_section)
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+
+# Configure error handling
+configure_streamlit_error_handling()
 
 # ============================================================================
 # MAIN FUNCTION
 # ============================================================================
 
+@safe_main
 def main():
     """Función principal de la aplicación - Punto de entrada principal"""
     

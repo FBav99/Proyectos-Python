@@ -1,6 +1,11 @@
 import streamlit as st
 from core.auth_service import auth_service
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
+# Configure error handling at module level
+configure_streamlit_error_handling()
+
+@safe_main
 def main():
     """Página de recuperación de contraseña"""
     st.set_page_config(

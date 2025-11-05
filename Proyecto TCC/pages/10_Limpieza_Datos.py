@@ -2,7 +2,12 @@ import streamlit as st
 import pandas as pd
 from utils.data import create_data_cleaning_interface, show_upload_section, show_examples_section
 from core.config import setup_page_config, apply_custom_css
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
+# Configure error handling
+configure_streamlit_error_handling()
+
+@safe_main
 def main():
     """Página de limpieza automática de datos"""
     # Configurar página

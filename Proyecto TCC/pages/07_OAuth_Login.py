@@ -8,7 +8,11 @@ import hashlib
 import secrets
 from core.auth_service import get_current_user, login_user
 from core.security import security_manager, secure_oauth_callback
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 import yaml
+
+# Configure error handling
+configure_streamlit_error_handling()
 
 def generate_state():
     """Generate a random state parameter for OAuth security"""
@@ -22,6 +26,7 @@ def generate_pkce():
     ).decode().rstrip('=')
     return code_verifier, code_challenge
 
+@safe_main
 def main():
     """Página de login con OAuth (Google/Microsoft)"""
     st.set_page_config(

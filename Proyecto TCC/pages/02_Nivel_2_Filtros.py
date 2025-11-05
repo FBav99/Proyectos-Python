@@ -7,6 +7,10 @@ from utils.learning import load_level_styles, get_level_progress, create_step_ca
 from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+
+# Configure error handling
+configure_streamlit_error_handling()
 
 # Page config
 st.set_page_config(
@@ -22,6 +26,7 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 
 # Sample data functions are now imported from utils.level_data
 
+@safe_main
 def main():
     # Check if user is authenticated
     if 'user' not in st.session_state or not st.session_state.get('authenticated'):

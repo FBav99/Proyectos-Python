@@ -12,6 +12,10 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from core.database import db_manager, get_database_info
 from core.auth_service import get_current_user
+from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+
+# Configure error handling
+configure_streamlit_error_handling()
 
 def reset_supabase_database():
     """Drop all tables in Supabase to start fresh"""
@@ -64,6 +68,7 @@ def reset_sqlite_database():
         st.error(f"Error: {e}")
         return False
 
+@safe_main
 def main():
     """Admin backup page"""
     st.set_page_config(
