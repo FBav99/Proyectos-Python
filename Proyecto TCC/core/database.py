@@ -109,9 +109,12 @@ class DatabaseManager:
                     conn.close()
         else:
             # SQLite connection (default)
-            conn = sqlite3.connect(self.db_path)
+            # Add timeout to handle concurrent access (5 seconds)
+            conn = sqlite3.connect(self.db_path, timeout=5.0)
             conn.row_factory = sqlite3.Row  # Enable dict-like access
             conn.execute("PRAGMA foreign_keys = ON")  # Enable foreign key constraints
+            # Enable WAL mode for better concurrent access
+            conn.execute("PRAGMA journal_mode = WAL")
             
             try:
                 yield conn

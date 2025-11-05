@@ -76,11 +76,12 @@ class AuthService:
             if not password_valid:
                 return False, password_msg
             
-            # Server-side input sanitization
-            username = security_features.sanitize_input(username)
-            email = security_features.sanitize_input(email)
-            first_name = security_features.sanitize_input(first_name)
-            last_name = security_features.sanitize_input(last_name)
+            # Server-side input sanitization for database storage (no HTML encoding)
+            # HTML encoding is for display, not database storage
+            username = security_features.sanitize_input_for_db(username)
+            email = security_features.sanitize_input_for_db(email)
+            first_name = security_features.sanitize_input_for_db(first_name)
+            last_name = security_features.sanitize_input_for_db(last_name)
             
             # Check if user already exists
             if self.user_exists(username, email):
@@ -98,8 +99,15 @@ class AuthService:
                 
                 user_id = cursor.lastrowid
                 
-                # Create user progress record using progress tracker
-                progress_tracker.create_user_progress(user_id)
+                # Create user progress record in the same transaction to avoid nested connections
+                try:
+                    conn.execute("""
+                        INSERT INTO user_progress (user_id, last_updated)
+                        VALUES (?, ?)
+                    """, (user_id, datetime.now().isoformat()))
+                except Exception as e:
+                    logger.error(f"Error creating user progress: {e}")
+                    # Don't fail registration if progress creation fails
                 
                 conn.commit()
             
@@ -123,8 +131,8 @@ class AuthService:
             if not rate_limit_ok:
                 return False, rate_limit_msg, None
             
-            # Sanitize inputs
-            username = security_features.sanitize_input(username)
+            # Sanitize inputs for database (no HTML encoding)
+            username = security_features.sanitize_input_for_db(username)
             
             # Get user from database
             with db_manager.get_connection() as conn:
@@ -320,8 +328,8 @@ class AuthService:
             Returns (False, None, None, None) if user not found
         """
         try:
-            # Sanitize input
-            username = security_features.sanitize_input(username)
+            # Sanitize input for database (no HTML encoding)
+            username = security_features.sanitize_input_for_db(username)
             
             # Find user by username
             with db_manager.get_connection() as conn:

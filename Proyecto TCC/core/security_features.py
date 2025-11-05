@@ -130,6 +130,29 @@ class SecurityFeatures:
             logger.error(f"Input sanitization error: {e}")
             return ""
     
+    def sanitize_input_for_db(self, input_string: str) -> str:
+        """Sanitize user input for database storage (no HTML encoding)"""
+        try:
+            if not input_string:
+                return ""
+            
+            # Convert to string if needed
+            sanitized = str(input_string).strip()
+            
+            # Remove only truly dangerous characters that could cause issues
+            # Note: SQL injection is prevented by parameterized queries, not string sanitization
+            # We only remove characters that could break the data format
+            dangerous_chars = ['\x00', '\n', '\r', '\x1a']  # Control characters that could break SQL
+            for char in dangerous_chars:
+                sanitized = sanitized.replace(char, '')
+            
+            # Limit length (longer for database storage)
+            return sanitized[:255] if len(sanitized) > 255 else sanitized
+            
+        except Exception as e:
+            logger.error(f"Database input sanitization error: {e}")
+            return ""
+    
     def sanitize_error_message(self, error: Exception) -> str:
         """Enhanced error message sanitization"""
         try:

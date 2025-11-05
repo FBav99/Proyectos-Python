@@ -157,8 +157,6 @@ def main():
                 )
                 
                 if success:
-                    # Clear form on successful registration
-                    st.session_state.registration_form = {}
                     st.success('✅ Usuario registrado exitosamente!')
                     st.info(f'📧 Email: {email}')
                     st.info(f'👤 Usuario: {username}')
