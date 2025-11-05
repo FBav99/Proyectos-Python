@@ -10,6 +10,14 @@ init_sidebar = auth_ui.init_sidebar
 # Configure error handling
 configure_streamlit_error_handling()
 
+# Ensure database is initialized before using it
+from core.database import ensure_database_initialized
+try:
+    ensure_database_initialized()
+except Exception as e:
+    st.error(f"Error initializing database: {e}")
+    st.stop()
+
 def validate_email(email):
     """Validate email format"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'

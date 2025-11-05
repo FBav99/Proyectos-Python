@@ -16,12 +16,18 @@ import bcrypt
 import streamlit as st
 
 # Imports locales
-from core.database import db_manager
+from core.database import db_manager, ensure_database_initialized
 from core.progress_tracker import progress_tracker
 from core.security import security_manager
 from core.security_features import security_features
 
 logger = logging.getLogger(__name__)
+
+# Ensure database is initialized when this module is imported
+try:
+    ensure_database_initialized()
+except Exception as e:
+    logger.warning(f"Could not ensure database initialization in auth_service: {e}")
 
 # ============================================================================
 # AUTH SERVICE CLASS

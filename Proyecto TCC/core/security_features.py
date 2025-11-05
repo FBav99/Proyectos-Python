@@ -9,9 +9,15 @@ import re
 import html
 from datetime import datetime, timedelta
 from typing import Tuple
-from core.database import db_manager
+from core.database import db_manager, ensure_database_initialized
 
 logger = logging.getLogger(__name__)
+
+# Ensure database is initialized when this module is imported
+try:
+    ensure_database_initialized()
+except Exception as e:
+    logger.warning(f"Could not ensure database initialization in security_features: {e}")
 
 class SecurityFeatures:
     """Handles security features like rate limiting and input sanitization"""

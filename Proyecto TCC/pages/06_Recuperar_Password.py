@@ -11,6 +11,14 @@ init_sidebar = auth_ui.init_sidebar
 # Configure error handling at module level
 configure_streamlit_error_handling()
 
+# Ensure database is initialized before using it
+from core.database import ensure_database_initialized
+try:
+    ensure_database_initialized()
+except Exception as e:
+    # Error will be shown when page loads
+    pass
+
 def validate_email(email):
     """Validate email format"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'

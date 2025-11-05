@@ -482,8 +482,36 @@ class DatabaseManager:
             except:
                 return False
         else:
-            # SQLite - check if file exists
-            return os.path.exists(self.db_path)
+            # SQLite - check if file exists AND if tables are created
+            if not os.path.exists(self.db_path):
+                return False
+            
+            # Also verify that essential tables exist
+            try:
+                with self.get_connection() as conn:
+                    cursor = conn.cursor()
+                    # Check for essential tables
+                    cursor.execute("""
+                        SELECT name FROM sqlite_master 
+                        WHERE type='table' AND name='users'
+                    """)
+                    if not cursor.fetchone():
+                        return False  # Database file exists but tables not created
+                    return True
+            except:
+                # If we can't connect, database might be corrupted or locked
+                return False
+    
+    def ensure_database_initialized(self):
+        """Ensure database is initialized - creates it if it doesn't exist or is incomplete"""
+        if not self.check_database_exists():
+            logger.info("Database not found or incomplete, initializing...")
+            try:
+                self.init_database()
+                logger.info("Database initialized successfully")
+            except Exception as e:
+                logger.error(f"Error initializing database: {e}")
+                raise
     
     def get_database_info(self) -> Dict[str, Any]:
         """Get database information"""
@@ -535,6 +563,32 @@ class DatabaseManager:
 # Global database manager instance
 db_manager = DatabaseManager()
 
+# Auto-initialize database on module import (for Streamlit Cloud)
+# This ensures the database is always ready when any module imports this
+# Using a module-level flag to prevent multiple initializations
+_db_initialized = False
+
+def _auto_init_database():
+    """Auto-initialize database when module is imported"""
+    global _db_initialized
+    if _db_initialized:
+        return
+    
+    try:
+        if not db_manager.check_database_exists():
+            logger.info("Auto-initializing database on module import...")
+            db_manager.init_database()
+            logger.info("Database auto-initialized successfully")
+        _db_initialized = True
+    except Exception as e:
+        # Don't fail on import if there's an error - let it fail later when actually used
+        logger.warning(f"Could not auto-initialize database on import: {e}")
+        # Still mark as attempted to avoid repeated tries
+        _db_initialized = True
+
+# Run auto-initialization (only once)
+_auto_init_database()
+
 def get_db_connection():
     """Get database connection (for backward compatibility)"""
     return db_manager.get_connection()
@@ -546,6 +600,10 @@ def init_database():
 def check_database_exists():
     """Check if database exists (for backward compatibility)"""
     return db_manager.check_database_exists()
+
+def ensure_database_initialized():
+    """Ensure database is initialized - creates it if it doesn't exist or is incomplete"""
+    return db_manager.ensure_database_initialized()
 
 def get_database_info():
     """Get database info (for backward compatibility)"""
