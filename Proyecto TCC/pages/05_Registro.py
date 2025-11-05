@@ -46,37 +46,76 @@ def main():
     # Create registration form
     st.markdown("### 🔐 Crear Nueva Cuenta")
     
-    with st.form("registration_form", clear_on_submit=True):
+    # Password requirements tooltip text
+    password_help = "La contraseña debe tener: mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+    
+    with st.form("registration_form", clear_on_submit=False):
+        # First row: Name fields (left to right)
         col1, col2 = st.columns(2)
-        
         with col1:
-            first_name = st.text_input("Nombre", placeholder="Tu nombre")
-            email = st.text_input("Correo Electrónico", placeholder="tu@email.com")
-            username = st.text_input("Nombre de Usuario", placeholder="usuario123")
-        
+            first_name = st.text_input("Nombre", placeholder="Tu nombre", key="first_name")
         with col2:
-            last_name = st.text_input("Apellido", placeholder="Tu apellido")
-            password = st.text_input("Contraseña", type="password", placeholder="••••••••")
-            confirm_password = st.text_input("Confirmar Contraseña", type="password", placeholder="••••••••")
+            last_name = st.text_input("Apellido", placeholder="Tu apellido", key="last_name")
         
-        # Password strength indicator
+        # Second row: Email and Username (left to right)
+        col3, col4 = st.columns(2)
+        with col3:
+            email = st.text_input("Correo Electrónico", placeholder="tu@email.com", key="email")
+        with col4:
+            username = st.text_input("Nombre de Usuario", placeholder="usuario123", key="username")
+        
+        # Third row: Password fields (left to right)
+        col5, col6 = st.columns(2)
+        with col5:
+            password = st.text_input(
+                "Contraseña", 
+                type="password", 
+                placeholder="••••••••",
+                help=password_help,
+                key="password"
+            )
+        with col6:
+            confirm_password = st.text_input(
+                "Confirmar Contraseña", 
+                type="password", 
+                placeholder="••••••••",
+                key="confirm_password"
+            )
+        
+        # Password strength indicator (outside columns, doesn't reset)
         if password:
             is_valid, message = validate_password(password)
             if is_valid:
                 st.success(f"✅ {message}")
             else:
-                st.error(f"❌ {message}")
+                st.warning(f"⚠️ {message}")
+                # Show detailed requirements
+                st.info("""
+                **Requisitos de contraseña:**
+                - Mínimo 8 caracteres
+                - Al menos una letra mayúscula (A-Z)
+                - Al menos una letra minúscula (a-z)
+                - Al menos un número (0-9)
+                """)
+        
+        # Real-time validation messages (shown below form, don't reset)
+        validation_messages = []
         
         # Email validation
         if email and not validate_email(email):
-            st.error("❌ Formato de email inválido")
+            validation_messages.append("❌ Formato de email inválido")
         
         # Username validation
         if username:
             if len(username) < 3:
-                st.error("❌ El nombre de usuario debe tener al menos 3 caracteres")
+                validation_messages.append("❌ El nombre de usuario debe tener al menos 3 caracteres")
             elif not username.isalnum():
-                st.error("❌ El nombre de usuario solo puede contener letras y números")
+                validation_messages.append("❌ El nombre de usuario solo puede contener letras y números")
+        
+        # Show validation messages if any
+        if validation_messages:
+            for msg in validation_messages:
+                st.warning(msg)
         
         submitted = st.form_submit_button("📝 Registrarse", type="primary", use_container_width=True)
         
@@ -118,6 +157,8 @@ def main():
                 )
                 
                 if success:
+                    # Clear form on successful registration
+                    st.session_state.registration_form = {}
                     st.success('✅ Usuario registrado exitosamente!')
                     st.info(f'📧 Email: {email}')
                     st.info(f'👤 Usuario: {username}')
@@ -140,6 +181,7 @@ def main():
                             st.switch_page("Inicio.py")
                 else:
                     st.error(f'❌ Error durante el registro: {message}')
+                    # Don't clear form on error - data is preserved
                     
             except Exception as e:
                 st.error(f'❌ Error durante el registro: {str(e)}')
