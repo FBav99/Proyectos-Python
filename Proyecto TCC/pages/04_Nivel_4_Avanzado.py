@@ -10,6 +10,7 @@ from utils.learning import load_level_styles, get_level_progress, create_step_ca
 from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
+from utils.ui.auth_ui import init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 # Configure error handling
@@ -29,15 +30,18 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 
 @safe_main
 def main():
+    # Initialize sidebar with user info (always visible)
+    current_user = init_sidebar()
+    
     # Check if user is authenticated
-    if 'user' not in st.session_state or not st.session_state.get('authenticated'):
+    if not current_user:
         st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
     # Get current user
-    user = st.session_state.get('user')
+    user = current_user
     if not user or 'id' not in user:
         st.error("❌ Error: No se pudo obtener la información del usuario.")
         if st.button("Ir al Inicio", type="primary"):

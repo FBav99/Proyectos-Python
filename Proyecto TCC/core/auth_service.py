@@ -374,6 +374,51 @@ class AuthService:
             logger.error(f"Password recovery error: {e}")
             return False, None, None, None
 
+    def update_email(self, user_id: int, new_email: str) -> Tuple[bool, str]:
+        """
+        Update user email address
+        
+        Args:
+            user_id: ID of the user
+            new_email: New email address
+            
+        Returns:
+            Tuple of (success, message)
+        """
+        try:
+            # Validate email format
+            email_valid, email_msg = security_features.validate_email(new_email)
+            if not email_valid:
+                return False, email_msg
+            
+            # Sanitize email
+            new_email = security_features.sanitize_input_for_db(new_email)
+            
+            # Check if email is already taken by another user
+            with db_manager.get_connection() as conn:
+                cursor = conn.execute("""
+                    SELECT id FROM users WHERE email = ? AND id != ?
+                """, (new_email, user_id))
+                if cursor.fetchone():
+                    return False, "Este email ya está en uso por otra cuenta"
+                
+                # Update email
+                conn.execute("""
+                    UPDATE users SET email = ? WHERE id = ?
+                """, (new_email, user_id))
+                conn.commit()
+            
+            # Log activity
+            self.log_activity(user_id, 'email_update', {
+                'new_email': new_email
+            })
+            
+            return True, "Email actualizado exitosamente"
+            
+        except Exception as e:
+            logger.error(f"Email update error: {e}")
+            return False, security_features.sanitize_error_message(e)
+    
     def verify_session(self, session_token: str) -> Tuple[bool, Optional[Dict]]:
         """Verify if a session is valid and return user data"""
         try:

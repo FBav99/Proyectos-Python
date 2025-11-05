@@ -35,8 +35,13 @@ def main():
         layout="wide"
     )
     
+    # Initialize sidebar with user info (always visible)
+    from utils.ui.auth_ui import init_sidebar
+    current_user = init_sidebar()
+    
     # Check if user is already authenticated
-    current_user = get_current_user()
+    if not current_user:
+        current_user = get_current_user()
     if current_user:
         st.success(f"✅ Ya estás autenticado como {current_user['username']}")
         st.info("Redirigiendo al inicio...")

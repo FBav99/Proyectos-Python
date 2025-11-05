@@ -1,6 +1,7 @@
 import streamlit as st
 import re
 from core.auth_service import auth_service
+from utils.ui.auth_ui import init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 # Configure error handling
@@ -35,6 +36,9 @@ def main():
         page_icon="📝",
         layout="wide"
     )
+    
+    # Initialize sidebar with user info (always visible)
+    init_sidebar()
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
@@ -121,69 +125,90 @@ def main():
         
         if submitted:
             # Validate all fields
+            validation_error = None
+            
             if not all([first_name, last_name, email, username, password, confirm_password]):
-                st.error("❌ Todos los campos son obligatorios")
-                return
+                validation_error = "❌ Todos los campos son obligatorios"
+            elif not validate_email(email):
+                validation_error = "❌ Formato de email inválido"
+            else:
+                is_valid, message = validate_password(password)
+                if not is_valid:
+                    validation_error = f"❌ {message}"
+                elif password != confirm_password:
+                    validation_error = "❌ Las contraseñas no coinciden"
+                elif len(username) < 3:
+                    validation_error = "❌ El nombre de usuario debe tener al menos 3 caracteres"
+                elif not username.isalnum():
+                    validation_error = "❌ El nombre de usuario solo puede contener letras y números"
             
-            if not validate_email(email):
-                st.error("❌ Formato de email inválido")
-                return
-            
-            is_valid, message = validate_password(password)
-            if not is_valid:
-                st.error(f"❌ {message}")
-                return
-            
-            if password != confirm_password:
-                st.error("❌ Las contraseñas no coinciden")
-                return
-            
-            if len(username) < 3:
-                st.error("❌ El nombre de usuario debe tener al menos 3 caracteres")
-                return
-            
-            if not username.isalnum():
-                st.error("❌ El nombre de usuario solo puede contener letras y números")
-                return
-            
-            # Attempt registration
-            try:
-                success, message = auth_service.register_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    first_name=first_name,
-                    last_name=last_name
-                )
-                
-                if success:
-                    st.success('✅ Usuario registrado exitosamente!')
-                    st.info(f'📧 Email: {email}')
-                    st.info(f'👤 Usuario: {username}')
-                    st.info(f'👨‍💼 Nombre: {first_name} {last_name}')
+            if validation_error:
+                # Store error in session state to show outside form
+                st.session_state.registration_error = validation_error
+                st.rerun()
+            else:
+                # Attempt registration
+                try:
+                    success, message = auth_service.register_user(
+                        username=username,
+                        email=email,
+                        password=password,
+                        first_name=first_name,
+                        last_name=last_name
+                    )
                     
-                    st.markdown("---")
-                    st.markdown("### 🎉 ¡Registro Completado!")
-                    st.markdown("""
-                    Tu cuenta ha sido creada exitosamente. Ahora puedes:
-                    
-                    - 🔐 **Iniciar sesión** con tu nuevo usuario y contraseña
-                    - 📚 **Acceder a todos los niveles** de aprendizaje
-                    - 📊 **Crear dashboards** personalizados
-                    - 💾 **Guardar tu progreso** automáticamente
-                    """)
-                    
-                    col1, col2, col3 = st.columns(3)
-                    with col2:
-                        if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
-                            st.switch_page("Inicio.py")
-                else:
-                    st.error(f'❌ Error durante el registro: {message}')
-                    # Don't clear form on error - data is preserved
-                    
-            except Exception as e:
-                st.error(f'❌ Error durante el registro: {str(e)}')
-                # The error is already sanitized by auth_service
+                    if success:
+                        # Store success info in session state to display outside form
+                        st.session_state.registration_success = True
+                        st.session_state.registered_user = {
+                            'email': email,
+                            'username': username,
+                            'first_name': first_name,
+                            'last_name': last_name
+                        }
+                        st.rerun()
+                    else:
+                        st.session_state.registration_error = f'❌ Error durante el registro: {message}'
+                        st.rerun()
+                        
+                except Exception as e:
+                    st.session_state.registration_error = f'❌ Error durante el registro: {str(e)}'
+                    st.rerun()
+    
+    # Show error messages outside form (if any)
+    if 'registration_error' in st.session_state and st.session_state.registration_error:
+        st.error(st.session_state.registration_error)
+        # Clear error after showing
+        del st.session_state.registration_error
+    
+    # Show success message outside form (if registration was successful)
+    if st.session_state.get('registration_success', False):
+        user_info = st.session_state.get('registered_user', {})
+        st.success('✅ Usuario registrado exitosamente!')
+        st.info(f'📧 Email: {user_info.get("email", "")}')
+        st.info(f'👤 Usuario: {user_info.get("username", "")}')
+        st.info(f'👨‍💼 Nombre: {user_info.get("first_name", "")} {user_info.get("last_name", "")}')
+        
+        st.markdown("---")
+        st.markdown("### 🎉 ¡Registro Completado!")
+        st.markdown("""
+        Tu cuenta ha sido creada exitosamente. Ahora puedes:
+        
+        - 🔐 **Iniciar sesión** con tu nuevo usuario y contraseña
+        - 📚 **Acceder a todos los niveles** de aprendizaje
+        - 📊 **Crear dashboards** personalizados
+        - 💾 **Guardar tu progreso** automáticamente
+        """)
+        
+        col1, col2, col3 = st.columns(3)
+        with col2:
+            if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
+                # Clear registration success state
+                if 'registration_success' in st.session_state:
+                    del st.session_state.registration_success
+                if 'registered_user' in st.session_state:
+                    del st.session_state.registered_user
+                st.switch_page("Inicio.py")
     
     # Navigation
     st.markdown("---")

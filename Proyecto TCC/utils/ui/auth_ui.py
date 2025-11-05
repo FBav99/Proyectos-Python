@@ -43,29 +43,62 @@ def show_login_form():
         if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
             st.switch_page("pages/07_OAuth_Login.py")
 
-def show_user_sidebar(current_user):
-    """Display user information and logout button in sidebar"""
+def show_user_sidebar(current_user=None):
+    """Display user information and logout button in sidebar - Always shows username prominently"""
     with st.sidebar:
         st.markdown("### 👤 Usuario")
+        st.markdown("---")
         
-        # Handle both database users and OAuth users
-        if 'oauth_provider' in current_user:
-            # OAuth user
-            name = f"{current_user['first_name']} {current_user['last_name']}"
-            st.write(f"**{name}**")
-            st.write(f"@{current_user['username']}")
-            st.write(f"🔐 {current_user['oauth_provider'].title()}")
+        if current_user:
+            # Handle both database users and OAuth users
+            if 'oauth_provider' in current_user:
+                # OAuth user
+                name = f"{current_user['first_name']} {current_user['last_name']}"
+                username = current_user['username']
+                provider = current_user['oauth_provider'].title()
+                
+                # Show username prominently
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                            padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center;">
+                    <h3 style="color: white; margin: 0;">@{username}</h3>
+                    <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.9rem;">{name}</p>
+                    <p style="color: white; margin: 0.3rem 0 0 0; font-size: 0.8rem;">🔐 {provider}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                # Database user
+                name = f"{current_user['first_name']} {current_user['last_name']}"
+                username = current_user['username']
+                
+                # Show username prominently with green background to indicate active session
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); 
+                            padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center;">
+                    <h3 style="color: white; margin: 0;">@{username}</h3>
+                    <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.9rem;">{name}</p>
+                    <p style="color: white; margin: 0.3rem 0 0 0; font-size: 0.8rem;">✅ Sesión activa</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("---")
+            if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
+                logout_user()
+                st.rerun()
+            
+            return name
         else:
-            # Database user
-            name = f"{current_user['first_name']} {current_user['last_name']}"
-            st.write(f"**{name}**")
-            st.write(f"@{current_user['username']}")
-        
-        if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
-            logout_user()
-            st.rerun()
-    
-    return name
+            # Not authenticated - show login prompt with clear indication
+            st.markdown(f"""
+            <div style="background: #f0f0f0; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center; border: 2px solid #ff6b6b;">
+                <p style="color: #666; margin: 0; font-weight: bold;">⚠️ No autenticado</p>
+                <p style="color: #999; margin: 0.5rem 0 0 0; font-size: 0.9rem;">👤 Usuario: Invitado</p>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown("---")
+            if st.button("🔐 Iniciar Sesión", type="primary", use_container_width=True):
+                st.switch_page("Inicio.py")
+            return None
 
 def get_current_user():
     """Get current authenticated user (handles both database and OAuth users)"""
@@ -76,16 +109,22 @@ def get_current_user():
     # Then check for database user
     return db_get_current_user()
 
+def init_sidebar():
+    """Initialize sidebar with user info on all pages - Call this at the start of every page"""
+    current_user = get_current_user()
+    show_user_sidebar(current_user)
+    return current_user
+
 def handle_authentication():
     """Handle authentication flow and return user info if authenticated"""
     current_user = get_current_user()
+    
+    # Always show sidebar with username (even if not authenticated)
+    name = show_user_sidebar(current_user)
     
     if not current_user:
         show_login_form()
         return None, None
     
-    # User is authenticated - show logout button
-    username = current_user['username']
-    name = show_user_sidebar(current_user)
-    
+    # User is authenticated
     return current_user, name

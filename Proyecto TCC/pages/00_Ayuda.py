@@ -24,6 +24,7 @@ from utils.learning import (
     create_learning_resources,
     create_navigation_section
 )
+from utils.ui.auth_ui import init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 # Configure error handling
@@ -38,6 +39,9 @@ st.set_page_config(
 
 @safe_main
 def main():
+    # Initialize sidebar with user info (always visible)
+    init_sidebar()
+    
     # Load level styles for consistent appearance
     st.markdown(load_level_styles(), unsafe_allow_html=True)
     

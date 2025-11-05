@@ -30,6 +30,7 @@ from utils.ui import (
 
 # Import new dashboard modules
 from utils.dashboard import configure_component, render_dashboard, create_dashboard_sidebar, show_dashboard_info
+from utils.ui.auth_ui import init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 # Configure error handling
@@ -47,8 +48,8 @@ def main():
     )
     apply_custom_css()
     
-    # Check authentication using new system
-    current_user = get_current_user()
+    # Initialize sidebar with user info (always visible)
+    current_user = init_sidebar()
     if not current_user:
         st.error("Por favor inicia sesión para acceder a esta página.")
         st.markdown("---")
