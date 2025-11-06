@@ -25,6 +25,26 @@ def get_level_progress(user_id):
 def show_learning_section(total_progress, completed_count, progress):
     """Show the learning section with progress tracking"""
     st.markdown("---")
+    
+    # Check if user has completed initial survey
+    from core.survey_system import survey_system
+    user = st.session_state.get('user')
+    if user and user.get('id'):
+        user_id = user['id']
+        if not survey_system.has_completed_survey(user_id, 'initial'):
+            st.markdown(f"""
+            <div style="background: rgba(0, 123, 255, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #007bff;">
+                <h3 style="color: #007bff; margin-bottom: 1rem;">{get_icon('📋')} Encuesta Inicial</h3>
+                <p style="color: #666; margin-bottom: 1rem;">Antes de comenzar con los niveles, nos gustaría conocer un poco sobre ti. Esto nos ayuda a mejorar la experiencia.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("📝 Completar Encuesta Inicial", type="primary", use_container_width=True):
+                st.switch_page("pages/99_Survey_Inicial.py")
+            
+            st.info("💡 Puedes completar la encuesta más tarde, pero te recomendamos hacerlo antes de comenzar.")
+            st.markdown("---")
+    
     st.markdown(f"""
     <div style="background: rgba(255, 193, 7, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #ffc107;">
         <h3 style="color: #ffc107; margin-bottom: 1rem;">{get_icon('🎓')} Sistema de Aprendizaje por Niveles</h3>

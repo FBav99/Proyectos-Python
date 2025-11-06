@@ -387,88 +387,53 @@ def main():
             if show_correlation:
                 st.plotly_chart(fig_corr, use_container_width=True)
     
-    # 7. Quiz Section
-    st.header("🧠 Quiz de Comprensión")
+    # 7. Quiz Section - Must complete quiz before marking level as complete
+    st.header("🧠 Quiz del Nivel")
+    st.markdown("### Pon a prueba tus conocimientos")
+    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
     
-    st.markdown("Responde estas preguntas para verificar que entiendes los conceptos avanzados del nivel.")
+    # Check if user passed the quiz
+    quiz_passed = st.session_state.get(f'quiz_nivel4_passed', False)
     
-    # Quiz questions
-    quiz_questions = [
-        {
-            "question": "¿Qué es un dashboard?",
-            "options": [
-                "Un gráfico individual",
-                "Una colección de visualizaciones y métricas organizadas",
-                "Una tabla de datos",
-                "Un cálculo matemático"
-            ],
-            "correct": 1
-        },
-        {
-            "question": "¿Por qué son importantes las visualizaciones interactivas?",
-            "options": [
-                "Porque se ven más bonitas",
-                "Porque permiten explorar los datos de manera más profunda",
-                "Porque son más fáciles de crear",
-                "Porque ocupan menos espacio"
-            ],
-            "correct": 1
-        },
-        {
-            "question": "¿Qué son los insights en análisis de datos?",
-            "options": [
-                "Solo los números",
-                "Descubrimientos importantes que pueden llevar a acciones valiosas",
-                "Los gráficos",
-                "Las fórmulas matemáticas"
-            ],
-            "correct": 1
-        }
-    ]
-    
-    # Initialize quiz state
-    if 'quiz_answers' not in st.session_state:
-        st.session_state.quiz_answers = {}
-    
-    if 'quiz_completed' not in st.session_state:
-        st.session_state.quiz_completed = False
-    
-    # Display quiz
-    for i, q in enumerate(quiz_questions):
-        st.markdown(f"**Pregunta {i+1}:** {q['question']}")
+    if quiz_passed:
+        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+    else:
+        # Show quiz using unified system
+        from core.quiz_system import create_quiz
+        create_quiz('nivel4', user['username'])
         
-        answer = st.radio(
-            f"Selecciona la respuesta correcta:",
-            q['options'],
-            key=f"quiz_{i}",
-            label_visibility="collapsed"
+        # Check if quiz was just completed and passed
+        if st.session_state.get(f'quiz_nivel4_completed', False):
+            score = st.session_state.get(f'quiz_nivel4_score', 0)
+            if score >= 3:
+                st.session_state[f'quiz_nivel4_passed'] = True
+                st.rerun()
+    
+    st.divider()
+    
+    # 8. Navigation or next steps
+    st.header("✅ Verificación del Nivel")
+    
+    # Only allow marking as complete if quiz is passed
+    if not quiz_passed:
+        st.warning("⚠️ Debes aprobar el quiz antes de poder marcar el nivel como completado.")
+        nivel4_completed = False
+    else:
+        nivel4_completed = st.checkbox(
+            "He completado todos los pasos del Nivel 4 y aprobé el quiz",
+            value=st.session_state.get('nivel4_completed', False),
+            key='nivel4_checkbox'
         )
-        
-        st.session_state.quiz_answers[i] = q['options'].index(answer)
     
-    # Quiz submission
-    if st.button("📝 Enviar Respuestas", type="primary"):
-        correct_answers = 0
-        total_questions = len(quiz_questions)
-        
-        for i, q in enumerate(quiz_questions):
-            if st.session_state.quiz_answers.get(i) == q['correct']:
-                correct_answers += 1
-        
-        score = (correct_answers / total_questions) * 100
-        
-        if score >= 80:
-            st.success(f"🎉 ¡Excelente! Obtuviste {score:.0f}% - ¡Has completado todos los niveles exitosamente!")
-            
-            # Save progress
-            if save_level_progress(user['id'], 'nivel4', True):
-                st.session_state.quiz_completed = True
-                st.balloons()
+    if nivel4_completed:
+        # Save progress to database
+        user_id = user['id']
+        if save_level_progress(user_id, 'nivel4', True):
+            st.session_state['nivel4_completed'] = True
         else:
-            st.warning(f"📚 Obtuviste {score:.0f}%. Necesitas al menos 80% para completar el nivel. ¡Sigue estudiando!")
-    
-    # Show completion status
-    if st.session_state.get('quiz_completed', False):
+            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            return
+        
         # Show final achievement
         create_achievement_display('nivel4', progress)
         
@@ -477,12 +442,18 @@ def main():
         
         st.success("🎉 ¡Felicidades! Has completado todos los niveles del curso. ¡Eres un experto en análisis de datos!")
         
-        col1, col2 = st.columns(2)
+        st.markdown("### 📝 Antes de continuar, nos gustaría conocer tu opinión sobre este nivel y la experiencia general.")
+        
+        col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("🏠 Volver al Inicio", type="primary"):
-                st.switch_page("Inicio.py")
+            if st.button("📝 Encuesta del Nivel 4", type="primary"):
+                st.session_state.survey_level = 'nivel4'
+                st.switch_page("pages/99_Survey_Nivel.py")
         with col2:
-            if st.button("📊 Crear Dashboard", type="primary"):
+            if st.button("🏆 Encuesta Final", type="primary"):
+                st.switch_page("pages/99_Survey_Final.py")
+        with col3:
+            if st.button("📊 Crear Dashboard", type="secondary"):
                 st.switch_page("pages/08_Dashboard_Blanco.py")
     
     # 8. Navigation

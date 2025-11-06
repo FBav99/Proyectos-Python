@@ -69,6 +69,28 @@ def main():
         progress = {}
     
     # ============================================================================
+    # SECCIÓN ENCUESTA INICIAL - Botón prominente para encuesta (solo para pruebas)
+    # ============================================================================
+    # Solo mostrar si el usuario no ha completado la encuesta inicial
+    if 'oauth_provider' not in current_user:
+        from core.survey_system import survey_system
+        user_id = current_user['id']
+        if not survey_system.has_completed_survey(user_id, 'initial'):
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); padding: 2rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 3px solid #fff;">
+                <h2 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.6rem;">📋 Encuesta Inicial - Período de Pruebas</h2>
+                <p style="color: white; text-align: center; margin-bottom: 1.5rem; font-size: 1.1rem; opacity: 0.95;">Ayúdanos a mejorar la plataforma completando nuestra encuesta inicial</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                if st.button("📝 Completar Encuesta Inicial", type="primary", use_container_width=True, key="initial_survey_banner"):
+                    st.switch_page("pages/99_Survey_Inicial.py")
+            
+            st.markdown("---")
+    
+    # ============================================================================
     # SECCIÓN QUICK START - Botones de acción principal
     # ============================================================================
     show_quick_start_section()

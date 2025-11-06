@@ -1,9 +1,43 @@
 import streamlit as st
 import random
+from datetime import datetime
 from core.auth_config import update_user_progress, check_achievement
+from core.database import db_manager
 
 # Quiz questions for each level
 QUIZ_QUESTIONS = {
+    'nivel0': [
+        {
+            'question': '¿Qué son los datos?',
+            'options': ['Información que se puede medir, contar o describir', 'Solo números', 'Solo texto', 'Solo fechas'],
+            'correct': 0,
+            'explanation': 'Los datos son información que se puede medir, contar o describir. Incluyen números, texto, fechas y más.'
+        },
+        {
+            'question': '¿Cuáles son los tipos principales de datos?',
+            'options': ['Solo números', 'Numéricos, texto, fecha/hora, y sí/no', 'Solo texto y números', 'Solo fechas'],
+            'correct': 1,
+            'explanation': 'Los datos principales son: numéricos (números), texto (palabras), fecha/hora, y datos de sí/no (verdadero/falso).'
+        },
+        {
+            'question': 'En una tabla de datos, ¿qué representa cada fila?',
+            'options': ['Un tipo de información', 'Un registro individual (una venta, un cliente, etc.)', 'Un número', 'Un color'],
+            'correct': 1,
+            'explanation': 'Cada fila representa un registro individual, como una venta, un cliente, o un producto.'
+        },
+        {
+            'question': 'En una tabla de datos, ¿qué representa cada columna?',
+            'options': ['Un registro completo', 'Un tipo de información específica', 'Un número aleatorio', 'Una fila'],
+            'correct': 1,
+            'explanation': 'Cada columna representa un tipo de información específica, como fecha, precio, o nombre del producto.'
+        },
+        {
+            'question': '¿Qué es el análisis de datos?',
+            'options': ['Solo contar números', 'Examinar información para encontrar respuestas, patrones e insights', 'Solo hacer gráficos', 'Eliminar datos'],
+            'correct': 1,
+            'explanation': 'El análisis de datos es examinar la información para encontrar respuestas, patrones e insights que ayuden a tomar mejores decisiones.'
+        }
+    ],
     'nivel1': [
         {
             'question': '¿Cuál es el formato más común para archivos de datos?',
@@ -182,53 +216,86 @@ def create_quiz(level, username):
             st.markdown(f"### Pregunta {current_q + 1} de {len(questions)}")
             st.markdown(f"**{question['question']}**")
             
-            # Display options
-            selected_option = st.radio(
-                "Selecciona tu respuesta:",
-                question['options'],
-                key=f"quiz_{level}_q{current_q}"
-            )
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("✅ Confirmar Respuesta"):
-                    # Check answer
-                    correct = question['options'].index(selected_option) == question['correct']
-                    
-                    if correct:
-                        st.session_state[f'quiz_{level}_score'] += 1
-                        st.success("🎉 ¡Correcto!")
-                    else:
-                        st.error(f"❌ Incorrecto. La respuesta correcta era: {question['options'][question['correct']]}")
-                    
-                    # Store answer
-                    st.session_state[f'quiz_{level}_answers'].append({
-                        'question': question['question'],
-                        'selected': selected_option,
-                        'correct': question['options'][question['correct']],
-                        'is_correct': correct,
-                        'explanation': question['explanation']
-                    })
-                    
-                    # Show explanation
-                    st.info(f"💡 **Explicación:** {question['explanation']}")
-                    
-                    # Move to next question
-                    st.session_state[f'quiz_{level}_current_question'] += 1
-                    
-                    if st.session_state[f'quiz_{level}_current_question'] >= len(questions):
-                        st.session_state[f'quiz_{level}_completed'] = True
-                    
-                    st.rerun()
-            
-            with col2:
-                if st.button("🔄 Reiniciar Quiz"):
-                    st.session_state[f'quiz_{level}_started'] = False
-                    st.session_state[f'quiz_{level}_current_question'] = 0
-                    st.session_state[f'quiz_{level}_score'] = 0
-                    st.session_state[f'quiz_{level}_answers'] = []
-                    st.session_state[f'quiz_{level}_completed'] = False
-                    st.rerun()
+            # Show feedback for current question if answer was already confirmed
+            if f'quiz_{level}_answered_{current_q}' in st.session_state:
+                feedback = st.session_state[f'quiz_{level}_answered_{current_q}']
+                if feedback['is_correct']:
+                    st.success("🎉 ¡Correcto!")
+                else:
+                    st.error(f"❌ Incorrecto. La respuesta correcta era: **{feedback['correct_answer']}**")
+                
+                st.info(f"💡 **Explicación:** {feedback['explanation']}")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    # Show button to continue to next question
+                    if st.button("➡️ Siguiente Pregunta", type="primary", use_container_width=True):
+                        # Move to next question
+                        st.session_state[f'quiz_{level}_current_question'] += 1
+                        
+                        if st.session_state[f'quiz_{level}_current_question'] >= len(questions):
+                            st.session_state[f'quiz_{level}_completed'] = True
+                        
+                        st.rerun()
+                with col2:
+                    if st.button("🔄 Reiniciar Quiz", use_container_width=True):
+                        st.session_state[f'quiz_{level}_started'] = False
+                        st.session_state[f'quiz_{level}_current_question'] = 0
+                        st.session_state[f'quiz_{level}_score'] = 0
+                        st.session_state[f'quiz_{level}_answers'] = []
+                        st.session_state[f'quiz_{level}_completed'] = False
+                        # Clear all answered flags
+                        for i in range(len(questions)):
+                            if f'quiz_{level}_answered_{i}' in st.session_state:
+                                del st.session_state[f'quiz_{level}_answered_{i}']
+                        st.rerun()
+            else:
+                # Display options
+                selected_option = st.radio(
+                    "Selecciona tu respuesta:",
+                    question['options'],
+                    key=f"quiz_{level}_q{current_q}"
+                )
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("✅ Confirmar Respuesta"):
+                        # Check answer
+                        correct = question['options'].index(selected_option) == question['correct']
+                        
+                        # Store feedback in session state so it persists after rerun
+                        st.session_state[f'quiz_{level}_answered_{current_q}'] = {
+                            'is_correct': correct,
+                            'correct_answer': question['options'][question['correct']],
+                            'explanation': question['explanation']
+                        }
+                        
+                        if correct:
+                            st.session_state[f'quiz_{level}_score'] += 1
+                        
+                        # Store answer
+                        st.session_state[f'quiz_{level}_answers'].append({
+                            'question': question['question'],
+                            'selected': selected_option,
+                            'correct': question['options'][question['correct']],
+                            'is_correct': correct,
+                            'explanation': question['explanation']
+                        })
+                        
+                        st.rerun()
+                
+                with col2:
+                    if st.button("🔄 Reiniciar Quiz"):
+                        st.session_state[f'quiz_{level}_started'] = False
+                        st.session_state[f'quiz_{level}_current_question'] = 0
+                        st.session_state[f'quiz_{level}_score'] = 0
+                        st.session_state[f'quiz_{level}_answers'] = []
+                        st.session_state[f'quiz_{level}_completed'] = False
+                        # Clear all answered flags
+                        for i in range(len(questions)):
+                            if f'quiz_{level}_answered_{i}' in st.session_state:
+                                del st.session_state[f'quiz_{level}_answered_{i}']
+                        st.rerun()
     
     # Quiz completed
     else:
@@ -260,6 +327,7 @@ def show_quiz_results(level, username, questions):
     # Results message
     if passed:
         st.success("🎉 ¡Felicitaciones! Has aprobado el quiz.")
+        st.session_state[f'quiz_{level}_passed'] = True
         
         # Check for perfect score achievement
         if score == total_questions:
@@ -269,6 +337,7 @@ def show_quiz_results(level, username, questions):
                 st.success("🏆 ¡Logro desbloqueado: Maestro del Quiz!")
     else:
         st.error("📚 Necesitas al menos 3 respuestas correctas para aprobar. ¡Sigue estudiando!")
+        st.session_state[f'quiz_{level}_passed'] = False
     
     # Detailed results
     st.markdown("### 📋 Respuestas Detalladas")
@@ -300,6 +369,9 @@ def show_quiz_results(level, username, questions):
             st.session_state[f'quiz_{level}_completed'] = False
             st.rerun()
     
+    # Save quiz attempt to database
+    save_quiz_attempt(level, username, score, total_questions, percentage, passed, st.session_state[f'quiz_{level}_answers'])
+    
     # Update user progress
     if passed:
         update_user_progress(username, quiz_scores={level: percentage})
@@ -309,6 +381,68 @@ def show_quiz_results(level, username, questions):
             new_achievements = check_achievement(username, 'level_completion')
             if new_achievements:
                 st.success("🏆 ¡Logro desbloqueado: Primer Nivel Completado!")
+
+def save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers_list):
+    """Save quiz attempt and answers to database"""
+    try:
+        # Get user_id from username - query database directly
+        with db_manager.get_connection() as conn:
+            if db_manager.db_type == "sqlite":
+                cursor = conn.execute("SELECT id FROM users WHERE username = ?", (username,))
+            else:
+                cursor = conn.cursor()
+                cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+            
+            user_result = cursor.fetchone()
+            
+            if not user_result:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"User not found for username: {username}")
+                return False
+            
+            user_id = user_result[0] if isinstance(user_result, tuple) else user_result['id']
+        
+        # Now insert quiz attempt with the user_id
+        with db_manager.get_connection() as conn:
+            # Insert quiz attempt
+            if db_manager.db_type == "sqlite":
+                cursor = conn.execute("""
+                    INSERT INTO quiz_attempts (user_id, level, score, total_questions, percentage, passed, completed_at)
+                    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """, (user_id, level, score, total_questions, percentage, passed))
+                quiz_attempt_id = cursor.lastrowid
+            else:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO quiz_attempts (user_id, level, score, total_questions, percentage, passed, completed_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                    RETURNING id
+                """, (user_id, level, score, total_questions, percentage, passed))
+                quiz_attempt_id = cursor.fetchone()[0]
+            
+            # Insert each answer
+            for answer in answers_list:
+                if db_manager.db_type == "sqlite":
+                    conn.execute("""
+                        INSERT INTO quiz_answers (quiz_attempt_id, question_text, selected_answer, correct_answer, is_correct, explanation)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    """, (quiz_attempt_id, answer['question'], answer['selected'], answer['correct'], answer['is_correct'], answer.get('explanation', '')))
+                else:
+                    cursor.execute("""
+                        INSERT INTO quiz_answers (quiz_attempt_id, question_text, selected_answer, correct_answer, is_correct, explanation)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (quiz_attempt_id, answer['question'], answer['selected'], answer['correct'], answer['is_correct'], answer.get('explanation', '')))
+            
+            conn.commit()
+            return True
+            
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error saving quiz attempt: {e}")
+        # Don't show error to user, just log it
+        return False
 
 def show_achievements(username):
     """Display user achievements"""

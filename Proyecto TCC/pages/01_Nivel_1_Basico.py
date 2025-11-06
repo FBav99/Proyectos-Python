@@ -548,13 +548,43 @@ def main():
     else:
         st.info("📁 Sube un archivo CSV o Excel para ver el análisis en acción.")
     
-    # 6. Navigation or next steps
+    # 6. Quiz Section - Must complete quiz before marking level as complete
+    st.header("🧠 Quiz del Nivel")
+    st.markdown("### Pon a prueba tus conocimientos")
+    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
+    
+    # Check if user passed the quiz
+    quiz_passed = st.session_state.get(f'quiz_nivel1_passed', False)
+    
+    if quiz_passed:
+        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+    else:
+        # Show quiz
+        from core.quiz_system import create_quiz
+        create_quiz('nivel1', user['username'])
+        
+        # Check if quiz was just completed and passed
+        if st.session_state.get(f'quiz_nivel1_completed', False):
+            score = st.session_state.get(f'quiz_nivel1_score', 0)
+            if score >= 3:
+                st.session_state[f'quiz_nivel1_passed'] = True
+                st.rerun()
+    
+    st.divider()
+    
+    # 7. Navigation or next steps
     st.header("✅ Verificación del Nivel")
-    nivel1_completed = st.checkbox(
-        "He completado todos los pasos del Nivel 1",
-        value=st.session_state.get('nivel1_completed', False),
-        key='nivel1_checkbox'
-    )
+    
+    # Only allow marking as complete if quiz is passed
+    if not quiz_passed:
+        st.warning("⚠️ Debes aprobar el quiz antes de poder marcar el nivel como completado.")
+        nivel1_completed = False
+    else:
+        nivel1_completed = st.checkbox(
+            "He completado todos los pasos del Nivel 1 y aprobé el quiz",
+            value=st.session_state.get('nivel1_completed', False),
+            key='nivel1_checkbox'
+        )
     
     if nivel1_completed:
         # Save progress to database
@@ -575,13 +605,14 @@ def main():
         )
         
         st.subheader("🚀 ¿Qué sigue?")
-        st.markdown("En el **Nivel 2** aprenderás a organizar y filtrar la información para encontrar exactamente lo que necesitas.")
+        st.markdown("Antes de continuar, nos gustaría conocer tu opinión sobre este nivel.")
         
         # Show next level preview
         create_level_preview('nivel2')
         
-        if st.button("Continuar al Nivel 2", type="primary"):
-            st.switch_page("pages/02_Nivel_2_Filtros.py")
+        if st.button("Completar Encuesta del Nivel", type="primary"):
+            st.session_state.survey_level = 'nivel1'
+            st.switch_page("pages/99_Survey_Nivel.py")
     
     # Additional resources
     create_info_box(

@@ -21,8 +21,8 @@ def sanitize_traceback(tb_lines: list) -> list:
         line = re.sub(r'/mount/src/', '[APP]/', line)
         
         # Remove Windows paths
-        line = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[APP]\\', line)
-        line = re.sub(r'C:\\Users\\[^\\]*\\', '[USER]\\', line)
+        line = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[APP]', line)
+        line = re.sub(r'C:\\Users\\[^\\]*\\', '[USER]', line)
         
         # Remove Linux/Mac paths
         line = re.sub(r'/home/[^/]+/', '[HOME]/', line)
@@ -51,7 +51,7 @@ def sanitize_error_message(error_msg: str) -> str:
     
     # Remove paths
     error_msg = re.sub(r'/mount/src/[^/]+/', '[APP]/', error_msg)
-    error_msg = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[PATH]\\', error_msg)
+    error_msg = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[PATH]', error_msg)
     error_msg = re.sub(r'/home/[^/]+/', '[HOME]/', error_msg)
     error_msg = re.sub(r'Proyecto TCC', '[PROJECT]', error_msg)
     
@@ -100,9 +100,12 @@ def safe_streamlit_page(func: Callable) -> Callable:
             st.error(user_msg)
             
             # Optionally show a generic technical message (without paths)
-            if st.session_state.get('debug_mode', False):
+            # Temporarily enable debug mode for troubleshooting
+            if st.session_state.get('debug_mode', False) or True:  # Temporarily always True for debugging
                 with st.expander("🔧 Detalles técnicos (modo debug)"):
-                    st.code(f"Tipo: {error_type}\nMensaje: {sanitized_msg}", language=None)
+                    st.code(f"Tipo: {error_type}\nMensaje: {sanitized_msg}\nError original: {error_message}", language=None)
+                    import traceback
+                    st.code(traceback.format_exc(), language='python')
             
             # Log the full error for debugging (server-side only)
             import logging

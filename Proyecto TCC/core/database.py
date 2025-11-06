@@ -136,6 +136,7 @@ class DatabaseManager:
         self.create_quiz_attempts_table()
         self.create_quiz_answers_table()
         self.create_rate_limiting_table()
+        self.create_survey_responses_table()
         
         # File upload tables (needed for data analysis)
         self.create_uploaded_files_table()
@@ -426,6 +427,23 @@ class DatabaseManager:
             """)
             conn.commit()
     
+    def create_survey_responses_table(self):
+        """Create survey responses table for all survey types"""
+        with self.get_connection() as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS survey_responses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    survey_type VARCHAR(50) NOT NULL,
+                    level VARCHAR(20),
+                    responses TEXT NOT NULL,
+                    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                    UNIQUE(user_id, survey_type, level)
+                )
+            """)
+            conn.commit()
+    
     def create_indexes(self):
         """Create database indexes for performance"""
         with self.get_connection() as conn:
@@ -461,6 +479,10 @@ class DatabaseManager:
             # Rate limiting indexes
             conn.execute("CREATE INDEX IF NOT EXISTS idx_rate_limiting_identifier ON rate_limiting(identifier)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_rate_limiting_last_attempt ON rate_limiting(last_attempt)")
+            
+            # Survey indexes
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_survey_user_type ON survey_responses(user_id, survey_type)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_survey_completed ON survey_responses(completed_at)")
             
             conn.commit()
     
