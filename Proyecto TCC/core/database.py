@@ -95,6 +95,7 @@ class DatabaseManager:
         """Get database connection with proper configuration (SQLite or PostgreSQL)"""
         if self.db_type == "supabase" and POSTGRES_AVAILABLE and self.connection_string:
             # PostgreSQL/Supabase connection
+            conn = None
             try:
                 conn = psycopg2.connect(self.connection_string)
                 conn.autocommit = False  # Use transactions
@@ -236,212 +237,411 @@ class DatabaseManager:
     def create_user_progress_table(self):
         """Create user progress table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS user_progress (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    nivel0_completed BOOLEAN DEFAULT 0,
-                    nivel1_completed BOOLEAN DEFAULT 0,
-                    nivel2_completed BOOLEAN DEFAULT 0,
-                    nivel3_completed BOOLEAN DEFAULT 0,
-                    nivel4_completed BOOLEAN DEFAULT 0,
-                    total_time_spent INTEGER DEFAULT 0,
-                    data_analyses_created INTEGER DEFAULT 0,
-                    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS user_progress (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        nivel0_completed BOOLEAN DEFAULT FALSE,
+                        nivel1_completed BOOLEAN DEFAULT FALSE,
+                        nivel2_completed BOOLEAN DEFAULT FALSE,
+                        nivel3_completed BOOLEAN DEFAULT FALSE,
+                        nivel4_completed BOOLEAN DEFAULT FALSE,
+                        total_time_spent INTEGER DEFAULT 0,
+                        data_analyses_created INTEGER DEFAULT 0,
+                        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS user_progress (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        nivel0_completed BOOLEAN DEFAULT 0,
+                        nivel1_completed BOOLEAN DEFAULT 0,
+                        nivel2_completed BOOLEAN DEFAULT 0,
+                        nivel3_completed BOOLEAN DEFAULT 0,
+                        nivel4_completed BOOLEAN DEFAULT 0,
+                        total_time_spent INTEGER DEFAULT 0,
+                        data_analyses_created INTEGER DEFAULT 0,
+                        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_quiz_attempts_table(self):
         """Create quiz attempts table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS quiz_attempts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    level VARCHAR(20) NOT NULL,
-                    score INTEGER NOT NULL,
-                    total_questions INTEGER NOT NULL,
-                    percentage DECIMAL(5,2) NOT NULL,
-                    passed BOOLEAN NOT NULL,
-                    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    time_taken INTEGER,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS quiz_attempts (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        level VARCHAR(20) NOT NULL,
+                        score INTEGER NOT NULL,
+                        total_questions INTEGER NOT NULL,
+                        percentage DECIMAL(5,2) NOT NULL,
+                        passed BOOLEAN NOT NULL,
+                        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        time_taken INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS quiz_attempts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        level VARCHAR(20) NOT NULL,
+                        score INTEGER NOT NULL,
+                        total_questions INTEGER NOT NULL,
+                        percentage DECIMAL(5,2) NOT NULL,
+                        passed BOOLEAN NOT NULL,
+                        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        time_taken INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_quiz_answers_table(self):
         """Create quiz answers table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS quiz_answers (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    quiz_attempt_id INTEGER NOT NULL,
-                    question_text TEXT NOT NULL,
-                    selected_answer TEXT NOT NULL,
-                    correct_answer TEXT NOT NULL,
-                    is_correct BOOLEAN NOT NULL,
-                    explanation TEXT,
-                    FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS quiz_answers (
+                        id SERIAL PRIMARY KEY,
+                        quiz_attempt_id INTEGER NOT NULL,
+                        question_text TEXT NOT NULL,
+                        selected_answer TEXT NOT NULL,
+                        correct_answer TEXT NOT NULL,
+                        is_correct BOOLEAN NOT NULL,
+                        explanation TEXT,
+                        FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS quiz_answers (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        quiz_attempt_id INTEGER NOT NULL,
+                        question_text TEXT NOT NULL,
+                        selected_answer TEXT NOT NULL,
+                        correct_answer TEXT NOT NULL,
+                        is_correct BOOLEAN NOT NULL,
+                        explanation TEXT,
+                        FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_achievements_table(self):
         """Create achievements table (optional - for future gamification)"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS achievements (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    achievement_type VARCHAR(50) NOT NULL,
-                    achievement_title VARCHAR(100) NOT NULL,
-                    achievement_description TEXT,
-                    unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS achievements (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        achievement_type VARCHAR(50) NOT NULL,
+                        achievement_title VARCHAR(100) NOT NULL,
+                        achievement_description TEXT,
+                        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS achievements (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        achievement_type VARCHAR(50) NOT NULL,
+                        achievement_title VARCHAR(100) NOT NULL,
+                        achievement_description TEXT,
+                        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_uploaded_files_table(self):
         """Create uploaded files table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS uploaded_files (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    filename VARCHAR(255) NOT NULL,
-                    original_filename VARCHAR(255) NOT NULL,
-                    file_size INTEGER NOT NULL,
-                    file_type VARCHAR(50) NOT NULL,
-                    file_path VARCHAR(500) NOT NULL,
-                    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    is_active BOOLEAN DEFAULT 1,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS uploaded_files (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        filename VARCHAR(255) NOT NULL,
+                        original_filename VARCHAR(255) NOT NULL,
+                        file_size INTEGER NOT NULL,
+                        file_type VARCHAR(50) NOT NULL,
+                        file_path VARCHAR(500) NOT NULL,
+                        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS uploaded_files (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        filename VARCHAR(255) NOT NULL,
+                        original_filename VARCHAR(255) NOT NULL,
+                        file_size INTEGER NOT NULL,
+                        file_type VARCHAR(50) NOT NULL,
+                        file_path VARCHAR(500) NOT NULL,
+                        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        is_active BOOLEAN DEFAULT 1,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_file_analysis_sessions_table(self):
         """Create file analysis sessions table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS file_analysis_sessions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    file_id INTEGER NOT NULL,
-                    session_name VARCHAR(100),
-                    filters_applied TEXT,
-                    metrics_calculated TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    duration_minutes INTEGER,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                    FOREIGN KEY (file_id) REFERENCES uploaded_files(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS file_analysis_sessions (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        file_id INTEGER NOT NULL,
+                        session_name VARCHAR(100),
+                        filters_applied TEXT,
+                        metrics_calculated TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        duration_minutes INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                        FOREIGN KEY (file_id) REFERENCES uploaded_files(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS file_analysis_sessions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        file_id INTEGER NOT NULL,
+                        session_name VARCHAR(100),
+                        filters_applied TEXT,
+                        metrics_calculated TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        duration_minutes INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                        FOREIGN KEY (file_id) REFERENCES uploaded_files(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_dashboards_table(self):
         """Create dashboards table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS dashboards (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    dashboard_name VARCHAR(100) NOT NULL,
-                    dashboard_config TEXT NOT NULL,
-                    is_public BOOLEAN DEFAULT 0,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS dashboards (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        dashboard_name VARCHAR(100) NOT NULL,
+                        dashboard_config TEXT NOT NULL,
+                        is_public BOOLEAN DEFAULT FALSE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS dashboards (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        dashboard_name VARCHAR(100) NOT NULL,
+                        dashboard_config TEXT NOT NULL,
+                        is_public BOOLEAN DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_dashboard_components_table(self):
         """Create dashboard components table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS dashboard_components (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    dashboard_id INTEGER NOT NULL,
-                    component_type VARCHAR(50) NOT NULL,
-                    component_config TEXT NOT NULL,
-                    position_x INTEGER,
-                    position_y INTEGER,
-                    width INTEGER,
-                    height INTEGER,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (dashboard_id) REFERENCES dashboards(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS dashboard_components (
+                        id SERIAL PRIMARY KEY,
+                        dashboard_id INTEGER NOT NULL,
+                        component_type VARCHAR(50) NOT NULL,
+                        component_config TEXT NOT NULL,
+                        position_x INTEGER,
+                        position_y INTEGER,
+                        width INTEGER,
+                        height INTEGER,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (dashboard_id) REFERENCES dashboards(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS dashboard_components (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        dashboard_id INTEGER NOT NULL,
+                        component_type VARCHAR(50) NOT NULL,
+                        component_config TEXT NOT NULL,
+                        position_x INTEGER,
+                        position_y INTEGER,
+                        width INTEGER,
+                        height INTEGER,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (dashboard_id) REFERENCES dashboards(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_user_activity_log_table(self):
         """Create user activity log table (optional - for security auditing)"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS user_activity_log (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    activity_type VARCHAR(50) NOT NULL,
-                    activity_details TEXT,
-                    ip_address VARCHAR(45),
-                    user_agent TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS user_activity_log (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        activity_type VARCHAR(50) NOT NULL,
+                        activity_details TEXT,
+                        ip_address VARCHAR(45),
+                        user_agent TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS user_activity_log (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        activity_type VARCHAR(50) NOT NULL,
+                        activity_details TEXT,
+                        ip_address VARCHAR(45),
+                        user_agent TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """)
             conn.commit()
     
     def create_system_metrics_table(self):
         """Create system metrics table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS system_metrics (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    metric_name VARCHAR(100) NOT NULL,
-                    metric_value DECIMAL(10,2) NOT NULL,
-                    metric_unit VARCHAR(20),
-                    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    additional_data TEXT
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS system_metrics (
+                        id SERIAL PRIMARY KEY,
+                        metric_name VARCHAR(100) NOT NULL,
+                        metric_value DECIMAL(10,2) NOT NULL,
+                        metric_unit VARCHAR(20),
+                        recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        additional_data TEXT
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS system_metrics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        metric_name VARCHAR(100) NOT NULL,
+                        metric_value DECIMAL(10,2) NOT NULL,
+                        metric_unit VARCHAR(20),
+                        recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        additional_data TEXT
+                    )
+                """)
             conn.commit()
     
     def create_rate_limiting_table(self):
         """Create rate limiting table"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS rate_limiting (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    identifier VARCHAR(100) NOT NULL,
-                    attempts INTEGER DEFAULT 0,
-                    last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    locked_until TIMESTAMP
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS rate_limiting (
+                        id SERIAL PRIMARY KEY,
+                        identifier VARCHAR(100) NOT NULL,
+                        attempts INTEGER DEFAULT 0,
+                        last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        locked_until TIMESTAMP
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS rate_limiting (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifier VARCHAR(100) NOT NULL,
+                        attempts INTEGER DEFAULT 0,
+                        last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        locked_until TIMESTAMP
+                    )
+                """)
             conn.commit()
     
     def create_survey_responses_table(self):
         """Create survey responses table for all survey types"""
         with self.get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS survey_responses (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    survey_type VARCHAR(50) NOT NULL,
-                    level VARCHAR(20),
-                    responses TEXT NOT NULL,
-                    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                    UNIQUE(user_id, survey_type, level)
-                )
-            """)
+            cursor = conn.cursor()
+            
+            if self.db_type == "supabase":
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS survey_responses (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        survey_type VARCHAR(50) NOT NULL,
+                        level VARCHAR(20),
+                        responses TEXT NOT NULL,
+                        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                        UNIQUE(user_id, survey_type, level)
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS survey_responses (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        survey_type VARCHAR(50) NOT NULL,
+                        level VARCHAR(20),
+                        responses TEXT NOT NULL,
+                        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                        UNIQUE(user_id, survey_type, level)
+                    )
+                """)
             conn.commit()
     
     def create_indexes(self):
