@@ -149,11 +149,12 @@ def main():
                 
                 # Auto-redirect after 2 seconds
                 st.session_state.initial_survey_completed = True
-                
-                if st.button("Comenzar con los Niveles", type="primary", use_container_width=True):
-                    st.switch_page("Inicio.py")
             else:
                 st.error("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo.")
+    
+    if st.session_state.get("initial_survey_completed"):
+        if st.button("Comenzar con los Niveles", type="primary", use_container_width=True):
+            st.switch_page("Inicio.py")
 
 if __name__ == "__main__":
     main()
