@@ -24,6 +24,98 @@ try:
 except ImportError:
     POSTGRES_AVAILABLE = False
 
+# =============================================================================
+# PostgreSQL wrappers to emulate SQLite-style convenience methods
+# =============================================================================
+class PostgresCursorWrapper:
+    """Adapter for psycopg2 cursor to provide sqlite-style interface (lastrowid, dict rows)."""
+
+    def __init__(self, cursor, connection, executed_query):
+        self._cursor = cursor
+        self._connection = connection
+        self._query = executed_query
+        self._lastrowid = self._extract_lastrowid()
+
+    def _extract_lastrowid(self):
+        query = self._query.lstrip().upper()
+        if not query.startswith("INSERT"):
+            return None
+
+        # Try to infer inserted id using PostgreSQL sequence helpers
+        try:
+            temp_cursor = self._connection.cursor()
+            try:
+                temp_cursor.execute("SELECT LASTVAL()")
+                result = temp_cursor.fetchone()
+                return result[0] if result else None
+            finally:
+                temp_cursor.close()
+        except Exception:
+            return None
+
+    @property
+    def lastrowid(self):
+        return self._lastrowid
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+    def close(self):
+        return self._cursor.close()
+
+    def __iter__(self):
+        return iter(self._cursor)
+
+    def __getattr__(self, item):
+        return getattr(self._cursor, item)
+
+
+class PostgresConnectionWrapper:
+    """Wrapper that mimics sqlite3 connection API for psycopg2 connections."""
+
+    def __init__(self, connection):
+        self._connection = connection
+
+    def _adapt_query(self, query, params):
+        if params is None:
+            adapted_params = None
+        elif isinstance(params, dict):
+            adapted_params = params
+        else:
+            adapted_params = tuple(params)
+
+        if "?" in query:
+            query = query.replace("?", "%s")
+
+        return query, adapted_params
+
+    def cursor(self):
+        return self._connection.cursor(cursor_factory=RealDictCursor)
+
+    def execute(self, query, params=None):
+        adapted_query, adapted_params = self._adapt_query(query, params)
+        cursor = self.cursor()
+        if adapted_params is None:
+            cursor.execute(adapted_query)
+        else:
+            cursor.execute(adapted_query, adapted_params)
+        return PostgresCursorWrapper(cursor, self._connection, adapted_query)
+
+    def commit(self):
+        return self._connection.commit()
+
+    def rollback(self):
+        return self._connection.rollback()
+
+    def close(self):
+        return self._connection.close()
+
+    def __getattr__(self, item):
+        return getattr(self._connection, item)
+
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -95,19 +187,20 @@ class DatabaseManager:
         """Get database connection with proper configuration (SQLite or PostgreSQL)"""
         if self.db_type == "supabase" and POSTGRES_AVAILABLE and self.connection_string:
             # PostgreSQL/Supabase connection
-            conn = None
+            raw_conn = None
             try:
-                conn = psycopg2.connect(self.connection_string)
-                conn.autocommit = False  # Use transactions
+                raw_conn = psycopg2.connect(self.connection_string)
+                raw_conn.autocommit = False  # Use transactions
+                conn = PostgresConnectionWrapper(raw_conn)
                 yield conn
             except Exception as e:
                 logger.error(f"PostgreSQL connection error: {e}")
-                if conn:
-                    conn.rollback()
+                if raw_conn:
+                    raw_conn.rollback()
                 raise
             finally:
-                if conn:
-                    conn.close()
+                if raw_conn:
+                    raw_conn.close()
         else:
             # SQLite connection (default)
             # Add timeout to handle concurrent access (5 seconds)
