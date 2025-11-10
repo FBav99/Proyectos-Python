@@ -27,31 +27,93 @@ except ImportError:
 # =============================================================================
 # PostgreSQL wrappers to emulate SQLite-style convenience methods
 # =============================================================================
+class PostgresConnectionWrapper:
+    """Wrapper that mimics sqlite3 connection API for psycopg2 connections."""
+
+    def __init__(self, connection):
+        self._connection = connection
+
+    def _adapt_query(self, query, params):
+        adapted_query = query.replace("?", "%s") if "?" in query else query
+        adapted_params = self._adapt_params(params)
+        return adapted_query, adapted_params
+
+    def _adapt_params(self, params):
+        if params is None:
+            return None
+        if isinstance(params, dict):
+            return params
+        return tuple(params)
+
+    def cursor(self):
+        raw_cursor = self._connection.cursor(cursor_factory=RealDictCursor)
+        return PostgresCursorWrapper(raw_cursor, self)
+
+    def execute(self, query, params=None):
+        cursor = self.cursor()
+        cursor.execute(query, params)
+        return cursor
+
+    def commit(self):
+        return self._connection.commit()
+
+    def rollback(self):
+        return self._connection.rollback()
+
+    def close(self):
+        return self._connection.close()
+
+    def __getattr__(self, item):
+        return getattr(self._connection, item)
+
+
 class PostgresCursorWrapper:
     """Adapter for psycopg2 cursor to provide sqlite-style interface (lastrowid, dict rows)."""
 
-    def __init__(self, cursor, connection, executed_query):
+    def __init__(self, cursor, connection_wrapper):
         self._cursor = cursor
-        self._connection = connection
-        self._query = executed_query
-        self._lastrowid = self._extract_lastrowid()
+        self._connection_wrapper = connection_wrapper
+        self._lastrowid = None
 
-    def _extract_lastrowid(self):
-        query = self._query.lstrip().upper()
+    def _update_lastrowid(self, adapted_query):
+        query = adapted_query.lstrip().upper()
         if not query.startswith("INSERT"):
-            return None
+            self._lastrowid = None
+            return
 
-        # Try to infer inserted id using PostgreSQL sequence helpers
         try:
-            temp_cursor = self._connection.cursor()
+            temp_cursor = self._connection_wrapper._connection.cursor()
             try:
                 temp_cursor.execute("SELECT LASTVAL()")
                 result = temp_cursor.fetchone()
-                return result[0] if result else None
+                self._lastrowid = result[0] if result else None
             finally:
                 temp_cursor.close()
         except Exception:
-            return None
+            self._lastrowid = None
+
+    def execute(self, query, params=None):
+        adapted_query, adapted_params = self._connection_wrapper._adapt_query(query, params)
+        if adapted_params is None:
+            self._cursor.execute(adapted_query)
+        else:
+            self._cursor.execute(adapted_query, adapted_params)
+        self._update_lastrowid(adapted_query)
+        return self
+
+    def executemany(self, query, seq_of_params):
+        adapted_query, _ = self._connection_wrapper._adapt_query(query, None)
+        if seq_of_params is None:
+            self._cursor.executemany(adapted_query, None)
+            self._lastrowid = None
+            return self
+
+        adapted_params_list = [
+            self._connection_wrapper._adapt_params(params) for params in seq_of_params
+        ]
+        self._cursor.executemany(adapted_query, adapted_params_list)
+        self._lastrowid = None
+        return self
 
     @property
     def lastrowid(self):
@@ -69,52 +131,14 @@ class PostgresCursorWrapper:
     def __iter__(self):
         return iter(self._cursor)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def __getattr__(self, item):
         return getattr(self._cursor, item)
-
-
-class PostgresConnectionWrapper:
-    """Wrapper that mimics sqlite3 connection API for psycopg2 connections."""
-
-    def __init__(self, connection):
-        self._connection = connection
-
-    def _adapt_query(self, query, params):
-        if params is None:
-            adapted_params = None
-        elif isinstance(params, dict):
-            adapted_params = params
-        else:
-            adapted_params = tuple(params)
-
-        if "?" in query:
-            query = query.replace("?", "%s")
-
-        return query, adapted_params
-
-    def cursor(self):
-        return self._connection.cursor(cursor_factory=RealDictCursor)
-
-    def execute(self, query, params=None):
-        adapted_query, adapted_params = self._adapt_query(query, params)
-        cursor = self.cursor()
-        if adapted_params is None:
-            cursor.execute(adapted_query)
-        else:
-            cursor.execute(adapted_query, adapted_params)
-        return PostgresCursorWrapper(cursor, self._connection, adapted_query)
-
-    def commit(self):
-        return self._connection.commit()
-
-    def rollback(self):
-        return self._connection.rollback()
-
-    def close(self):
-        return self._connection.close()
-
-    def __getattr__(self, item):
-        return getattr(self._connection, item)
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
