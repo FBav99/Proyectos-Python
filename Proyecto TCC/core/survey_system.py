@@ -13,6 +13,13 @@ from core.database import db_manager
 logger = logging.getLogger(__name__)
 
 
+def _adapt_query(query: str) -> str:
+    """Adjust placeholder style depending on database backend."""
+    if db_manager.db_type == "supabase":
+        return query.replace("?", "%s")
+    return query
+
+
 class SurveySystem:
     """Handles survey management and responses"""
     
@@ -56,15 +63,15 @@ class SurveySystem:
                 else:
                     cursor = conn.cursor()
                     if level:
-                        cursor.execute("""
+                        cursor.execute(_adapt_query("""
                             SELECT id FROM survey_responses 
                             WHERE user_id = ? AND survey_type = ? AND level = ?
-                        """, (user_id, survey_type, level))
+                        """), (user_id, survey_type, level))
                     else:
-                        cursor.execute("""
+                        cursor.execute(_adapt_query("""
                             SELECT id FROM survey_responses 
                             WHERE user_id = ? AND survey_type = ? AND level IS NULL
-                        """, (user_id, survey_type,))
+                        """), (user_id, survey_type,))
                     existing = cursor.fetchone()
                 
                 if existing:
@@ -84,17 +91,17 @@ class SurveySystem:
                             """, (responses_json, user_id, survey_type,))
                     else:
                         if level:
-                            cursor.execute("""
+                            cursor.execute(_adapt_query("""
                                 UPDATE survey_responses 
                                 SET responses = ?, completed_at = CURRENT_TIMESTAMP
                                 WHERE user_id = ? AND survey_type = ? AND level = ?
-                            """, (responses_json, user_id, survey_type, level))
+                            """), (responses_json, user_id, survey_type, level))
                         else:
-                            cursor.execute("""
+                            cursor.execute(_adapt_query("""
                                 UPDATE survey_responses 
                                 SET responses = ?, completed_at = CURRENT_TIMESTAMP
                                 WHERE user_id = ? AND survey_type = ? AND level IS NULL
-                            """, (responses_json, user_id, survey_type,))
+                            """), (responses_json, user_id, survey_type,))
                 else:
                     # Insert new response
                     if db_manager.db_type == "sqlite":
@@ -103,10 +110,10 @@ class SurveySystem:
                             VALUES (?, ?, ?, ?)
                         """, (user_id, survey_type, level, responses_json))
                     else:
-                        cursor.execute("""
+                        cursor.execute(_adapt_query("""
                             INSERT INTO survey_responses (user_id, survey_type, level, responses)
                             VALUES (?, ?, ?, ?)
-                        """, (user_id, survey_type, level, responses_json))
+                        """), (user_id, survey_type, level, responses_json))
                 
                 conn.commit()
                 return True
@@ -137,15 +144,15 @@ class SurveySystem:
                 else:
                     cursor = conn.cursor()
                     if level:
-                        cursor.execute("""
+                        cursor.execute(_adapt_query("""
                             SELECT id FROM survey_responses 
                             WHERE user_id = ? AND survey_type = ? AND level = ?
-                        """, (user_id, survey_type, level))
+                        """), (user_id, survey_type, level))
                     else:
-                        cursor.execute("""
+                        cursor.execute(_adapt_query("""
                             SELECT id FROM survey_responses 
                             WHERE user_id = ? AND survey_type = ? AND level IS NULL
-                        """, (user_id, survey_type,))
+                        """), (user_id, survey_type,))
                 
                 return cursor.fetchone() is not None
                 
@@ -162,15 +169,15 @@ class SurveySystem:
                 cursor = conn.cursor()
                 
                 if level:
-                    cursor.execute("""
+                    cursor.execute(_adapt_query("""
                         SELECT responses FROM survey_responses 
                         WHERE user_id = ? AND survey_type = ? AND level = ?
-                    """, (user_id, survey_type, level))
+                    """), (user_id, survey_type, level))
                 else:
-                    cursor.execute("""
+                    cursor.execute(_adapt_query("""
                         SELECT responses FROM survey_responses 
                         WHERE user_id = ? AND survey_type = ? AND level IS NULL
-                    """, (user_id, survey_type,))
+                    """), (user_id, survey_type,))
                 
                 result = cursor.fetchone()
                 
@@ -190,16 +197,16 @@ class SurveySystem:
                 cursor = conn.cursor()
                 
                 if survey_type:
-                    cursor.execute("""
+                    cursor.execute(_adapt_query("""
                         SELECT * FROM survey_responses 
                         WHERE survey_type = ?
                         ORDER BY completed_at DESC
-                    """, (survey_type,))
+                    """), (survey_type,))
                 else:
-                    cursor.execute("""
+                    cursor.execute(_adapt_query("""
                         SELECT * FROM survey_responses 
                         ORDER BY completed_at DESC
-                    """)
+                    """))
                 
                 results = cursor.fetchall()
                 responses = []
