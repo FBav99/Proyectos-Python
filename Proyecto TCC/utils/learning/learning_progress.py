@@ -171,27 +171,31 @@ def show_learning_section(total_progress, completed_count, progress):
                 st.error(f"Error al obtener progreso detallado: {e}")
     
     # Navigation buttons
-    col1, col2, col3, col4, col5 = st.columns(5)
+    level_columns = st.columns(5)
     
-    with col1:
+    with level_columns[0]:
+        if st.button("🧭 Nivel 0: Introducción", use_container_width=True, key="learn_nivel0"):
+            st.switch_page("pages/00_Nivel_0_Introduccion.py")
+    
+    with level_columns[1]:
         if st.button("📚 Nivel 1: Básico", type="primary", use_container_width=True, key="learn_nivel1"):
             st.switch_page("pages/01_Nivel_1_Basico.py")
     
-    with col2:
+    with level_columns[2]:
         if st.button("🔍 Nivel 2: Filtros", use_container_width=True, key="learn_nivel2"):
             st.switch_page("pages/02_Nivel_2_Filtros.py")
     
-    with col3:
+    with level_columns[3]:
         if st.button("📊 Nivel 3: Métricas", use_container_width=True, key="learn_nivel3"):
             st.switch_page("pages/03_Nivel_3_Metricas.py")
     
-    with col4:
+    with level_columns[4]:
         if st.button("🚀 Nivel 4: Avanzado", use_container_width=True, key="learn_nivel4"):
             st.switch_page("pages/04_Nivel_4_Avanzado.py")
     
-    with col5:
-        if st.button("❓ Ayuda", use_container_width=True, key="learn_ayuda"):
-            st.switch_page("pages/00_Ayuda.py")
+    st.markdown("")
+    if st.button("❓ Ayuda y Recursos", use_container_width=True, key="learn_ayuda"):
+        st.switch_page("pages/00_Ayuda.py")
     
     # Back button
     if st.button("⬅️ Volver", key="back_from_learning"):
