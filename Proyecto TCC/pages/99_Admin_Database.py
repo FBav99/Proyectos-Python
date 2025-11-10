@@ -255,7 +255,7 @@ def main():
             "Escribe tu query SQL:",
             height=150,
             placeholder="SELECT * FROM users LIMIT 10;",
-            help="Ejemplo: SELECT * FROM users WHERE is_active = 1;"
+            help="Ejemplo: SELECT * FROM users WHERE is_active = TRUE;"
         )
         
         col1, col2 = st.columns([1, 4])
@@ -287,7 +287,7 @@ def main():
         
         quick_queries = {
             "Ver todos los usuarios": "SELECT id, username, email, created_at, is_active FROM users;",
-            "Usuarios activos": "SELECT id, username, email FROM users WHERE is_active = 1;",
+            "Usuarios activos": "SELECT id, username, email FROM users WHERE is_active = TRUE;",
             "Conteo por tabla": """
             SELECT 
                 'users' as tabla, COUNT(*) as registros FROM users

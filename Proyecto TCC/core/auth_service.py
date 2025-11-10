@@ -144,8 +144,8 @@ class AuthService:
             with db_manager.get_connection() as conn:
                 cursor = conn.execute("""
                     SELECT * FROM users 
-                    WHERE username = ? AND is_active = 1
-                """, (username,))
+                    WHERE username = ? AND is_active = ?
+                """, (username, db_manager.get_boolean_value(True)))
                 user = cursor.fetchone()
             
             if not user:
@@ -342,8 +342,8 @@ class AuthService:
                 cursor = conn.execute("""
                     SELECT id, username, email, first_name, last_name, is_active
                     FROM users 
-                    WHERE username = ? AND is_active = 1
-                """, (username,))
+                    WHERE username = ? AND is_active = ?
+                """, (username, db_manager.get_boolean_value(True)))
                 user = cursor.fetchone()
             
             if not user:
@@ -433,8 +433,8 @@ class AuthService:
                     SELECT us.*, u.username, u.email, u.first_name, u.last_name, u.is_active
                     FROM user_sessions us
                     JOIN users u ON us.user_id = u.id
-                    WHERE us.session_token = ? AND us.expires_at > ? AND u.is_active = 1
-                """, (session_token, datetime.now().isoformat()))
+                    WHERE us.session_token = ? AND us.expires_at > ? AND u.is_active = ?
+                """, (session_token, datetime.now().isoformat(), db_manager.get_boolean_value(True)))
                 
                 session_data = cursor.fetchone()
                 

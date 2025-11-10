@@ -182,6 +182,12 @@ class DatabaseManager:
         else:
             return conn.execute(sql)
     
+    def get_boolean_value(self, value: bool):
+        """Return appropriate boolean representation depending on database type"""
+        if self.db_type == "supabase":
+            return value
+        return 1 if value else 0
+    
     @contextmanager
     def get_connection(self):
         """Get database connection with proper configuration (SQLite or PostgreSQL)"""

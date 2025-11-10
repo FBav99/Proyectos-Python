@@ -76,8 +76,8 @@ def main():
                         cursor = conn.execute("""
                             SELECT id, username, email, first_name, last_name 
                             FROM users 
-                            WHERE username = ? AND is_active = 1
-                        """, (username_sanitized,))
+                            WHERE username = ? AND is_active = ?
+                        """, (username_sanitized, db_manager.get_boolean_value(True)))
                         user = cursor.fetchone()
                     
                     if user:
