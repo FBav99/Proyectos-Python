@@ -235,6 +235,8 @@ class DatabaseManager:
         # File upload tables (needed for data analysis)
         self.create_uploaded_files_table()
         self.create_file_analysis_sessions_table()
+        self.create_dashboards_table()
+        self.create_dashboard_components_table()
         
         # Optional tables (can be enabled later if needed)
         # self.create_user_activity_log_table()
