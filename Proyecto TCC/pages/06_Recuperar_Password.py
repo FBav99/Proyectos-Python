@@ -73,11 +73,12 @@ def main():
                     # Check if user exists and get email
                     username_sanitized = username.strip()
                     with db_manager.get_connection() as conn:
-                        cursor = conn.execute("""
+                        active_literal = db_manager.get_boolean_literal(True)
+                        cursor = conn.execute(f"""
                             SELECT id, username, email, first_name, last_name 
                             FROM users 
-                            WHERE username = ? AND is_active = ?
-                        """, (username_sanitized, db_manager.get_boolean_value(True)))
+                            WHERE username = ? AND is_active = {active_literal}
+                        """, (username_sanitized,))
                         user = cursor.fetchone()
                     
                     if user:

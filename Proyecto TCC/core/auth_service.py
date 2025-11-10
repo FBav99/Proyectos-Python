@@ -142,10 +142,11 @@ class AuthService:
             
             # Get user from database
             with db_manager.get_connection() as conn:
-                cursor = conn.execute("""
+                active_literal = db_manager.get_boolean_literal(True)
+                cursor = conn.execute(f"""
                     SELECT * FROM users 
-                    WHERE username = ? AND is_active = ?
-                """, (username, db_manager.get_boolean_value(True)))
+                    WHERE username = ? AND is_active = {active_literal}
+                """, (username,))
                 user = cursor.fetchone()
             
             if not user:
@@ -339,11 +340,12 @@ class AuthService:
             
             # Find user by username
             with db_manager.get_connection() as conn:
-                cursor = conn.execute("""
+                active_literal = db_manager.get_boolean_literal(True)
+                cursor = conn.execute(f"""
                     SELECT id, username, email, first_name, last_name, is_active
                     FROM users 
-                    WHERE username = ? AND is_active = ?
-                """, (username, db_manager.get_boolean_value(True)))
+                    WHERE username = ? AND is_active = {active_literal}
+                """, (username,))
                 user = cursor.fetchone()
             
             if not user:
@@ -429,12 +431,13 @@ class AuthService:
         """Verify if a session is valid and return user data"""
         try:
             with db_manager.get_connection() as conn:
-                cursor = conn.execute("""
+                active_literal = db_manager.get_boolean_literal(True)
+                cursor = conn.execute(f"""
                     SELECT us.*, u.username, u.email, u.first_name, u.last_name, u.is_active
                     FROM user_sessions us
                     JOIN users u ON us.user_id = u.id
-                    WHERE us.session_token = ? AND us.expires_at > ? AND u.is_active = ?
-                """, (session_token, datetime.now().isoformat(), db_manager.get_boolean_value(True)))
+                    WHERE us.session_token = ? AND us.expires_at > ? AND u.is_active = {active_literal}
+                """, (session_token, datetime.now().isoformat()))
                 
                 session_data = cursor.fetchone()
                 
