@@ -1,6 +1,59 @@
 import streamlit as st
 from core.auth_service import login_user, logout_user, get_current_user as db_get_current_user
 
+HIDDEN_NAVIGATION_PATTERNS = [
+    "pages/99_Survey",
+    "pages/99_Admin",
+    "/99_Survey",
+    "/99_Admin",
+    "99_Survey_",
+    "99_Admin_",
+]
+
+
+def hide_restricted_sidebar_entries():
+    """Inject CSS rules to hide restricted pages from the sidebar navigation."""
+    if not HIDDEN_NAVIGATION_PATTERNS:
+        return
+
+    selectors = []
+    for pattern in HIDDEN_NAVIGATION_PATTERNS:
+        selectors.append(f'section[data-testid="stSidebar"] a[href*="{pattern}"]')
+        selectors.append(f'section[data-testid="stSidebar"] li a[href*="{pattern}"]')
+        selectors.append(f'section[data-testid="stSidebar"] button[href*="{pattern}"]')
+    combined_selector = ", ".join(selectors)
+    css_rules = f"{combined_selector} {{ display: none !important; }}"
+    st.markdown(f"<style>{css_rules}</style>", unsafe_allow_html=True)
+
+    scripts = """
+    <script>
+    const __dashboardHiddenKeywords = ["encuesta", "survey", "admin database", "admin backup", "admin"];
+    const __hideRestrictedNav = () => {
+        const doc = window.parent?.document || document;
+        const sidebar = doc.querySelector('section[data-testid="stSidebar"]');
+        if (!sidebar) { return; }
+        const links = sidebar.querySelectorAll('a, button');
+        links.forEach(link => {
+            const text = (link.innerText || "").trim().toLowerCase();
+            const href = (link.getAttribute("href") || "").toLowerCase();
+            if (__dashboardHiddenKeywords.some(keyword => text.includes(keyword) || href.includes(keyword))) {
+                link.style.display = "none";
+                if (link.parentElement && link.parentElement.tagName === "LI") {
+                    link.parentElement.style.display = "none";
+                }
+            }
+        });
+    };
+    const __sidebarObserver = new MutationObserver(() => __hideRestrictedNav());
+    __sidebarObserver.observe(window.parent?.document?.body || document.body, { childList: true, subtree: true });
+    setInterval(__hideRestrictedNav, 800);
+    window.addEventListener("load", __hideRestrictedNav);
+    __hideRestrictedNav();
+    </script>
+    """
+    st.markdown(scripts, unsafe_allow_html=True)
+
+
 def show_login_form():
     """Display the login form for unauthenticated users"""
     st.markdown("""
@@ -45,11 +98,18 @@ def show_login_form():
 
 def show_user_sidebar(current_user=None):
     """Display user information and logout button in sidebar - Always shows username prominently"""
+    hide_restricted_sidebar_entries()
     with st.sidebar:
         st.markdown("### 👤 Usuario")
         st.markdown("---")
         
         if current_user:
+            # Persist authenticated user info in session state for cross-page utilities
+            st.session_state['auth_user'] = current_user
+            st.session_state['auth_user_id'] = current_user.get('id')
+            st.session_state['auth_username'] = current_user.get('username')
+            st.session_state['auth_user_full_name'] = f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip()
+
             # Handle both database users and OAuth users
             if 'oauth_provider' in current_user:
                 # OAuth user
@@ -88,6 +148,11 @@ def show_user_sidebar(current_user=None):
             
             return name
         else:
+            # Clear cached auth info
+            st.session_state.pop('auth_user', None)
+            st.session_state.pop('auth_user_id', None)
+            st.session_state.pop('auth_username', None)
+            st.session_state.pop('auth_user_full_name', None)
             # Not authenticated - show login prompt with clear indication
             st.markdown(f"""
             <div style="background: #f0f0f0; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center; border: 2px solid #ff6b6b;">

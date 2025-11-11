@@ -294,13 +294,36 @@ def render_component(component, df):
             ]
             st.rerun()
 
+
 def render_dashboard(df):
     """Render the complete dashboard"""
-    if not st.session_state.dashboard_components:
+    components = st.session_state.get('dashboard_components', [])
+    if not components:
         st.info("🎨 No hay componentes en tu dashboard. Usa la barra lateral para agregar componentes.")
         return
-    
-    # Render each component
-    for component in st.session_state.dashboard_components:
-        render_component(component, df)
-        st.markdown("---")
+
+    layout_rows = {}
+    fallback_row_base = 1000
+
+    for idx, component in enumerate(components):
+        layout = component.get('layout') or {}
+        row_key = layout.get('row')
+        if row_key is None:
+            row_key = fallback_row_base + idx
+        order = layout.get('order', idx)
+        col_span = layout.get('col_span', layout.get('width', 12))
+        col_span = max(1, col_span)
+        layout_rows.setdefault(row_key, []).append({
+            'order': order,
+            'col_span': col_span,
+            'component': component
+        })
+
+    for row_key in sorted(layout_rows.keys()):
+        row_components = sorted(layout_rows[row_key], key=lambda item: item['order'])
+        column_spans = [item['col_span'] for item in row_components]
+        columns = st.columns(column_spans)
+
+        for col, item in zip(columns, row_components):
+            with col:
+                render_component(item['component'], df)

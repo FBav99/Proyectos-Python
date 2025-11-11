@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
+
 def get_default_config(component_type, df):
     """Get default configuration for a component type"""
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -240,78 +241,94 @@ def configure_component(component, df):
         key=f"title_{component['id']}"
     )
 
-def create_component_buttons():
+def create_component_buttons(key_prefix="", expand_all=False):
     """Create buttons for adding different component types"""
     st.markdown("### 🎯 Tipos de Componentes")
     
     # Metrics category
-    with st.expander("📈 Métricas y KPIs", expanded=False):
+    with st.expander("📈 Métricas y KPIs", expanded=expand_all):
         st.markdown("**Indicadores numéricos clave**")
-        if st.button("📊 Agregar Métrica", key="add_metric", use_container_width=True):
+        if st.button("📊 Agregar Métrica", key=f"{key_prefix}add_metric", use_container_width=True):
             return "📈 Métricas"
     
     # Charts category
-    with st.expander("📊 Gráficos Básicos", expanded=False):
+    with st.expander("📊 Gráficos Básicos", expanded=expand_all):
         st.markdown("**Visualizaciones fundamentales**")
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("📈 Líneas", key="add_line", use_container_width=True):
+            if st.button("📈 Líneas", key=f"{key_prefix}add_line", use_container_width=True):
                 return "📊 Gráfico de Líneas"
             
-            if st.button("📋 Barras", key="add_bar", use_container_width=True):
+            if st.button("📋 Barras", key=f"{key_prefix}add_bar", use_container_width=True):
                 return "📋 Gráfico de Barras"
         
         with col2:
-            if st.button("🥧 Circular", key="add_pie", use_container_width=True):
+            if st.button("🥧 Circular", key=f"{key_prefix}add_pie", use_container_width=True):
                 return "🥧 Gráfico Circular"
             
-            if st.button("📈 Área", key="add_area", use_container_width=True):
+            if st.button("📈 Área", key=f"{key_prefix}add_area", use_container_width=True):
                 return "📈 Gráfico de Área"
     
     # Advanced charts category
-    with st.expander("🔬 Gráficos Avanzados", expanded=False):
+    with st.expander("🔬 Gráficos Avanzados", expanded=expand_all):
         st.markdown("**Análisis estadístico avanzado**")
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("📈 Dispersión", key="add_scatter", use_container_width=True):
+            if st.button("📈 Dispersión", key=f"{key_prefix}add_scatter", use_container_width=True):
                 return "📈 Gráfico de Dispersión"
             
-            if st.button("📊 Histograma", key="add_hist", use_container_width=True):
+            if st.button("📊 Histograma", key=f"{key_prefix}add_hist", use_container_width=True):
                 return "📊 Histograma"
         
         with col2:
-            if st.button("📊 Box Plot", key="add_box", use_container_width=True):
+            if st.button("📊 Box Plot", key=f"{key_prefix}add_box", use_container_width=True):
                 return "📊 Box Plot"
             
-            if st.button("📈 Violín", key="add_violin", use_container_width=True):
+            if st.button("📈 Violín", key=f"{key_prefix}add_violin", use_container_width=True):
                 return "📈 Gráfico de Violín"
     
     # Analysis category
-    with st.expander("🔍 Análisis", expanded=False):
+    with st.expander("🔍 Análisis", expanded=expand_all):
         st.markdown("**Herramientas de análisis**")
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("📊 Correlación", key="add_correlation", use_container_width=True):
+            if st.button("📊 Correlación", key=f"{key_prefix}add_correlation", use_container_width=True):
                 return "📊 Matriz de Correlación"
         
         with col2:
-            if st.button("📋 Tabla", key="add_table", use_container_width=True):
+            if st.button("📋 Tabla", key=f"{key_prefix}add_table", use_container_width=True):
                 return "📋 Tabla de Datos"
     
     return None
 
-def add_component_to_dashboard(component_type, df):
+
+def add_component_to_dashboard(component_type, df, *, layout=None, overrides=None, title=None):
     """Add a new component to the dashboard"""
-    if component_type:
-        new_component = {
-            'id': len(st.session_state.dashboard_components),
-            'type': component_type,
-            'title': f"Nuevo {component_type}",
-            'config': get_default_config(component_type, df)
-        }
-        st.session_state.dashboard_components.append(new_component)
-        return True
-    return False
+    if not component_type:
+        return False
+
+    if 'dashboard_components' not in st.session_state:
+        st.session_state.dashboard_components = []
+
+    if 'dashboard_component_counter' not in st.session_state:
+        st.session_state.dashboard_component_counter = 0
+
+    component_id = st.session_state.dashboard_component_counter
+    st.session_state.dashboard_component_counter += 1
+
+    config = get_default_config(component_type, df) or {}
+    if overrides:
+        config.update({k: v for k, v in overrides.items() if v is not None})
+
+    new_component = {
+        'id': component_id,
+        'type': component_type,
+        'title': title or f"Nuevo {component_type}",
+        'config': config,
+        'layout': layout or {}
+    }
+    st.session_state.dashboard_components.append(new_component)
+    return True
