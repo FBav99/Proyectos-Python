@@ -19,9 +19,11 @@ import bcrypt
 # Try to import PostgreSQL support (optional - for Supabase)
 try:
     import psycopg2
+    from psycopg2 import OperationalError as PsycopgOperationalError
     from psycopg2.extras import RealDictCursor
     POSTGRES_AVAILABLE = True
 except ImportError:
+    PsycopgOperationalError = None
     POSTGRES_AVAILABLE = False
 
 # =============================================================================
@@ -183,6 +185,7 @@ class DatabaseManager:
         self.db_path = db_path
         self.db_type = get_db_type()
         self.connection_string = get_supabase_connection_string() if self.db_type == "supabase" else None
+        self.supabase_fallback_active = False
         self.ensure_migrations_dir()
         
         # Verificar disponibilidad de PostgreSQL si se requiere
@@ -190,6 +193,23 @@ class DatabaseManager:
             logger.warning("Supabase configurado pero psycopg2 no está instalado. Usando SQLite.")
             logger.warning("Instala con: pip install psycopg2-binary")
             self.db_type = "sqlite"
+
+    def _should_fallback_to_sqlite(self, error: Exception) -> bool:
+        """Determine if we should fallback to SQLite when Supabase connection fails."""
+        if self.db_type != "supabase" or self.supabase_fallback_active:
+            return False
+        if PsycopgOperationalError is not None and isinstance(error, PsycopgOperationalError):
+            return True
+        return False
+
+    def _switch_to_sqlite_backend(self):
+        """Switch database manager to SQLite backend after Supabase failure."""
+        if self.db_type == "supabase":
+            logger.warning("Supabase connection unavailable. Falling back to SQLite for this session.")
+            logger.info("Set database.db_type='sqlite' en .streamlit/secrets.toml para ejecución local o verifica las credenciales de Supabase.")
+            self.db_type = "sqlite"
+            self.connection_string = None
+            self.supabase_fallback_active = True
     
     def ensure_migrations_dir(self):
         """Asegura que el directorio de migraciones existe"""
@@ -219,12 +239,25 @@ class DatabaseManager:
             # PostgreSQL/Supabase connection
             raw_conn = None
             try:
-                raw_conn = psycopg2.connect(self.connection_string)
+                raw_conn = psycopg2.connect(self.connection_string, connect_timeout=5)
                 raw_conn.autocommit = False  # Use transactions
                 conn = PostgresConnectionWrapper(raw_conn)
                 yield conn
-            except Exception as e:
+            except PsycopgOperationalError as e:
                 logger.error(f"PostgreSQL connection error: {e}")
+                if raw_conn:
+                    raw_conn.rollback()
+                if self._should_fallback_to_sqlite(e):
+                    if raw_conn:
+                        raw_conn.close()
+                        raw_conn = None
+                    self._switch_to_sqlite_backend()
+                    with self.get_connection() as fallback_conn:
+                        yield fallback_conn
+                    return
+                raise
+            except Exception as e:
+                logger.error(f"Unexpected PostgreSQL error: {e}")
                 if raw_conn:
                     raw_conn.rollback()
                 raise
