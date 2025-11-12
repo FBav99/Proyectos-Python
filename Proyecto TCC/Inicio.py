@@ -5,11 +5,13 @@ Autor: Fernando Bavera Villalba
 Fecha: 25/10/2025
 """
 
+import logging
 import streamlit as st
 
 # Imports de módulos core
 from core.config import apply_custom_css
-from core.data_quality_analyzer import data_quality_page
+from core.data_loader import load_sample_data
+from core.data_quality_analyzer import analyze_data_quality, data_quality_page
 from core.database import init_database, check_database_exists
 
 # Imports de módulos utils
@@ -23,9 +25,53 @@ from utils.ui import (clear_selected_template, get_current_user,
                       handle_authentication, should_show_main_content,
                       show_header, show_quick_start_section)
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
+from data.sample_datasets import get_sample_datasets
+
+logger = logging.getLogger(__name__)
+
+HERO_BANNER_HTML = """
+<div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 1.75rem; border-radius: 18px; margin: 1.5rem 0 2rem; box-shadow: 0 20px 35px rgba(15,23,42,0.18); border: 1px solid rgba(255,255,255,0.2);">
+    <h2 style="color: #e2e8f0; margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem;">🌟 Bienvenido al piloto de la Plataforma TCC</h2>
+    <p style="color: rgba(226,232,240,0.95); font-size: 1rem; margin-bottom: 1rem; text-align: center;">
+        Estás probando una versión en preparación de nuestra guía interactiva para analizar datos desde cero: carga tus propios archivos,
+        evalúa la calidad, aplica limpiezas guiadas y diseña dashboards personalizados siguiendo niveles paso a paso.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 1rem;">
+        <div style="background: rgba(15, 118, 110, 0.2); border-radius: 12px; padding: 1rem; border: 1px solid rgba(16,185,129,0.35);">
+            <h4 style="color: #bbf7d0; margin: 0 0 0.3rem 0;">Aprendizaje guiado</h4>
+            <p style="color: #e2e8f0; margin: 0; font-size: 0.9rem;">Recorre niveles prácticos que explican cada paso con ejemplos claros y sin tecnicismos innecesarios.</p>
+        </div>
+        <div style="background: rgba(59, 130, 246, 0.18); border-radius: 12px; padding: 1rem; border: 1px solid rgba(96,165,250,0.35);">
+            <h4 style="color: #bfdbfe; margin: 0 0 0.3rem 0;">Procesamiento de datos</h4>
+            <p style="color: #e2e8f0; margin: 0; font-size: 0.9rem;">Sube tus archivos CSV o Excel, revisa la calidad y aplica limpiezas guiadas antes de visualizar.</p>
+        </div>
+        <div style="background: rgba(129, 140, 248, 0.18); border-radius: 12px; padding: 1rem; border: 1px solid rgba(165,180,252,0.35);">
+            <h4 style="color: #c7d2fe; margin: 0 0 0.3rem 0;">Dashboards a medida</h4>
+            <p style="color: #e2e8f0; margin: 0; font-size: 0.9rem;">Combina componentes visuales, guarda tus configuraciones y exporta resultados para compartirlos.</p>
+        </div>
+    </div>
+    <p style="color: rgba(226,232,240,0.85); font-size: 0.9rem; margin-top: 1.4rem; text-align: center;">
+        Tu feedback es clave en esta etapa piloto: completa la encuesta inicial y cuéntanos qué te resulta útil o qué mejorarías.
+    </p>
+</div>
+"""
 
 # Configure error handling
 configure_streamlit_error_handling()
+
+
+def warm_initial_caches():
+    """Preload heavy resources once per session to avoid cloud cold-start delays."""
+    if st.session_state.get("_warm_start_complete"):
+        return
+    try:
+        sample_df = load_sample_data()
+        analyze_data_quality(sample_df)
+        get_sample_datasets()
+    except Exception as exc:  # pragma: no cover - defensive logging for cloud traces
+        logger.debug("Cache warm-up skipped: %s", exc)
+    st.session_state["_warm_start_complete"] = True
+
 
 # ============================================================================
 # MAIN FUNCTION
@@ -47,6 +93,7 @@ def main():
         initial_sidebar_state="expanded"
     )
     apply_custom_css()
+    warm_initial_caches()
     
     # Autenticación del usuario
     current_user, name = handle_authentication()
@@ -60,32 +107,7 @@ def main():
     show_header(name)
     
     # Resumen contextual durante la fase de pruebas
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 1.75rem; border-radius: 18px; margin: 1.5rem 0 2rem; box-shadow: 0 20px 35px rgba(15,23,42,0.18); border: 1px solid rgba(255,255,255,0.2);">
-        <h2 style="color: #e2e8f0; margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem;">🌟 Bienvenido al piloto de la Plataforma TCC</h2>
-        <p style="color: rgba(226,232,240,0.95); font-size: 1rem; margin-bottom: 1rem; text-align: center;">
-            Estás probando una versión en preparación de nuestra guía interactiva para analizar datos desde cero: carga tus propios archivos,
-            evalúa la calidad, aplica limpiezas guiadas y diseña dashboards personalizados siguiendo niveles paso a paso.
-        </p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 1rem;">
-            <div style="background: rgba(15, 118, 110, 0.2); border-radius: 12px; padding: 1rem; border: 1px solid rgba(16,185,129,0.35);">
-                <h4 style="color: #bbf7d0; margin: 0 0 0.3rem 0;">Aprendizaje guiado</h4>
-                <p style="color: #e2e8f0; margin: 0; font-size: 0.9rem;">Recorre niveles prácticos que explican cada paso con ejemplos claros y sin tecnicismos innecesarios.</p>
-            </div>
-            <div style="background: rgba(59, 130, 246, 0.18); border-radius: 12px; padding: 1rem; border: 1px solid rgba(96,165,250,0.35);">
-                <h4 style="color: #bfdbfe; margin: 0 0 0.3rem 0;">Procesamiento de datos</h4>
-                <p style="color: #e2e8f0; margin: 0; font-size: 0.9rem;">Sube tus archivos CSV o Excel, revisa la calidad y aplica limpiezas guiadas antes de visualizar.</p>
-            </div>
-            <div style="background: rgba(129, 140, 248, 0.18); border-radius: 12px; padding: 1rem; border: 1px solid rgba(165,180,252,0.35);">
-                <h4 style="color: #c7d2fe; margin: 0 0 0.3rem 0;">Dashboards a medida</h4>
-                <p style="color: #e2e8f0; margin: 0; font-size: 0.9rem;">Combina componentes visuales, guarda tus configuraciones y exporta resultados para compartirlos.</p>
-            </div>
-        </div>
-        <p style="color: rgba(226,232,240,0.85); font-size: 0.9rem; margin-top: 1.4rem; text-align: center;">
-            Tu feedback es clave en esta etapa piloto: completa la encuesta inicial y cuéntanos qué te resulta útil o qué mejorarías.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(HERO_BANNER_HTML, unsafe_allow_html=True)
     
     # Obtener progreso del usuario desde la base de datos (solo para usuarios DB, no OAuth)
     if 'oauth_provider' not in current_user:

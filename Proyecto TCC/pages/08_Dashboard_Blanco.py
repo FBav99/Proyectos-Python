@@ -47,6 +47,56 @@ from core.streamlit_error_handler import safe_main, configure_streamlit_error_ha
 # Configure error handling
 configure_streamlit_error_handling()
 
+DASHBOARD_CUSTOM_CSS = """
+<style>
+.dashboard-setup-card{
+    background: var(--secondary-background-color);
+    padding: 1.5rem 2rem;
+    border-radius: 20px;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(148,163,184,0.18);
+    box-shadow: 0 20px 38px rgba(15,23,42,0.08);
+}
+.dashboard-section-divider{
+    width: 100%;
+    height: 1px;
+    margin: 1.75rem 0;
+    background: linear-gradient(90deg, rgba(148,163,184,0), rgba(148,163,184,0.35), rgba(148,163,184,0));
+}
+.dashboard-subtle-divider{
+    width: 100%;
+    height: 1px;
+    margin: 1.25rem 0;
+    background: linear-gradient(90deg, rgba(148,163,184,0), rgba(148,163,184,0.2), rgba(148,163,184,0));
+}
+.dashboard-builder-card{
+    background: var(--background-color);
+    border: 1px dashed rgba(148,163,184,0.4);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+}
+.dashboard-info-card{
+    background: var(--secondary-background-color);
+    padding: 1.5rem;
+    border-radius: 18px;
+    margin: 1.5rem 0;
+    box-shadow: 0 16px 30px rgba(15,23,42,0.08);
+    border: 1px solid rgba(148,163,184,0.18);
+}
+.dashboard-canvas{
+    background: var(--background-color);
+    padding: 2rem;
+    border-radius: 20px;
+    margin-top: 1.5rem;
+    box-shadow: 0 24px 45px rgba(15,23,42,0.12);
+    border: 1px solid rgba(148,163,184,0.16);
+}
+.dashboard-canvas > div[data-testid="stVerticalBlock"]{
+    padding-top: 0;
+}
+</style>
+"""
+
 
 def load_uploaded_dataframe(uploaded_file):
     """Carga un archivo subido por el usuario y devuelve un DataFrame."""
@@ -716,58 +766,7 @@ def main():
     if 'dashboard_selected_template_title' not in st.session_state:
         st.session_state.dashboard_selected_template_title = None
 
-    st.markdown(
-        """
-        <style>
-        .dashboard-setup-card{
-            background: var(--secondary-background-color);
-            padding: 1.5rem 2rem;
-            border-radius: 20px;
-            margin-top: 1.5rem;
-            border: 1px solid rgba(148,163,184,0.18);
-            box-shadow: 0 20px 38px rgba(15,23,42,0.08);
-        }
-        .dashboard-section-divider{
-            width: 100%;
-            height: 1px;
-            margin: 1.75rem 0;
-            background: linear-gradient(90deg, rgba(148,163,184,0), rgba(148,163,184,0.35), rgba(148,163,184,0));
-        }
-        .dashboard-subtle-divider{
-            width: 100%;
-            height: 1px;
-            margin: 1.25rem 0;
-            background: linear-gradient(90deg, rgba(148,163,184,0), rgba(148,163,184,0.2), rgba(148,163,184,0));
-        }
-        .dashboard-builder-card{
-            background: var(--background-color);
-            border: 1px dashed rgba(148,163,184,0.4);
-            border-radius: 16px;
-            padding: 1.25rem 1.5rem;
-        }
-        .dashboard-info-card{
-            background: var(--secondary-background-color);
-            padding: 1.5rem;
-            border-radius: 18px;
-            margin: 1.5rem 0;
-            box-shadow: 0 16px 30px rgba(15,23,42,0.08);
-            border: 1px solid rgba(148,163,184,0.18);
-        }
-        .dashboard-canvas{
-            background: var(--background-color);
-            padding: 2rem;
-            border-radius: 20px;
-            margin-top: 1.5rem;
-            box-shadow: 0 24px 45px rgba(15,23,42,0.12);
-            border: 1px solid rgba(148,163,184,0.16);
-        }
-        .dashboard-canvas > div[data-testid="stVerticalBlock"]{
-            padding-top: 0;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown(DASHBOARD_CUSTOM_CSS, unsafe_allow_html=True)
 
     st.markdown('<div class="dashboard-setup-card">', unsafe_allow_html=True)
 

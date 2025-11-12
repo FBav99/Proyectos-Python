@@ -24,14 +24,20 @@ try:
 except ImportError:
     POSTGRES_AVAILABLE = False
 
+try:
+    import streamlit as st  # type: ignore
+except ImportError:  # pragma: no cover - Streamlit not available in all environments
+    st = None
+
 # =============================================================================
 # PostgreSQL wrappers to emulate SQLite-style convenience methods
 # =============================================================================
 class PostgresConnectionWrapper:
     """Wrapper that mimics sqlite3 connection API for psycopg2 connections."""
 
-    def __init__(self, connection):
+    def __init__(self, connection, pool=None):
         self._connection = connection
+        self._pool = pool
 
     def _adapt_query(self, query, params):
         adapted_query = query.replace("?", "%s") if "?" in query else query
@@ -61,7 +67,11 @@ class PostgresConnectionWrapper:
         return self._connection.rollback()
 
     def close(self):
-        return self._connection.close()
+        if self._pool and self._connection:
+            self._pool.putconn(self._connection)
+            self._connection = None
+        elif self._connection:
+            return self._connection.close()
 
     def __getattr__(self, item):
         return getattr(self._connection, item)
@@ -148,6 +158,21 @@ logger = logging.getLogger(__name__)
 DB_PATH = 'tcc_database.db'
 MIGRATIONS_DIR = 'migrations'
 
+if POSTGRES_AVAILABLE:
+    if st is not None:
+        @st.cache_resource(show_spinner=False)
+        def get_connection_pool(connection_string: str):
+            from psycopg2.pool import SimpleConnectionPool
+            return SimpleConnectionPool(minconn=1, maxconn=5, dsn=connection_string)
+    else:
+        _POOL_CACHE: Dict[str, Any] = {}
+
+        def get_connection_pool(connection_string: str):
+            from psycopg2.pool import SimpleConnectionPool
+            if connection_string not in _POOL_CACHE:
+                _POOL_CACHE[connection_string] = SimpleConnectionPool(minconn=1, maxconn=5, dsn=connection_string)
+            return _POOL_CACHE[connection_string]
+
 # Detectar tipo de base de datos desde secrets (Streamlit Cloud)
 def get_db_type():
     """Detecta el tipo de base de datos desde secrets"""
@@ -216,20 +241,27 @@ class DatabaseManager:
     def get_connection(self):
         """Get database connection with proper configuration (SQLite or PostgreSQL)"""
         if self.db_type == "supabase" and POSTGRES_AVAILABLE and self.connection_string:
-            # PostgreSQL/Supabase connection
+            # PostgreSQL/Supabase connection (with optional pooling)
+            pool = get_connection_pool(self.connection_string) if 'get_connection_pool' in globals() else None
             raw_conn = None
+            wrapper = None
             try:
-                raw_conn = psycopg2.connect(self.connection_string)
+                raw_conn = pool.getconn() if pool else psycopg2.connect(self.connection_string)
                 raw_conn.autocommit = False  # Use transactions
-                conn = PostgresConnectionWrapper(raw_conn)
-                yield conn
+                wrapper = PostgresConnectionWrapper(raw_conn, pool if pool else None)
+                yield wrapper
             except Exception as e:
                 logger.error(f"PostgreSQL connection error: {e}")
                 if raw_conn:
-                    raw_conn.rollback()
+                    try:
+                        raw_conn.rollback()
+                    except Exception:
+                        pass
                 raise
             finally:
-                if raw_conn:
+                if wrapper:
+                    wrapper.close()
+                elif raw_conn:
                     raw_conn.close()
         else:
             # SQLite connection (default)
