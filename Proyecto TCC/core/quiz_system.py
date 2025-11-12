@@ -168,150 +168,194 @@ QUIZ_QUESTIONS = {
     ]
 }
 
+LEVEL_HEADERS = {
+    'nivel0': 'Nivel 0: Introducción',
+    'nivel1': 'Nivel 1: Básico',
+    'nivel2': 'Nivel 2: Filtros',
+    'nivel3': 'Nivel 3: Métricas',
+    'nivel4': 'Nivel 4: Avanzado',
+}
+
+NEXT_LEVEL_DESTINATIONS = {
+    'nivel0': ("pages/01_Nivel_1_Basico.py", "Nivel 1: Básico"),
+    'nivel1': ("pages/02_Nivel_2_Filtros.py", "Nivel 2: Filtros"),
+    'nivel2': ("pages/03_Nivel_3_Metricas.py", "Nivel 3: Métricas"),
+    'nivel3': ("pages/04_Nivel_4_Avanzado.py", "Nivel 4: Avanzado"),
+    'nivel4': ("Inicio.py", "Inicio"),
+}
+
+
+def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
+    """Clear quiz-related session state values."""
+    prefix = f'quiz_{level}'
+    keys_to_clear = [
+        f'{prefix}_started',
+        f'{prefix}_current_question',
+        f'{prefix}_score',
+        f'{prefix}_answers',
+        f'{prefix}_completed',
+        f'{prefix}_question_order',
+        f'{prefix}_last_feedback',
+        f'{prefix}_skipped',
+    ]
+    for key in keys_to_clear:
+        st.session_state.pop(key, None)
+
+    # Remove legacy flags and selection keys
+    for idx in range(total_questions):
+        st.session_state.pop(f'{prefix}_answered_{idx}', None)
+        st.session_state.pop(f'{prefix}_q{idx}', None)
+        st.session_state.pop(f'{prefix}_q_{idx}', None)
+        st.session_state.pop(f'{prefix}_submit_{idx}', None)
+
+    if keep_expanded:
+        st.session_state[f'{prefix}_expanded'] = True
+    else:
+        st.session_state.pop(f'{prefix}_expanded', None)
 def create_quiz(level, username):
-    """Create and display a quiz for a specific level"""
-    
-    st.markdown(f"## 🧠 Quiz - Nivel {level[-1]}")
-    st.markdown("### Pon a prueba tus conocimientos")
-    
-    # Get questions for the level
+    """Create and display a quiz for a specific level."""
+
     questions = QUIZ_QUESTIONS.get(level, [])
-    
+
     if not questions:
         st.error("No hay preguntas disponibles para este nivel.")
         return
-    
-    # Initialize quiz state
-    if f'quiz_{level}_started' not in st.session_state:
-        st.session_state[f'quiz_{level}_started'] = False
-        st.session_state[f'quiz_{level}_current_question'] = 0
-        st.session_state[f'quiz_{level}_score'] = 0
-        st.session_state[f'quiz_{level}_answers'] = []
-        st.session_state[f'quiz_{level}_completed'] = False
-    
-    # Start quiz
-    if not st.session_state[f'quiz_{level}_started']:
-        st.markdown("""
-        ### 📋 Instrucciones:
-        - Responde 5 preguntas sobre los conceptos aprendidos
-        - Cada pregunta tiene 4 opciones, solo una es correcta
-        - Obtendrás retroalimentación inmediata
-        - Necesitas al menos 3 respuestas correctas para aprobar
-        
-        **¡Buena suerte! 🍀**
-        """)
-        
-        if st.button("🚀 Comenzar Quiz", type="primary"):
-            st.session_state[f'quiz_{level}_started'] = True
-            st.rerun()
-        return
-    
-    # Quiz in progress
-    if not st.session_state[f'quiz_{level}_completed']:
-        current_q = st.session_state[f'quiz_{level}_current_question']
-        
-        if current_q < len(questions):
-            question = questions[current_q]
-            
-            st.markdown(f"### Pregunta {current_q + 1} de {len(questions)}")
-            st.markdown(f"**{question['question']}**")
-            
-            # Show feedback for current question if answer was already confirmed
-            if f'quiz_{level}_answered_{current_q}' in st.session_state:
-                feedback = st.session_state[f'quiz_{level}_answered_{current_q}']
-                if feedback['is_correct']:
-                    st.success("🎉 ¡Correcto!")
-                else:
-                    st.error(f"❌ Incorrecto. La respuesta correcta era: **{feedback['correct_answer']}**")
-                
-                st.info(f"💡 **Explicación:** {feedback['explanation']}")
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    # Show button to continue to next question
-                    if st.button("➡️ Siguiente Pregunta", type="primary", use_container_width=True):
-                        # Move to next question
-                        st.session_state[f'quiz_{level}_current_question'] += 1
-                        
-                        if st.session_state[f'quiz_{level}_current_question'] >= len(questions):
-                            st.session_state[f'quiz_{level}_completed'] = True
-                        
-                        st.rerun()
-                with col2:
-                    if st.button("🔄 Reiniciar Quiz", use_container_width=True):
-                        st.session_state[f'quiz_{level}_started'] = False
-                        st.session_state[f'quiz_{level}_current_question'] = 0
-                        st.session_state[f'quiz_{level}_score'] = 0
-                        st.session_state[f'quiz_{level}_answers'] = []
-                        st.session_state[f'quiz_{level}_completed'] = False
-                        # Clear all answered flags
-                        for i in range(len(questions)):
-                            if f'quiz_{level}_answered_{i}' in st.session_state:
-                                del st.session_state[f'quiz_{level}_answered_{i}']
-                        st.rerun()
-            else:
-                # Display options
-                selected_option = st.radio(
-                    "Selecciona tu respuesta:",
-                    question['options'],
-                    key=f"quiz_{level}_q{current_q}"
-                )
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("✅ Confirmar Respuesta"):
-                        # Check answer
-                        correct = question['options'].index(selected_option) == question['correct']
-                        
-                        # Store feedback in session state so it persists after rerun
-                        st.session_state[f'quiz_{level}_answered_{current_q}'] = {
-                            'is_correct': correct,
-                            'correct_answer': question['options'][question['correct']],
-                            'explanation': question['explanation']
-                        }
-                        
-                        if correct:
-                            st.session_state[f'quiz_{level}_score'] += 1
-                        
-                        # Store answer
-                        st.session_state[f'quiz_{level}_answers'].append({
-                            'question': question['question'],
-                            'selected': selected_option,
-                            'correct': question['options'][question['correct']],
-                            'is_correct': correct,
-                            'explanation': question['explanation']
-                        })
-                        
-                        st.rerun()
-                
-                with col2:
-                    if st.button("🔄 Reiniciar Quiz"):
-                        st.session_state[f'quiz_{level}_started'] = False
-                        st.session_state[f'quiz_{level}_current_question'] = 0
-                        st.session_state[f'quiz_{level}_score'] = 0
-                        st.session_state[f'quiz_{level}_answers'] = []
-                        st.session_state[f'quiz_{level}_completed'] = False
-                        # Clear all answered flags
-                        for i in range(len(questions)):
-                            if f'quiz_{level}_answered_{i}' in st.session_state:
-                                del st.session_state[f'quiz_{level}_answered_{i}']
-                        st.rerun()
-    
-    # Quiz completed
-    else:
-        show_quiz_results(level, username, questions)
 
-def show_quiz_results(level, username, questions):
-    """Show quiz results and achievements"""
-    
-    score = st.session_state[f'quiz_{level}_score']
+    prefix = f'quiz_{level}'
+    expander_key = f'{prefix}_expanded'
+    skipped_key = f'{prefix}_skipped'
+
+    if st.session_state.get(skipped_key):
+        st.info("Has pospuesto este quiz. Puedes retomarlo cuando quieras. Recuerda que necesitas aprobarlo para completar el nivel.")
+
+    if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
+        st.session_state[expander_key] = True
+
+    expanded = st.session_state.get(expander_key, True)
+    header_text = LEVEL_HEADERS.get(level, f"Nivel {level[-1]}")
+
+    with st.expander(f"🧠 Quiz - {header_text}", expanded=expanded):
+        st.markdown("### Pon a prueba tus conocimientos")
+
+        if f'{prefix}_started' not in st.session_state:
+            st.session_state[f'{prefix}_started'] = False
+            st.session_state[f'{prefix}_current_question'] = 0
+            st.session_state[f'{prefix}_score'] = 0
+            st.session_state[f'{prefix}_answers'] = []
+            st.session_state[f'{prefix}_completed'] = False
+            st.session_state[f'{prefix}_question_order'] = []
+
+        total_questions = len(questions)
+
+        if not st.session_state[f'{prefix}_started']:
+            st.markdown("""
+            #### 📋 Instrucciones
+            - Responde 5 preguntas relacionadas con lo aprendido en este nivel.
+            - Cada pregunta tiene 4 opciones y solo una es correcta.
+            - El orden de las preguntas cambia cada vez para que practiques mejor.
+            - Necesitas al menos 3 respuestas correctas para aprobar el nivel.
+            """)
+
+            col_start, col_skip = st.columns([2, 1])
+            with col_start:
+                if st.button("🚀 Comenzar Quiz", type="primary", use_container_width=True, key=f"{prefix}_start"):
+                    st.session_state[f'{prefix}_question_order'] = random.sample(range(total_questions), total_questions)
+                    st.session_state[f'{prefix}_current_question'] = 0
+                    st.session_state[f'{prefix}_score'] = 0
+                    st.session_state[f'{prefix}_answers'] = []
+                    st.session_state[f'{prefix}_completed'] = False
+                    st.session_state[f'{prefix}_started'] = True
+                    st.session_state[expander_key] = True
+                    st.session_state.pop(skipped_key, None)
+                    st.rerun()
+            with col_skip:
+                if st.button("⏭️ Hacerlo más tarde", use_container_width=True, key=f"{prefix}_skip"):
+                    st.session_state[expander_key] = False
+                    st.session_state[skipped_key] = True
+                    st.rerun()
+            return
+
+        if not st.session_state.get(f'{prefix}_question_order'):
+            st.session_state[f'{prefix}_question_order'] = random.sample(range(total_questions), total_questions)
+
+        st.session_state[expander_key] = True
+
+        feedback = st.session_state.pop(f'{prefix}_last_feedback', None)
+        if feedback:
+            if feedback['is_correct']:
+                st.success("🎉 ¡Respuesta correcta!")
+            else:
+                st.error(f"❌ Incorrecto. La respuesta correcta era: **{feedback['correct_answer']}**")
+            st.info(f"💡 **Explicación:** {feedback['explanation']}")
+            st.markdown("---")
+
+        if not st.session_state[f'{prefix}_completed']:
+            order = st.session_state[f'{prefix}_question_order']
+            current_index = st.session_state[f'{prefix}_current_question']
+
+            if current_index >= len(order):
+                st.session_state[f'{prefix}_completed'] = True
+                st.rerun()
+
+            question = questions[order[current_index]]
+
+            st.markdown(f"#### Pregunta {current_index + 1} de {total_questions}")
+            st.markdown(f"**{question['question']}**")
+
+            selected_option = st.radio(
+                "Selecciona tu respuesta:",
+                question['options'],
+                key=f"{prefix}_q_{current_index}"
+            )
+
+            col_answer, col_restart = st.columns([2, 1])
+            with col_answer:
+                if st.button("✅ Enviar y continuar", type="primary", use_container_width=True, key=f"{prefix}_submit_{current_index}"):
+                    correct = question['options'].index(selected_option) == question['correct']
+
+                    if correct:
+                        st.session_state[f'{prefix}_score'] += 1
+
+                    st.session_state[f'{prefix}_answers'].append({
+                        'question': question['question'],
+                        'selected': selected_option,
+                        'correct': question['options'][question['correct']],
+                        'is_correct': correct,
+                        'explanation': question['explanation']
+                    })
+
+                    st.session_state[f'{prefix}_last_feedback'] = {
+                        'is_correct': correct,
+                        'correct_answer': question['options'][question['correct']],
+                        'explanation': question['explanation']
+                    }
+
+                    st.session_state[f'{prefix}_current_question'] += 1
+                    if st.session_state[f'{prefix}_current_question'] >= len(order):
+                        st.session_state[f'{prefix}_completed'] = True
+                    st.rerun()
+
+            with col_restart:
+                if st.button("🔄 Reiniciar Quiz", use_container_width=True, key=f"{prefix}_reset_{current_index}"):
+                    _reset_quiz_state(level, total_questions, keep_expanded=True)
+                    st.rerun()
+        else:
+            show_quiz_results(level, username, questions, expander_key)
+
+
+def show_quiz_results(level, username, questions, expander_key):
+    """Show quiz results and achievements."""
+
+    prefix = f'quiz_{level}'
+    st.session_state[expander_key] = True
+
+    score = st.session_state[f'{prefix}_score']
     total_questions = len(questions)
-    percentage = (score / total_questions) * 100
+    percentage = (score / total_questions) * 100 if total_questions else 0
     passed = score >= 3
-    
-    st.markdown("## 🎯 Resultados del Quiz")
-    
-    # Score display
+
+    st.subheader("🎯 Resultados del Quiz")
+
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Puntuación", f"{score}/{total_questions}")
@@ -320,16 +364,13 @@ def show_quiz_results(level, username, questions):
     with col3:
         status = "✅ Aprobado" if passed else "❌ No Aprobado"
         st.metric("Estado", status)
-    
-    # Progress bar
-    st.progress(percentage / 100)
-    
-    # Results message
+
+    st.progress(percentage / 100 if total_questions else 0)
+
     if passed:
         st.success("🎉 ¡Felicitaciones! Has aprobado el quiz.")
-        st.session_state[f'quiz_{level}_passed'] = True
-        
-        # Check for perfect score achievement
+        st.session_state[f'{prefix}_passed'] = True
+
         if score == total_questions:
             new_achievements = check_achievement(username, 'quiz_perfect')
             if new_achievements:
@@ -337,46 +378,41 @@ def show_quiz_results(level, username, questions):
                 st.success("🏆 ¡Logro desbloqueado: Maestro del Quiz!")
     else:
         st.error("📚 Necesitas al menos 3 respuestas correctas para aprobar. ¡Sigue estudiando!")
-        st.session_state[f'quiz_{level}_passed'] = False
-    
-    # Detailed results
+        st.session_state[f'{prefix}_passed'] = False
+
     st.markdown("### 📋 Respuestas Detalladas")
-    
-    for i, answer in enumerate(st.session_state[f'quiz_{level}_answers']):
+
+    for i, answer in enumerate(st.session_state[f'{prefix}_answers']):
         with st.expander(f"Pregunta {i + 1}: {answer['question']}"):
             if answer['is_correct']:
                 st.success(f"✅ Tu respuesta: {answer['selected']}")
             else:
                 st.error(f"❌ Tu respuesta: {answer['selected']}")
                 st.info(f"✅ Respuesta correcta: {answer['correct']}")
-            
+
             st.markdown(f"💡 **Explicación:** {answer['explanation']}")
-    
-    # Action buttons
-    col1, col2 = st.columns(2)
+
+    col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("🔄 Intentar de Nuevo"):
-            st.session_state[f'quiz_{level}_started'] = False
-            st.session_state[f'quiz_{level}_current_question'] = 0
-            st.session_state[f'quiz_{level}_score'] = 0
-            st.session_state[f'quiz_{level}_answers'] = []
-            st.session_state[f'quiz_{level}_completed'] = False
+        if st.button("🔄 Intentar de nuevo", use_container_width=True, key=f"{prefix}_retry"):
+            _reset_quiz_state(level, total_questions, keep_expanded=True)
             st.rerun()
-    
     with col2:
-        if st.button("🏠 Volver al Nivel"):
-            st.session_state[f'quiz_{level}_started'] = False
-            st.session_state[f'quiz_{level}_completed'] = False
+        if st.button("🏠 Volver al nivel", use_container_width=True, key=f"{prefix}_back"):
+            _reset_quiz_state(level, total_questions, keep_expanded=False)
             st.rerun()
-    
-    # Save quiz attempt to database
-    save_quiz_attempt(level, username, score, total_questions, percentage, passed, st.session_state[f'quiz_{level}_answers'])
-    
-    # Update user progress
+    with col3:
+        next_destination = NEXT_LEVEL_DESTINATIONS.get(level)
+        if next_destination:
+            next_page, next_label = next_destination
+            if st.button(f"➡️ Ir al {next_label}", type="primary", use_container_width=True, key=f"{prefix}_next"):
+                st.switch_page(next_page)
+
+    save_quiz_attempt(level, username, score, total_questions, percentage, passed, st.session_state[f'{prefix}_answers'])
+
     if passed:
         update_user_progress(username, quiz_scores={level: percentage})
-        
-        # Check for level completion achievement
+
         if level == 'nivel1' and not st.session_state.get('nivel1_completed', False):
             new_achievements = check_achievement(username, 'level_completion')
             if new_achievements:

@@ -57,25 +57,97 @@ def show_learning_section(total_progress, completed_count, progress):
     with col2:
         st.progress(total_progress / 100)
         st.caption(f"Progreso: {total_progress:.0f}% - {completed_count} de 5 niveles completados")
-        
-        # Show completion status for each level
-        st.markdown("**Estado de Niveles:**")
-        col_a, col_b, col_c, col_d, col_e = st.columns(5)
-        with col_a:
-            status = get_icon("✅") if progress['nivel0'] else get_icon("⏳")
-            st.markdown(f"{status} Nivel 0", unsafe_allow_html=True)
-        with col_b:
-            status = get_icon("✅") if progress['nivel1'] else get_icon("⏳")
-            st.markdown(f"{status} Nivel 1", unsafe_allow_html=True)
-        with col_c:
-            status = get_icon("✅") if progress['nivel2'] else get_icon("⏳")
-            st.markdown(f"{status} Nivel 2", unsafe_allow_html=True)
-        with col_d:
-            status = get_icon("✅") if progress['nivel3'] else get_icon("⏳")
-            st.markdown(f"{status} Nivel 3", unsafe_allow_html=True)
-        with col_e:
-            status = get_icon("✅") if progress['nivel4'] else get_icon("⏳")
-            st.markdown(f"{status} Nivel 4", unsafe_allow_html=True)
+        if not st.session_state.get('_level_status_styles_injected'):
+            st.markdown("""
+            <style>
+                .level-status-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                    gap: 1rem;
+                    margin-top: 1rem;
+                }
+                .level-status-card {
+                    background: rgba(148, 163, 184, 0.12);
+                    border: 1px solid rgba(148, 163, 184, 0.32);
+                    border-radius: 14px;
+                    padding: 1rem;
+                    text-align: center;
+                    transition: all 0.3s ease;
+                    opacity: 0.45;
+                }
+                .level-status-card.completed {
+                    background: linear-gradient(135deg, rgba(46, 204, 113, 0.22), rgba(34, 197, 94, 0.12));
+                    border-color: rgba(34, 197, 94, 0.45);
+                    opacity: 1;
+                    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.18);
+                }
+                .level-status-card.next {
+                    border-color: rgba(249, 115, 22, 0.6);
+                    background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(249, 115, 22, 0.06));
+                    opacity: 0.85;
+                    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.18);
+                }
+                .level-status-card .level-icon {
+                    font-size: 1.3rem;
+                    display: block;
+                    margin-bottom: 0.35rem;
+                }
+                .level-status-card .level-label {
+                    font-weight: 600;
+                    color: var(--text-color, #1f2937);
+                    display: block;
+                    margin-bottom: 0.2rem;
+                }
+                .level-status-card .level-subtitle {
+                    font-size: 0.85rem;
+                    color: rgba(71, 85, 105, 0.9);
+                    display: block;
+                    margin-bottom: 0.35rem;
+                }
+                .level-status-card .level-state {
+                    font-size: 0.8rem;
+                    color: rgba(71, 85, 105, 0.85);
+                    display: block;
+                }
+                @media (max-width: 768px) {
+                    .level-status-grid {
+                        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                    }
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            st.session_state['_level_status_styles_injected'] = True
+
+        level_definitions = [
+            ('nivel0', 'Nivel 0', 'Introducción'),
+            ('nivel1', 'Nivel 1', 'Básico'),
+            ('nivel2', 'Nivel 2', 'Filtros'),
+            ('nivel3', 'Nivel 3', 'Métricas'),
+            ('nivel4', 'Nivel 4', 'Avanzado'),
+        ]
+        next_pending_level = next((level for level, _, _ in level_definitions if not progress.get(level, False)), None)
+
+        status_cards_html = ['<div class="level-status-grid">']
+        for level_key, level_title, level_subtitle in level_definitions:
+            completed = progress.get(level_key, False)
+            classes = ["level-status-card"]
+            classes.append("completed" if completed else "pending")
+            if not completed and level_key == next_pending_level:
+                classes.append("next")
+            icon = get_icon("✅") if completed else get_icon("⏳")
+            state_text = "Completado" if completed else ("Siguiente paso" if level_key == next_pending_level else "Pendiente")
+            status_cards_html.append(
+                f"""
+                <div class="{' '.join(classes)}">
+                    <span class="level-icon">{icon}</span>
+                    <span class="level-label">{level_title}</span>
+                    <span class="level-subtitle">{level_subtitle}</span>
+                    <span class="level-state">{state_text}</span>
+                </div>
+                """
+            )
+        status_cards_html.append("</div>")
+        st.markdown("".join(status_cards_html), unsafe_allow_html=True)
     
     # Add progress reset button in learning section
     st.markdown("---")
@@ -172,26 +244,24 @@ def show_learning_section(total_progress, completed_count, progress):
     
     # Navigation buttons
     level_columns = st.columns(5)
-    
-    with level_columns[0]:
-        if st.button("🧭 Nivel 0: Introducción", use_container_width=True, key="learn_nivel0"):
-            st.switch_page("pages/00_Nivel_0_Introduccion.py")
-    
-    with level_columns[1]:
-        if st.button("📚 Nivel 1: Básico", type="primary", use_container_width=True, key="learn_nivel1"):
-            st.switch_page("pages/01_Nivel_1_Basico.py")
-    
-    with level_columns[2]:
-        if st.button("🔍 Nivel 2: Filtros", use_container_width=True, key="learn_nivel2"):
-            st.switch_page("pages/02_Nivel_2_Filtros.py")
-    
-    with level_columns[3]:
-        if st.button("📊 Nivel 3: Métricas", use_container_width=True, key="learn_nivel3"):
-            st.switch_page("pages/03_Nivel_3_Metricas.py")
-    
-    with level_columns[4]:
-        if st.button("🚀 Nivel 4: Avanzado", use_container_width=True, key="learn_nivel4"):
-            st.switch_page("pages/04_Nivel_4_Avanzado.py")
+
+    level_navigation = [
+        ("nivel0", "🧭 Nivel 0: Introducción", "pages/00_Nivel_0_Introduccion.py"),
+        ("nivel1", "📚 Nivel 1: Básico", "pages/01_Nivel_1_Basico.py"),
+        ("nivel2", "🔍 Nivel 2: Filtros", "pages/02_Nivel_2_Filtros.py"),
+        ("nivel3", "📊 Nivel 3: Métricas", "pages/03_Nivel_3_Metricas.py"),
+        ("nivel4", "🚀 Nivel 4: Avanzado", "pages/04_Nivel_4_Avanzado.py"),
+    ]
+
+    next_pending_level = next((level for level, _, _ in level_navigation if not progress.get(level, False)), None)
+
+    for col, (level_key, label, target_page) in zip(level_columns, level_navigation):
+        with col:
+            button_type = "primary" if progress.get(level_key, False) else "secondary"
+            if st.button(label, type=button_type, use_container_width=True, key=f"learn_{level_key}"):
+                st.switch_page(target_page)
+            if level_key == next_pending_level and not progress.get(level_key, False):
+                st.caption("⭐ Comienza aquí")
     
     st.markdown("")
     if st.button("❓ Ayuda y Recursos", use_container_width=True, key="learn_ayuda"):

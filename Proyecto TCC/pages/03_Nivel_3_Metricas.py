@@ -93,7 +93,7 @@ def main():
     
     # Step 1
     create_step_card(
-        step_number="1",
+        step_number="3.1",
         title="Entender qué son las métricas y KPIs",
         description="<strong>¿Qué son las métricas?</strong> Las métricas son números que te dicen algo importante sobre tu negocio o actividad. Son como 'termómetros' que miden el estado de las cosas.",
         sections={
@@ -117,7 +117,7 @@ def main():
     
     # Step 2
     create_step_card(
-        step_number="2",
+        step_number="3.2",
         title="Identificar métricas clave para tu negocio",
         description="<strong>¿Por qué es importante?</strong> No todas las métricas son igual de importantes. Necesitas enfocarte en las que realmente importan para tu objetivo.",
         sections={
@@ -137,7 +137,7 @@ def main():
     
     # Step 3
     create_step_card(
-        step_number="3",
+        step_number="3.3",
         title="Interpretar y analizar métricas",
         description="<strong>¿Qué significa interpretar?</strong> No solo ver los números, sino entender qué te están diciendo y qué acciones tomar.",
         sections={
@@ -158,7 +158,7 @@ def main():
     
     # Step 4
     create_step_card(
-        step_number="4",
+        step_number="3.4",
         title="Usar métricas para tomar decisiones",
         description="<strong>¿Cómo usar las métricas?</strong> Las métricas no son solo para ver, son para actuar. Te ayudan a tomar decisiones informadas.",
         sections={

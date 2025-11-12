@@ -3,6 +3,9 @@ import json
 import textwrap
 from datetime import datetime
 
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 from core.dashboard_repository import (
     delete_dashboard,
@@ -10,6 +13,19 @@ from core.dashboard_repository import (
     upsert_dashboard,
 )
 from .dashboard_components import create_component_buttons, add_component_to_dashboard
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError:
+    Image = ImageDraw = ImageFont = None
+
+def _get_active_dataframe():
+    """Return the DataFrame currently used in the dashboard context."""
+    for key in ("cleaned_data", "uploaded_data", "sample_data"):
+        df = st.session_state.get(key)
+        if df is not None:
+            return df
+    return None
 
 def create_dashboard_sidebar(df, show_component_controls=True):
     """Create the dashboard sidebar with all controls"""
@@ -252,12 +268,16 @@ def export_dashboard(format_type):
         dashboard_name = (st.session_state.get('dashboard_name_input') or "Mi Dashboard").strip() or "Mi Dashboard"
         components = st.session_state.get('dashboard_components', [])
         summary_lines = _build_component_summary(components, width=95)
+        df = _get_active_dataframe()
+        if df is None:
+            st.warning("No hay datos activos para exportar el dashboard. Carga un dataset antes de exportar.")
+            return
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         format_upper = format_type.upper()
 
         if format_upper == "PDF":
             try:
-                image_buffer, image_size = _generate_dashboard_image(dashboard_name, summary_lines)
+                image_buffer, image_size = _generate_dashboard_image(dashboard_name, components, df)
             except ImportError as exc:
                 st.error(str(exc))
                 return
@@ -290,7 +310,7 @@ def export_dashboard(format_type):
 
         if format_upper in {"IMAGEN", "IMÁGEN", "PNG"}:
             try:
-                image_buffer, _ = _generate_dashboard_image(dashboard_name, summary_lines)
+                image_buffer, _ = _generate_dashboard_image(dashboard_name, components, df)
             except ImportError as exc:
                 st.error(str(exc))
                 return
@@ -371,44 +391,379 @@ def _build_component_summary(components, width=90):
     return lines or ["Sin componentes disponibles."]
 
 
-def _generate_dashboard_image(dashboard_name, summary_lines):
-    try:
-        from PIL import Image, ImageDraw, ImageFont
-    except ImportError as exc:
-        raise ImportError("Pillow no está instalado. Instala con `pip install pillow` para exportar como imagen.") from exc
+def _prepare_layout_rows(components):
+    """Return components grouped and ordered by layout row."""
+    layout_rows = {}
+    fallback_row_base = 1000
 
-    padding = 48
-    content_width = 1104
-    image_width = content_width + padding * 2
+    for idx, component in enumerate(components):
+        layout = component.get('layout') or {}
+        row_key = layout.get('row')
+        if row_key is None:
+            row_key = fallback_row_base + idx
+        order = layout.get('order', idx)
+        col_span = layout.get('col_span', layout.get('width', 12))
+        col_span = max(1, col_span)
+        layout_rows.setdefault(row_key, []).append({
+            'order': order,
+            'col_span': col_span,
+            'component': component
+        })
 
-    # Load fonts (fallback to default)
+    return [(row_key, sorted(items, key=lambda item: item['order'])) for row_key, items in sorted(layout_rows.items())]
+
+
+def _calculate_metric_value(config, df, component_title):
+    metric_type = config.get('metric_type', 'count')
+    column = config.get('column')
+    label = component_title or "Métrica"
+
     try:
-        title_font = ImageFont.truetype("arial.ttf", 28)
-        subtitle_font = ImageFont.truetype("arial.ttf", 20)
+        if metric_type == 'count':
+            value = len(df)
+            label = label or "Total de registros"
+        elif metric_type in ['sum', 'mean', 'median', 'min', 'max']:
+            if not column:
+                raise ValueError("Selecciona una columna para la métrica.")
+            if column not in df.columns:
+                raise ValueError(f"La columna '{column}' no existe en el dataset.")
+            series = df[column]
+            if not np.issubdtype(series.dtype, np.number):
+                raise ValueError(f"La columna '{column}' debe ser numérica para calcular esta métrica.")
+            if metric_type == 'sum':
+                value = series.sum()
+                label = f"Suma de {column}"
+            elif metric_type == 'mean':
+                value = series.mean()
+                label = f"Promedio de {column}"
+            elif metric_type == 'median':
+                value = series.median()
+                label = f"Mediana de {column}"
+            elif metric_type == 'min':
+                value = series.min()
+                label = f"Mínimo de {column}"
+            elif metric_type == 'max':
+                value = series.max()
+                label = f"Máximo de {column}"
+        else:
+            raise ValueError(f"Tipo de métrica no válido: {metric_type}")
+    except Exception as exc:
+        raise ValueError(f"No se pudo calcular la métrica ({exc}).") from exc
+
+    if isinstance(value, (int, np.integer)):
+        formatted_value = f"{value:,}"
+    elif isinstance(value, (float, np.floating)):
+        formatted_value = f"{value:,.2f}"
+    else:
+        formatted_value = str(value)
+
+    return label, formatted_value
+
+
+def _create_card_base(width, body_height, fonts, title):
+    padding = 28
+    header_height = 54
+    total_height = padding * 2 + header_height + body_height
+    card = Image.new("RGB", (width, total_height), "#ffffff")
+    draw = ImageDraw.Draw(card)
+
+    # Outer card
+    draw.rounded_rectangle((0, 0, width, total_height), radius=18, fill="#ffffff", outline="#e2e8f0", width=2)
+
+    # Header
+    header_box = (padding, padding, width - padding, padding + header_height)
+    draw.rounded_rectangle(header_box, radius=12, fill="#f1f5f9")
+    draw.text((padding + 12, padding + 12), title, font=fonts['subtitle'], fill="#1e293b")
+
+    body_top = padding + header_height + 16
+    return card, draw, body_top, padding
+
+
+def _render_placeholder_card(width, body_height, fonts, title, message):
+    card, draw, body_top, padding = _create_card_base(width, body_height, fonts, title)
+    draw.text((padding, body_top), message, font=fonts['body'], fill="#dc2626")
+    return card
+
+
+def _render_metric_card(component, df, width, fonts):
+    config = component.get('config', {})
+    title = component.get('title') or "📈 Métrica"
+    try:
+        label, formatted_value = _calculate_metric_value(config, df, title)
+    except ValueError as exc:
+        return _render_placeholder_card(width, 120, fonts, title, str(exc))
+
+    card, draw, body_top, padding = _create_card_base(width, 110, fonts, title)
+    draw.text((padding, body_top), formatted_value, font=fonts['value'], fill="#0f172a")
+    value_height = fonts['value'].getbbox(formatted_value)[3] - fonts['value'].getbbox(formatted_value)[1]
+    draw.text((padding, body_top + value_height + 12), label, font=fonts['body'], fill="#475569")
+    return card
+
+
+def _build_plotly_figure(component_type, config, df):
+    if component_type == "📊 Gráfico de Líneas":
+        x_col = config.get('x_column')
+        y_col = config.get('y_column')
+        color_col = config.get('color_column')
+        if not x_col or not y_col:
+            raise ValueError("Selecciona columnas X e Y para el gráfico.")
+        if x_col not in df.columns or y_col not in df.columns:
+            raise ValueError("Las columnas seleccionadas no existen en el dataset.")
+        fig = px.line(df, x=x_col, y=y_col, color=color_col)
+    elif component_type == "📋 Gráfico de Barras":
+        x_col = config.get('x_column')
+        y_col = config.get('y_column')
+        orientation = config.get('orientation', 'vertical')
+        if not x_col or not y_col:
+            raise ValueError("Selecciona columnas X e Y para el gráfico.")
+        if x_col not in df.columns or y_col not in df.columns:
+            raise ValueError("Las columnas seleccionadas no existen en el dataset.")
+        if orientation == 'horizontal':
+            fig = px.bar(df, y=x_col, x=y_col)
+        else:
+            fig = px.bar(df, x=x_col, y=y_col)
+    elif component_type == "🥧 Gráfico Circular":
+        values_col = config.get('values_column')
+        names_col = config.get('names_column')
+        if not values_col or not names_col:
+            raise ValueError("Selecciona columnas de valores y nombres.")
+        if values_col not in df.columns or names_col not in df.columns:
+            raise ValueError("Las columnas seleccionadas no existen en el dataset.")
+        pie_data = df.groupby(names_col)[values_col].sum().reset_index()
+        fig = px.pie(pie_data, values=values_col, names=names_col)
+    elif component_type == "📈 Gráfico de Área":
+        x_col = config.get('x_column')
+        y_col = config.get('y_column')
+        color_col = config.get('color_column')
+        if not x_col or not y_col:
+            raise ValueError("Selecciona columnas X e Y para el gráfico.")
+        fig = px.area(df, x=x_col, y=y_col, color=color_col)
+    elif component_type == "📈 Gráfico de Dispersión":
+        x_col = config.get('x_column')
+        y_col = config.get('y_column')
+        color_col = config.get('color_column')
+        if not x_col or not y_col:
+            raise ValueError("Selecciona columnas X e Y para el gráfico.")
+        fig = px.scatter(df, x=x_col, y=y_col, color=color_col)
+    elif component_type == "📊 Histograma":
+        column = config.get('column')
+        bins = config.get('bins', 20)
+        if not column:
+            raise ValueError("Selecciona una columna para el histograma.")
+        if column not in df.columns:
+            raise ValueError("La columna seleccionada no existe en el dataset.")
+        fig = px.histogram(df, x=column, nbins=bins)
+    elif component_type == "📊 Box Plot":
+        x_col = config.get('x_column')
+        y_col = config.get('y_column')
+        if not x_col or not y_col:
+            raise ValueError("Selecciona columnas X e Y para el gráfico.")
+        fig = px.box(df, x=x_col, y=y_col)
+    elif component_type == "📈 Gráfico de Violín":
+        x_col = config.get('x_column')
+        y_col = config.get('y_column')
+        if not x_col or not y_col:
+            raise ValueError("Selecciona columnas X e Y para el gráfico.")
+        fig = px.violin(df, x=x_col, y=y_col)
+    elif component_type == "📊 Matriz de Correlación":
+        columns = config.get('columns', [])
+        if len(columns) < 2:
+            raise ValueError("Selecciona al menos dos columnas numéricas para la matriz de correlación.")
+        missing = [col for col in columns if col not in df.columns]
+        if missing:
+            raise ValueError(f"Columnas inexistentes: {', '.join(missing)}.")
+        corr_matrix = df[columns].corr()
+        fig = px.imshow(corr_matrix, text_auto=True, aspect="auto", color_continuous_scale="RdBu")
+    else:
+        raise ValueError("Tipo de componente no soportado para exportación.")
+
+    fig.update_layout(
+        margin=dict(l=40, r=20, t=40, b=40),
+        title=None,
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+    )
+    return fig
+
+
+def _render_chart_card(component, df, width, fonts):
+    chart_height = 350
+    title = component.get('title') or component.get('type')
+    try:
+        fig = _build_plotly_figure(component.get('type'), component.get('config', {}), df)
+    except ValueError as exc:
+        return _render_placeholder_card(width, chart_height, fonts, title, str(exc))
+
+    card, _, body_top, padding = _create_card_base(width, chart_height, fonts, title)
+    chart_width = width - padding * 2
+
+    try:
+        chart_bytes = fig.to_image(format="png", width=chart_width, height=chart_height, scale=2)
+    except ValueError as exc:
+        if "kaleido" in str(exc).lower():
+            raise ImportError("Se requiere la librería 'kaleido' para exportar los gráficos a PNG. Instálala con `pip install -U kaleido`.") from exc
+        return _render_placeholder_card(width, chart_height, fonts, title, str(exc))
+    except Exception as exc:
+        return _render_placeholder_card(width, chart_height, fonts, title, str(exc))
+
+    chart_image = Image.open(io.BytesIO(chart_bytes)).convert("RGB")
+    card.paste(chart_image, (padding, body_top))
+    return card
+
+
+def _render_table_card(component, df, width, fonts):
+    config = component.get('config', {})
+    columns = config.get('columns') or df.columns.tolist()
+    rows = config.get('rows', min(20, len(df)))
+    title = component.get('title') or "📋 Tabla de Datos"
+
+    if not columns:
+        return _render_placeholder_card(width, 140, fonts, title, "Selecciona columnas para la tabla.")
+
+    missing = [col for col in columns if col not in df.columns]
+    if missing:
+        return _render_placeholder_card(width, 140, fonts, title, f"Columnas inexistentes: {', '.join(missing)}.")
+
+    table_df = df[columns].head(rows)
+    visible_rows = min(len(table_df), 8)
+    if visible_rows == 0:
+        return _render_placeholder_card(width, 140, fonts, title, "No hay datos para mostrar en la tabla.")
+
+    row_height = 34
+    table_height = row_height * (visible_rows + 1)
+    body_height = table_height + 40
+    card, draw, body_top, padding = _create_card_base(width, body_height, fonts, title)
+
+    table_width = width - padding * 2
+    table_image = Image.new("RGB", (table_width, table_height), "white")
+    table_draw = ImageDraw.Draw(table_image)
+
+    col_count = len(columns)
+    col_width = table_width // col_count if col_count else table_width
+
+    header_bg = "#0f172a"
+    text_color = "#1f2937"
+
+    for idx, col in enumerate(columns):
+        x0 = idx * col_width
+        table_draw.rectangle((x0, 0, x0 + col_width, row_height), fill=header_bg)
+        table_draw.text((x0 + 8, 8), str(col)[:22], font=fonts['body'], fill="#f8fafc")
+
+    for row_idx in range(visible_rows):
+        y0 = row_height * (row_idx + 1)
+        if row_idx % 2 == 0:
+            table_draw.rectangle((0, y0, table_width, y0 + row_height), fill="#f8fafc")
+        for col_idx, col in enumerate(columns):
+            x0 = col_idx * col_width
+            value = table_df.iloc[row_idx][col]
+            table_draw.text((x0 + 8, y0 + 8), str(value)[:22], font=fonts['body'], fill=text_color)
+
+    card.paste(table_image, (padding, body_top))
+    caption = f"Mostrando {visible_rows} de {len(df)} registros"
+    draw.text((padding, body_top + table_height + 12), caption, font=fonts['caption'], fill="#475569")
+    return card
+
+
+def _render_component_card(component, df, width, fonts):
+    component_type = component.get('type')
+    try:
+        if component_type == "📈 Métricas":
+            return _render_metric_card(component, df, width, fonts)
+        elif component_type in {
+            "📊 Gráfico de Líneas",
+            "📋 Gráfico de Barras",
+            "🥧 Gráfico Circular",
+            "📈 Gráfico de Área",
+            "📈 Gráfico de Dispersión",
+            "📊 Histograma",
+            "📊 Box Plot",
+            "📈 Gráfico de Violín",
+            "📊 Matriz de Correlación",
+        }:
+            return _render_chart_card(component, df, width, fonts)
+        elif component_type == "📋 Tabla de Datos":
+            return _render_table_card(component, df, width, fonts)
+    except ImportError:
+        raise
+    except Exception as exc:
+        return _render_placeholder_card(width, 140, fonts, component.get('title') or component_type, str(exc))
+
+    return _render_placeholder_card(width, 140, fonts, component.get('title') or component_type, "Este tipo de componente no se puede exportar todavía.")
+
+
+def _generate_dashboard_image(dashboard_name, components, df):
+    if Image is None or ImageDraw is None or ImageFont is None:
+        raise ImportError("Pillow no está instalado. Instala con `pip install pillow` para exportar como imagen.")
+
+    canvas_width = 1600
+    margin = 48
+    row_gap = 36
+    column_gap = 24
+
+    try:
+        title_font = ImageFont.truetype("arial.ttf", 30)
+        subtitle_font = ImageFont.truetype("arial.ttf", 22)
         body_font = ImageFont.truetype("arial.ttf", 18)
+        value_font = ImageFont.truetype("arialbd.ttf", 36)
+        caption_font = ImageFont.truetype("arial.ttf", 16)
     except Exception:
-        title_font = ImageFont.load_default()
-        subtitle_font = ImageFont.load_default()
-        body_font = ImageFont.load_default()
+        title_font = subtitle_font = body_font = value_font = caption_font = ImageFont.load_default()
 
-    line_height = body_font.getbbox("Ag")[3] - body_font.getbbox("Ag")[1] + 4
-    subtitle_height = subtitle_font.getbbox("Ag")[3] - subtitle_font.getbbox("Ag")[1]
+    fonts = {
+        'title': title_font,
+        'subtitle': subtitle_font,
+        'body': body_font,
+        'value': value_font,
+        'caption': caption_font,
+    }
+
+    layout_rows = _prepare_layout_rows(components)
+
+    rendered_rows = []
+    max_content_height = 0
+
+    for _, row_components in layout_rows:
+        total_span = sum(item['col_span'] for item in row_components)
+        span_units = max(total_span, 1)
+        available_width = canvas_width - (2 * margin) - column_gap * (len(row_components) - 1)
+        width_per_unit = available_width / span_units
+
+        row_rendered = []
+        row_height = 0
+        x_cursor = margin
+
+        for item in row_components:
+            component_width = int(width_per_unit * item['col_span'])
+            card_image = _render_component_card(item['component'], df, component_width, fonts)
+            row_rendered.append((card_image, x_cursor))
+            x_cursor += component_width + column_gap
+            row_height = max(row_height, card_image.height)
+
+        rendered_rows.append((row_rendered, row_height))
+        max_content_height += row_height + row_gap
+
     title_height = title_font.getbbox("Ag")[3] - title_font.getbbox("Ag")[1]
+    subtitle_height = subtitle_font.getbbox("Ag")[3] - subtitle_font.getbbox("Ag")[1]
 
-    content_height = padding + title_height + 8 + subtitle_height + 20 + len(summary_lines) * line_height + padding
-    image_height = max(content_height, 400)
+    estimated_height = margin + title_height + subtitle_height + 32 + max_content_height + margin
+    estimated_height = max(estimated_height, 600)
 
-    image = Image.new("RGB", (image_width, image_height), color="white")
+    image = Image.new("RGB", (canvas_width, estimated_height), "white")
     draw = ImageDraw.Draw(image)
 
     now_str = datetime.now().strftime('%d/%m/%Y %H:%M')
-    draw.text((padding, padding), f"Dashboard: {dashboard_name}", fill="black", font=title_font)
-    draw.text((padding, padding + title_height + 8), f"Generado: {now_str}", fill="#555555", font=subtitle_font)
+    draw.text((margin, margin), f"Dashboard: {dashboard_name}", fill="#111827", font=title_font)
+    draw.text((margin, margin + title_height + 10), f"Generado: {now_str}", fill="#475569", font=subtitle_font)
 
-    y_cursor = padding + title_height + subtitle_height + 24
-    for line in summary_lines:
-        draw.text((padding, y_cursor), line, fill="black", font=body_font)
-        y_cursor += line_height
+    y_cursor = margin + title_height + subtitle_height + 32
+
+    for row_rendered, row_height in rendered_rows:
+        for card_image, x_pos in row_rendered:
+            image.paste(card_image, (x_pos, y_cursor))
+        y_cursor += row_height + row_gap
+
+    final_height = max(y_cursor - row_gap + margin, 400)
+    image = image.crop((0, 0, canvas_width, final_height))
 
     image_buffer = io.BytesIO()
     image.save(image_buffer, format="PNG")

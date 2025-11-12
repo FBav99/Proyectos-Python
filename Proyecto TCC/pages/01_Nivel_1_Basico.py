@@ -94,7 +94,7 @@ def main():
     
     # Step 1
     create_step_card(
-        step_number="1",
+        step_number="1.1",
         title="Elegir el formato correcto para tus datos",
         description="<strong>¿Por qué es importante el formato?</strong> El formato correcto asegura que tus datos se carguen sin errores y sean fáciles de trabajar.",
         sections={
@@ -118,7 +118,7 @@ def main():
     
     # Step 2
     create_step_card(
-        step_number="2",
+        step_number="1.2",
         title="Preparar la estructura de datos correctamente",
         description="<strong>¿Por qué es importante la estructura?</strong> Una estructura bien organizada hace que el análisis sea más fácil y preciso.",
         sections={
@@ -146,7 +146,7 @@ def main():
     
     # Step 3
     create_step_card(
-        step_number="3",
+        step_number="1.3",
         title="Cargar el archivo en la herramienta",
         description="<strong>¿Cómo cargar datos?</strong> Una vez que tienes tu archivo preparado, necesitas subirlo a la herramienta de análisis.",
         sections={
@@ -171,7 +171,7 @@ def main():
     
     # Step 4
     create_step_card(
-        step_number="4",
+        step_number="1.4",
         title="Verificar que los datos se cargaron correctamente",
         description="<strong>¿Por qué verificar?</strong> Es crucial asegurarse de que todos los datos se cargaron sin errores antes de continuar con el análisis.",
         sections={
@@ -198,7 +198,7 @@ def main():
     
     # Step 5
     create_step_card(
-        step_number="5",
+        step_number="1.5",
         title="Entender la estructura de tus datos cargados",
         description="<strong>¿Por qué es importante?</strong> Conocer la estructura te ayuda a entender qué puedes hacer con los datos y cómo organizarlos para el análisis.",
         sections={

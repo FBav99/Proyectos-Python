@@ -95,7 +95,7 @@ def main():
     
     # Step 1
     create_step_card(
-        step_number="1",
+        step_number="2.1",
         title="Usar filtros de fecha para analizar períodos específicos",
         description="<strong>¿Por qué es útil?</strong> Los filtros de fecha te permiten ver información de un período específico, como las ventas del último mes o de un trimestre particular.",
         sections={
@@ -114,7 +114,7 @@ def main():
     
     # Step 2
     create_step_card(
-        step_number="2",
+        step_number="2.2",
         title="Filtrar por categorías y regiones",
         description="<strong>¿Qué significa?</strong> Los filtros por categoría te permiten ver solo los productos o servicios que te interesan, y los filtros por región te muestran resultados de áreas geográficas específicas.",
         sections={
@@ -133,7 +133,7 @@ def main():
     
     # Step 3
     create_step_card(
-        step_number="3",
+        step_number="2.3",
         title="Aplicar filtros numéricos con deslizadores",
         description="<strong>¿Cómo funcionan?</strong> Los filtros numéricos te permiten establecer rangos de valores, como ver solo productos entre ciertos precios o ventas por encima de un monto mínimo.",
         sections={
@@ -153,7 +153,7 @@ def main():
     
     # Step 4
     create_step_card(
-        step_number="4",
+        step_number="2.4",
         title="Combinar múltiples filtros para análisis detallado",
         description="<strong>¿Por qué combinar filtros?</strong> Al usar varios filtros juntos, puedes obtener información muy específica y relevante para tu análisis.",
         sections={
@@ -173,7 +173,7 @@ def main():
     
     # Step 5
     create_step_card(
-        step_number="5",
+        step_number="2.5",
         title="Entender cómo los filtros afectan las métricas",
         description="<strong>¿Qué significa?</strong> Cuando aplicas filtros, los totales, promedios y otras métricas cambian para mostrar solo la información filtrada.",
         sections={

@@ -100,6 +100,11 @@ def main():
     
     if not current_user:
         return  # Usuario no autenticado, formulario de login mostrado
+
+    welcome_data = st.session_state.pop('registration_welcome', None)
+    if welcome_data:
+        welcome_name = current_user.get('first_name') or welcome_data.get('first_name') or current_user.get('username', '')
+        st.success(f"🎉 ¡Bienvenido, {welcome_name}! Tu cuenta se creó correctamente.")
     
     # ============================================================================
     # SECCIÓN HEADER - Bienvenida e información del usuario

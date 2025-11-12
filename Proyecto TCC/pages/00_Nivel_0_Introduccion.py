@@ -81,7 +81,7 @@ def main():
     
     # Step 1
     create_step_card(
-        step_number="1",
+        step_number="0.1",
         title="¿Qué son los datos?",
         description="<strong>¿Qué son los datos?</strong> Los datos son información que se puede medir, contar o describir. Son como las piezas de un rompecabezas que, cuando las organizas, te cuentan una historia.",
         sections={
@@ -102,7 +102,7 @@ def main():
     
     # Step 2
     create_step_card(
-        step_number="2",
+        step_number="0.2",
         title="Tipos de datos que existen",
         description="<strong>¿Qué tipos hay?</strong> Los datos vienen en diferentes formas. Conocer estos tipos te ayuda a entender mejor tu información y saber qué puedes hacer con ella.",
         sections={
@@ -124,13 +124,19 @@ def main():
             "✅ Datos de sí/no:": [
                 "<strong>Verdadero/Falso:</strong> ¿Está activo? ¿Compró el producto?",
                 "<strong>Sí/No:</strong> ¿Tiene seguro? ¿Es cliente VIP?"
+            ],
+            "🛰️ Datos especiales:": [
+                "<strong>Datos geográficos:</strong> Coordenadas, mapas, direcciones, rutas de entrega",
+                "<strong>Imágenes:</strong> Fotos de productos, radiografías, planos de ingeniería",
+                "<strong>Audio y video:</strong> Grabaciones de llamadas, entrevistas, cámaras de seguridad",
+                "<strong>Sensores e IoT:</strong> Temperatura, humedad, pulso cardiaco, datos de dispositivos inteligentes"
             ]
         }
     )
     
     # Step 3
     create_step_card(
-        step_number="3",
+        step_number="0.3",
         title="¿Qué puedes hacer con los datos?",
         description="<strong>¿Para qué sirven?</strong> Los datos te permiten hacer muchas cosas útiles. Aquí te mostramos las principales formas de usar la información.",
         sections={
@@ -159,7 +165,7 @@ def main():
     
     # Step 4
     create_step_card(
-        step_number="4",
+        step_number="0.4",
         title="¿Cómo se ven los datos organizados?",
         description="<strong>¿Cómo se organizan?</strong> Los datos se organizan en tablas, como una hoja de Excel, donde cada fila es un registro y cada columna es un tipo de información.",
         sections={
@@ -186,7 +192,7 @@ def main():
     
     # Step 5
     create_step_card(
-        step_number="5",
+        step_number="0.5",
         title="¿Qué es el análisis de datos?",
         description="<strong>¿Qué significa analizar?</strong> Analizar datos significa examinar la información para encontrar respuestas, patrones y insights que te ayuden a tomar mejores decisiones.",
         sections={

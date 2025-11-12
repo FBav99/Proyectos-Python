@@ -1,6 +1,6 @@
 import streamlit as st
 import re
-from core.auth_service import auth_service
+from core.auth_service import auth_service, login_user
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 # Import init_sidebar - using absolute import path
@@ -169,15 +169,25 @@ def main():
                     )
                     
                     if success:
-                        # Store success info in session state to display outside form
-                        st.session_state.registration_success = True
-                        st.session_state.registered_user = {
-                            'email': email,
-                            'username': username,
-                            'first_name': first_name,
-                            'last_name': last_name
-                        }
-                        st.rerun()
+                        login_success, login_message = login_user(username, password)
+                        if login_success:
+                            st.session_state.pop('registration_error', None)
+                            st.session_state.pop('registration_success', None)
+                            st.session_state.registration_welcome = {
+                                'username': username,
+                                'first_name': first_name
+                            }
+                            st.switch_page("Inicio.py")
+                        else:
+                            st.session_state.registration_success = True
+                            st.session_state.registered_user = {
+                                'email': email,
+                                'username': username,
+                                'first_name': first_name,
+                                'last_name': last_name
+                            }
+                            st.session_state.registration_error = f'❌ Registro exitoso pero el inicio de sesión automático falló: {login_message}'
+                            st.rerun()
                     else:
                         st.session_state.registration_error = f'❌ Error durante el registro: {message}'
                         st.rerun()

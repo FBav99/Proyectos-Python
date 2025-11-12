@@ -67,13 +67,39 @@ def main():
         st.divider()
         
         st.subheader("💼 Contexto Profesional")
-        
-        # Question 2: What they do
-        what_they_do = st.text_area(
-            "¿A qué te dedicas? (Ej: Estudiante de ingeniería, Analista de ventas, Gerente de marketing, etc.)",
-            placeholder="Describe brevemente tu trabajo o área de estudio...",
-            key="what_do"
+
+        occupation_options = [
+            "Estudiante",
+            "Empleado/a en área administrativa",
+            "Empleado/a en ventas o atención al cliente",
+            "Analista o especialista en datos/BI",
+            "Profesional independiente / freelance",
+            "Liderazgo o gerencia",
+            "Docencia / capacitación",
+            "Emprendimiento o negocio propio",
+            "Buscando empleo",
+            "Otro (especificar)"
+        ]
+
+        occupation_selection = st.selectbox(
+            "¿A qué te dedicas actualmente?",
+            occupation_options,
+            key="occupation_selection"
         )
+
+        occupation_detail = ""
+        if occupation_selection == "Otro (especificar)":
+            occupation_detail = st.text_input(
+                "Cuéntanos tu ocupación",
+                placeholder="Ej: Diseñador UX, Enfermera, Consultor financiero...",
+                key="occupation_other_input"
+            )
+        else:
+            occupation_detail = st.text_input(
+                "¿En qué área o industria trabajas? (opcional)",
+                placeholder="Ej: Retail, Educación, Salud...",
+                key="occupation_context_input"
+            )
         
         # Question 3: Excel usage
         excel_usage = st.selectbox(
@@ -127,14 +153,18 @@ def main():
         
         if submitted:
             # Validate required fields
-            if not what_they_do.strip():
-                st.error("Por favor completa el campo sobre a qué te dedicas.")
+            occupation_value = occupation_detail.strip() if occupation_selection == "Otro (especificar)" else occupation_selection
+
+            if not occupation_value:
+                st.error("Por favor selecciona o especifica tu ocupación.")
                 return
             
             # Compile responses
             responses = {
                 'data_analysis_experience': data_analysis_exp,
-                'what_they_do': what_they_do.strip(),
+                'occupation_selection': occupation_selection,
+                'what_they_do': occupation_value,
+                'occupation_detail': occupation_detail.strip(),
                 'excel_usage_frequency': excel_usage,
                 'learning_goals': learning_goals,
                 'motivation': motivation,

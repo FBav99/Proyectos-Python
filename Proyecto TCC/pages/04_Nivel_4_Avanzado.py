@@ -96,7 +96,7 @@ def main():
     
     # Step 1
     create_step_card(
-        step_number="1",
+        step_number="4.1",
         title="Crear cálculos personalizados avanzados",
         description="<strong>¿Qué son los cálculos personalizados?</strong> Son fórmulas que creas tú mismo para obtener información específica que no está disponible directamente en tus datos.",
         sections={
@@ -116,7 +116,7 @@ def main():
     
     # Step 2
     create_step_card(
-        step_number="2",
+        step_number="4.2",
         title="Generar visualizaciones interactivas",
         description="<strong>¿Por qué visualizaciones interactivas?</strong> Los gráficos interactivos te permiten explorar los datos de manera más profunda y encontrar insights ocultos.",
         sections={
@@ -137,7 +137,7 @@ def main():
     
     # Step 3
     create_step_card(
-        step_number="3",
+        step_number="4.3",
         title="Crear dashboards profesionales",
         description="<strong>¿Qué es un dashboard?</strong> Es una colección de visualizaciones y métricas organizadas de manera lógica para contar una historia con los datos.",
         sections={
@@ -158,7 +158,7 @@ def main():
     
     # Step 4
     create_step_card(
-        step_number="4",
+        step_number="4.4",
         title="Interpretar y comunicar insights",
         description="<strong>¿Qué son los insights?</strong> Son descubrimientos importantes en los datos que pueden llevar a acciones o decisiones valiosas.",
         sections={
