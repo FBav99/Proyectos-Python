@@ -5,6 +5,7 @@ Handles user learning progress, level completion, and progress analytics
 
 import streamlit as st
 import logging
+import copy
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, Tuple
 from core.database import db_manager
@@ -16,10 +17,18 @@ class ProgressTracker:
     
     def __init__(self):
         self.levels = ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']
+        self._cache: Dict[int, Dict[str, Any]] = {}
+    
+    def _invalidate_cache(self, user_id: int):
+        """Remove cached progress for a user."""
+        self._cache.pop(user_id, None)
     
     def get_user_progress(self, user_id: int) -> Dict[str, Any]:
         """Get complete user progress information"""
         try:
+            if user_id in self._cache:
+                return copy.deepcopy(self._cache[user_id])
+            
             with db_manager.get_connection() as conn:
                 cursor = conn.execute("""
                     SELECT * FROM user_progress WHERE user_id = ?
@@ -39,11 +48,14 @@ class ProgressTracker:
                 progress_dict['completed_count'] = self.count_completed_levels(progress_dict)
                 progress_dict['current_level'] = self.get_current_level(progress_dict)
                 
-                return progress_dict
+                self._cache[user_id] = copy.deepcopy(progress_dict)
+                return copy.deepcopy(progress_dict)
                 
         except Exception as e:
             logger.error(f"Error getting user progress: {e}")
-            return self.get_default_progress()
+            default_progress = self.get_default_progress()
+            self._cache[user_id] = copy.deepcopy(default_progress)
+            return default_progress
     
     def create_user_progress(self, user_id: int) -> bool:
         """Create initial progress record for new user"""
@@ -54,6 +66,7 @@ class ProgressTracker:
                     VALUES (?, ?)
                 """, (user_id, datetime.now().isoformat()))
                 conn.commit()
+            self._invalidate_cache(user_id)
             return True
         except Exception as e:
             logger.error(f"Error creating user progress: {e}")
@@ -93,6 +106,7 @@ class ProgressTracker:
                 conn.execute(query, values)
                 conn.commit()
             
+            self._invalidate_cache(user_id)
             return True
             
         except Exception as e:

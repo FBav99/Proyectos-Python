@@ -4,8 +4,9 @@ import yaml
 from yaml.loader import SafeLoader
 import os
 
+@st.cache_data(show_spinner=False, ttl=300)
 def load_auth_config():
-    """Load authentication configuration from YAML file"""
+    """Load authentication configuration from YAML file with short-lived caching"""
     config_path = 'config/config.yaml'
     
     # Default config structure as per official GitHub documentation

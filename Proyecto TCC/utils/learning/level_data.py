@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 
+@st.cache_data(show_spinner=False, ttl=3600)
 def create_sample_data(version='clean'):
     """
     Create sample data for demonstration with dirty and clean versions
@@ -68,6 +70,7 @@ def create_sample_data(version='clean'):
     
     return df.sort_values('Fecha').reset_index(drop=True)
 
+@st.cache_data(show_spinner=False)
 def get_data_progression_info():
     """Get information about data progression across levels"""
     return {

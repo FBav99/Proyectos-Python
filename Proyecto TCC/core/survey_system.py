@@ -29,6 +29,19 @@ class SurveySystem:
             'level': 'Level Survey',
             'final': 'Final Survey'
         }
+        self._completion_cache: Dict[tuple, bool] = {}
+        self._response_cache: Dict[tuple, Dict[str, Any]] = {}
+    
+    @staticmethod
+    def _cache_key(user_id: int, survey_type: str, level: Optional[str]) -> tuple:
+        """Create a hashable cache key for survey lookups."""
+        return (user_id, survey_type, level or "__NO_LEVEL__")
+    
+    def _invalidate_cache(self, user_id: int, survey_type: str, level: Optional[str]):
+        """Invalidate cached data for a specific survey combination."""
+        key = self._cache_key(user_id, survey_type, level)
+        self._completion_cache.pop(key, None)
+        self._response_cache.pop(key, None)
     
     def _ensure_table_exists(self):
         """Ensure survey_responses table exists"""
@@ -39,9 +52,11 @@ class SurveySystem:
     
     def save_survey_response(self, user_id: int, survey_type: str, responses: Dict[str, Any], level: Optional[str] = None) -> bool:
         """Save survey response to database"""
+        cache_payload = None
         try:
             # Ensure survey_responses table exists
             self._ensure_table_exists()
+            key = self._cache_key(user_id, survey_type, level)
             
             with db_manager.get_connection() as conn:
                 # Convert responses to JSON string
@@ -114,19 +129,30 @@ class SurveySystem:
                             INSERT INTO survey_responses (user_id, survey_type, level, responses)
                             VALUES (?, ?, ?, ?)
                         """), (user_id, survey_type, level, responses_json))
-                
                 conn.commit()
-                return True
+                cache_payload = responses_json
                 
         except Exception as e:
             logger.error(f"Error saving survey response: {e}")
             return False
+        else:
+            # Update caches on success
+            self._completion_cache[key] = True
+            try:
+                self._response_cache[key] = json.loads(cache_payload) if cache_payload is not None else responses
+            except Exception:
+                self._response_cache.pop(key, None)
+            return True
     
     def has_completed_survey(self, user_id: int, survey_type: str, level: Optional[str] = None) -> bool:
         """Check if user has completed a specific survey"""
         try:
             # Ensure survey_responses table exists
             self._ensure_table_exists()
+            key = self._cache_key(user_id, survey_type, level)
+            
+            if key in self._completion_cache:
+                return self._completion_cache[key]
             
             with db_manager.get_connection() as conn:
                 # Use conn.execute for SQLite compatibility
@@ -154,7 +180,11 @@ class SurveySystem:
                             WHERE user_id = ? AND survey_type = ? AND level IS NULL
                         """), (user_id, survey_type,))
                 
-                return cursor.fetchone() is not None
+                exists = cursor.fetchone() is not None
+                self._completion_cache[key] = exists
+                if not exists:
+                    self._response_cache.pop(key, None)
+                return exists
                 
         except Exception as e:
             logger.error(f"Error checking survey completion: {e}")
@@ -165,6 +195,10 @@ class SurveySystem:
     def get_survey_response(self, user_id: int, survey_type: str, level: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """Get user's survey response"""
         try:
+            key = self._cache_key(user_id, survey_type, level)
+            if key in self._response_cache:
+                return self._response_cache[key]
+            
             with db_manager.get_connection() as conn:
                 cursor = conn.cursor()
                 
@@ -182,8 +216,13 @@ class SurveySystem:
                 result = cursor.fetchone()
                 
                 if result:
-                    return json.loads(result[0] if isinstance(result[0], str) else result['responses'])
+                    parsed = json.loads(result[0] if isinstance(result[0], str) else result['responses'])
+                    self._completion_cache[key] = True
+                    self._response_cache[key] = parsed
+                    return parsed
                 
+                self._completion_cache[key] = False
+                self._response_cache.pop(key, None)
                 return None
                 
         except Exception as e:

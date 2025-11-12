@@ -58,19 +58,28 @@ class IconSystem:
             "🤝": "handshake.png",
             "🏆": "trophy.png"
         }
+        self._path_cache = {}
+        self._exists_cache = {}
     
     def get_icon_path(self, emoji: str) -> str:
         """Get the path to the icon file for a given emoji"""
+        if emoji in self._path_cache:
+            return self._path_cache[emoji]
         if emoji in self.emoji_to_icon:
-            return str(self.icons_dir / self.emoji_to_icon[emoji])
-        return None
+            path = str(self.icons_dir / self.emoji_to_icon[emoji])
+        else:
+            path = None
+        self._path_cache[emoji] = path
+        return path
     
     def icon_exists(self, emoji: str) -> bool:
         """Check if an icon file exists for the given emoji"""
+        if emoji in self._exists_cache:
+            return self._exists_cache[emoji]
         icon_path = self.get_icon_path(emoji)
-        if icon_path:
-            return os.path.exists(icon_path)
-        return False
+        exists = bool(icon_path and os.path.exists(icon_path))
+        self._exists_cache[emoji] = exists
+        return exists
     
     def display_icon(self, emoji: str, size: int = 20, alt_text: str = None) -> str:
         """
