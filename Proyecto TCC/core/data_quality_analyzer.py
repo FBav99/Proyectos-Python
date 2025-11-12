@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+@st.cache_data(show_spinner=False, ttl=600)
 def analyze_data_quality(df):
     """Comprehensive data quality analysis"""
     

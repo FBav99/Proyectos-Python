@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+@st.cache_data(show_spinner=False, ttl=3600)
 def load_sample_data():
     """Generar conjunto de datos de muestra para demostración"""
     np.random.seed(42)

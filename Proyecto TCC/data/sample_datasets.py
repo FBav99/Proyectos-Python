@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import streamlit as st
 
 def create_ecommerce_dataset():
     """Create sample e-commerce dataset"""
@@ -268,6 +269,7 @@ def create_dirty_dataset():
     
     return df.reset_index(drop=True)
 
+@st.cache_data(show_spinner=False, ttl=3600)
 def get_sample_datasets():
     """Return all available sample datasets"""
     return {
