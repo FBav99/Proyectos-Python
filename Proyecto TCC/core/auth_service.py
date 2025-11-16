@@ -427,6 +427,67 @@ class AuthService:
             logger.error(f"Email update error: {e}")
             return False, security_features.sanitize_error_message(e)
     
+    def update_password(self, user_id: int, current_password: str, new_password: str) -> Tuple[bool, str]:
+        """
+        Update user password
+        
+        Args:
+            user_id: ID of the user
+            current_password: Current password for verification
+            new_password: New password to set
+            
+        Returns:
+            Tuple of (success, message)
+        """
+        try:
+            # Get current user password hash
+            with db_manager.get_connection() as conn:
+                cursor = conn.execute("""
+                    SELECT password_hash FROM users WHERE id = ?
+                """, (user_id,))
+                user = cursor.fetchone()
+            
+            if not user:
+                return False, "Usuario no encontrado"
+            
+            # Verify current password
+            if not self.verify_password(current_password, user['password_hash']):
+                return False, "La contraseña actual es incorrecta"
+            
+            # Validate new password
+            password_valid, password_msg = security_features.validate_password_server_side(new_password)
+            if not password_valid:
+                return False, password_msg
+            
+            # Check if new password is the same as current password
+            if self.verify_password(new_password, user['password_hash']):
+                return False, "La nueva contraseña debe ser diferente a la actual"
+            
+            # Hash the new password
+            new_password_hash = self.hash_password(new_password)
+            
+            # Update password in database and reset failed attempts
+            with db_manager.get_connection() as conn:
+                conn.execute("""
+                    UPDATE users 
+                    SET password_hash = ?, 
+                        failed_login_attempts = 0,
+                        locked_until = NULL
+                    WHERE id = ?
+                """, (new_password_hash, user_id))
+                conn.commit()
+            
+            # Log activity
+            self.log_activity(user_id, 'password_update', {
+                'update_type': 'password_change'
+            })
+            
+            return True, "Contraseña actualizada exitosamente"
+            
+        except Exception as e:
+            logger.error(f"Password update error: {e}")
+            return False, security_features.sanitize_error_message(e)
+    
     def verify_session(self, session_token: str) -> Tuple[bool, Optional[Dict]]:
         """Verify if a session is valid and return user data"""
         try:

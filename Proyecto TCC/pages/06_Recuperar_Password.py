@@ -24,6 +24,22 @@ def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
+def validate_password(password):
+    """Validate password strength"""
+    if len(password) < 8:
+        return False, "La contraseña debe tener al menos 8 caracteres"
+    
+    if not re.search(r'[A-Z]', password):
+        return False, "La contraseña debe contener al menos una letra mayúscula"
+    
+    if not re.search(r'[a-z]', password):
+        return False, "La contraseña debe contener al menos una letra minúscula"
+    
+    if not re.search(r'\d', password):
+        return False, "La contraseña debe contener al menos un número"
+    
+    return True, "Contraseña válida"
+
 @safe_main
 def main():
     """Página de recuperación de contraseña con verificación de email y cambio de email"""
@@ -39,12 +55,12 @@ def main():
     st.markdown("""
     <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
         <h1 style="color: white; margin-bottom: 1rem;">🔑 Recuperar Contraseña</h1>
-        <p style="color: white; font-size: 1.1rem;">Recupera tu contraseña o actualiza tu email de forma segura</p>
+        <p style="color: white; font-size: 1.1rem;">Recupera tu contraseña o actualiza tu email y contraseña de forma segura</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Tab selection for different recovery options
-    tab1, tab2 = st.tabs(["🔑 Recuperar Contraseña", "📧 Cambiar Email"])
+    tab1, tab2, tab3 = st.tabs(["🔑 Recuperar Contraseña", "📧 Cambiar Email", "🔐 Cambiar Contraseña"])
     
     with tab1:
         st.markdown("### 🔐 Recuperar Contraseña")
@@ -233,6 +249,96 @@ def main():
                             st.rerun()
                         else:
                             st.error(f"❌ {message}")
+    
+    with tab3:
+        st.markdown("### 🔐 Cambiar Contraseña")
+        st.info("""
+        **Para cambiar tu contraseña:**
+        1. Debes estar autenticado (iniciar sesión primero)
+        2. Ingresa tu contraseña actual
+        3. Ingresa y confirma tu nueva contraseña
+        4. Confirma el cambio
+        """)
+        
+        # Check if user is authenticated
+        from core.auth_service import get_current_user
+        current_user = get_current_user()
+        
+        if not current_user:
+            st.warning("⚠️ Debes iniciar sesión para cambiar tu contraseña")
+            if st.button("🔐 Ir a Iniciar Sesión", type="primary", use_container_width=True):
+                st.switch_page("Inicio.py")
+        else:
+            st.success(f"✅ Autenticado como: **@{current_user['username']}**")
+            
+            # Password requirements help text
+            password_help = "La contraseña debe tener: mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+            
+            with st.form("change_password_form", clear_on_submit=False):
+                current_password = st.text_input(
+                    "Contraseña Actual",
+                    type="password",
+                    placeholder="••••••••",
+                    help="Ingresa tu contraseña actual"
+                )
+                
+                new_password = st.text_input(
+                    "Nueva Contraseña",
+                    type="password",
+                    placeholder="••••••••",
+                    help=password_help
+                )
+                
+                confirm_new_password = st.text_input(
+                    "Confirmar Nueva Contraseña",
+                    type="password",
+                    placeholder="••••••••",
+                    help="Confirma tu nueva contraseña"
+                )
+                
+                # Password strength indicator
+                if new_password:
+                    is_valid, message = validate_password(new_password)
+                    if is_valid:
+                        st.success(f"✅ {message}")
+                    else:
+                        st.warning(f"⚠️ {message}")
+                        st.info("""
+                        **Requisitos de contraseña:**
+                        - Mínimo 8 caracteres
+                        - Al menos una letra mayúscula (A-Z)
+                        - Al menos una letra minúscula (a-z)
+                        - Al menos un número (0-9)
+                        """)
+                
+                submitted = st.form_submit_button("🔐 Cambiar Contraseña", type="primary", use_container_width=True)
+                
+                if submitted:
+                    if not current_password or not new_password or not confirm_new_password:
+                        st.error("❌ Por favor completa todos los campos")
+                    elif new_password != confirm_new_password:
+                        st.error("❌ Las contraseñas nuevas no coinciden")
+                    else:
+                        # Validate password strength
+                        is_valid, message = validate_password(new_password)
+                        if not is_valid:
+                            st.error(f"❌ {message}")
+                        else:
+                            # Update password
+                            success, message = auth_service.update_password(
+                                current_user['id'],
+                                current_password,
+                                new_password
+                            )
+                            
+                            if success:
+                                st.success(f"✅ {message}")
+                                st.info("🔄 Por favor, inicia sesión nuevamente con tu nueva contraseña")
+                                
+                                # Clear form by rerunning
+                                st.rerun()
+                            else:
+                                st.error(f"❌ {message}")
     
     # Navigation
     st.markdown("---")
