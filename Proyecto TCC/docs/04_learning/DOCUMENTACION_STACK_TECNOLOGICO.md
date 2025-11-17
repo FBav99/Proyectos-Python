@@ -9,7 +9,7 @@
 
 ## Resumen Ejecutivo
 
-La Plataforma de Análisis de Datos TCC está construida sobre un stack tecnológico moderno centrado en Python, utilizando Streamlit como framework principal para la interfaz de usuario web. El sistema integra bibliotecas especializadas para manipulación de datos (Pandas, NumPy), visualización interactiva (Plotly, Matplotlib, Seaborn), análisis estadístico (SciPy, scikit-learn), gestión de bases de datos (psycopg2-binary), autenticación y seguridad (bcrypt, streamlit-authenticator), y utilidades de soporte (PyYAML, openpyxl, requests). Esta documentación proporciona una descripción técnica detallada de cada componente del stack, sus versiones, propósitos específicos en el proyecto, y su integración dentro de la arquitectura general del sistema.
+La Plataforma de Análisis de Datos TCC está construida sobre un stack tecnológico moderno centrado en Python, utilizando Streamlit como framework principal para la interfaz de usuario web. El sistema integra bibliotecas especializadas para manipulación de datos (Pandas, NumPy), visualización interactiva (Plotly, Matplotlib, Seaborn), análisis estadístico (SciPy, scikit-learn), gestión de bases de datos (SQLite como base de datos por defecto, con soporte para Supabase/PostgreSQL mediante psycopg2-binary), autenticación y seguridad (bcrypt, streamlit-authenticator), y utilidades de soporte (PyYAML, openpyxl, requests). Esta documentación proporciona una descripción técnica detallada de cada componente del stack, sus versiones, propósitos específicos en el proyecto, y su integración dentro de la arquitectura general del sistema.
 
 ---
 
@@ -463,6 +463,242 @@ psycopg2-binary es esencial para la conexión con Supabase (que utiliza PostgreS
 
 ---
 
+### 6.2 Supabase
+
+**Versión:** Plataforma en la nube (sin versión específica)  
+**Tipo:** Plataforma de base de datos backend-as-a-service  
+**Documentación oficial:** https://supabase.com
+
+#### 6.2.1 Descripción
+
+Supabase es una plataforma de código abierto que proporciona una base de datos PostgreSQL gestionada en la nube, junto con servicios adicionales como autenticación, almacenamiento, y APIs REST y GraphQL automáticas. Es una alternativa de código abierto a Firebase, construida sobre PostgreSQL.
+
+#### 6.2.2 Uso en el Proyecto
+
+Supabase se utiliza como la plataforma de base de datos principal para la persistencia de datos:
+
+- **Base de Datos PostgreSQL:**
+  - Almacenamiento de datos de usuarios y autenticación
+  - Persistencia de progreso de aprendizaje de usuarios
+  - Almacenamiento de resultados de quizzes y evaluaciones
+  - Guardado de configuraciones de dashboard
+  - Persistencia de respuestas de encuestas
+
+- **Gestión de Datos:**
+  - Operaciones CRUD (Create, Read, Update, Delete) mediante SQL
+  - Transacciones de base de datos
+  - Consultas optimizadas para rendimiento
+  - Gestión de conexiones y pooling
+
+- **Autenticación y Seguridad:**
+  - Almacenamiento seguro de credenciales de usuarios
+  - Gestión de sesiones de usuario
+  - Registro de actividades de seguridad
+  - Validación de datos a nivel de base de datos
+
+#### 6.2.3 Características Utilizadas
+
+- **PostgreSQL como Base de Datos:**
+  - Tablas relacionales para estructura de datos
+  - Índices para optimización de consultas
+  - Constraints para integridad de datos
+  - Triggers y funciones almacenadas (si se requieren)
+
+- **Conexión mediante psycopg2:**
+  - Conexión directa a PostgreSQL de Supabase
+  - Ejecución de consultas SQL parametrizadas
+  - Gestión de transacciones
+  - Manejo de errores de base de datos
+
+- **Ventajas de Supabase:**
+  - Base de datos gestionada sin necesidad de administración de servidor
+  - Escalabilidad automática
+  - Backups automáticos
+  - Interfaz web para gestión de datos
+  - APIs REST y GraphQL automáticas (si se requieren en el futuro)
+
+#### 6.2.4 Casos de Uso Específicos
+
+- **core/database.py:**
+  - Gestión de conexiones a Supabase
+  - Operaciones de base de datos mediante SQL
+  - Inicialización de esquema de base de datos
+  - Migraciones de esquema
+
+- **core/auth_service.py:**
+  - Almacenamiento de usuarios y credenciales
+  - Gestión de sesiones de usuario
+  - Registro de actividades de autenticación
+
+- **core/progress_tracker.py:**
+  - Persistencia de progreso de niveles de aprendizaje
+  - Seguimiento de completación de niveles
+  - Historial de actividades del usuario
+
+- **core/quiz_system.py:**
+  - Almacenamiento de resultados de evaluaciones
+  - Historial de intentos de quizzes
+  - Estadísticas de rendimiento
+
+- **core/survey_system.py:**
+  - Persistencia de respuestas de encuestas
+  - Almacenamiento de datos de feedback
+
+#### 6.2.5 Configuración
+
+La conexión a Supabase se configura mediante:
+- Variables de entorno para credenciales
+- Archivo de configuración (`config/config.yaml`)
+- Parámetros de conexión (host, puerto, base de datos, usuario, contraseña)
+
+#### 6.2.6 Archivos Principales de Uso
+
+- `core/database.py` - Gestión de conexiones y operaciones con Supabase
+- `core/config.py` - Configuración de conexión a Supabase
+- `config/config.yaml` - Parámetros de configuración de base de datos
+- Todos los módulos que requieren persistencia de datos
+
+---
+
+### 6.3 SQLite
+
+**Versión:** Incluida en Python estándar (sqlite3)  
+**Tipo:** Base de datos SQL embebida  
+**Documentación oficial:** https://docs.python.org/3/library/sqlite3.html
+
+#### 6.3.1 Descripción
+
+SQLite es una biblioteca de base de datos SQL embebida, ligera y sin servidor que está incluida en la biblioteca estándar de Python. SQLite almacena toda la base de datos en un solo archivo y no requiere un proceso de servidor separado, lo que la hace ideal para aplicaciones pequeñas a medianas, desarrollo local, y prototipado.
+
+#### 6.3.2 Uso en el Proyecto
+
+SQLite se utiliza como la base de datos por defecto y alternativa en la plataforma TCC:
+
+- **Base de Datos por Defecto:**
+  - Se utiliza cuando Supabase no está configurado o no está disponible
+  - Base de datos local almacenada en el archivo `tcc_database.db`
+  - No requiere configuración adicional ni servicios externos
+
+- **Sistema Dual de Base de Datos:**
+  - El proyecto soporta tanto SQLite como PostgreSQL/Supabase
+  - La selección se realiza mediante configuración (`db_type` en secrets)
+  - Si Supabase está configurado pero `psycopg2` no está instalado, automáticamente se usa SQLite como respaldo
+
+- **Gestión de Datos:**
+  - Almacenamiento de usuarios y autenticación
+  - Persistencia de progreso de aprendizaje de usuarios
+  - Almacenamiento de resultados de quizzes y evaluaciones
+  - Guardado de configuraciones de dashboard
+  - Persistencia de respuestas de encuestas
+  - Gestión de archivos subidos y sesiones de análisis
+
+#### 6.3.3 Características Utilizadas
+
+- **Conexión y Configuración:**
+  - `sqlite3.connect()` para establecer conexiones
+  - Modo WAL (Write-Ahead Logging) para mejor acceso concurrente
+  - Timeout de 5 segundos para manejar acceso concurrente
+  - `row_factory = sqlite3.Row` para acceso tipo diccionario a filas
+  - Habilitación de claves foráneas con `PRAGMA foreign_keys = ON`
+
+- **Operaciones de Base de Datos:**
+  - Creación de tablas con `CREATE TABLE IF NOT EXISTS`
+  - Operaciones CRUD (Create, Read, Update, Delete)
+  - Transacciones para garantizar integridad de datos
+  - Consultas SQL estándar
+
+- **Ventajas de SQLite:**
+  - Sin necesidad de servidor de base de datos separado
+  - Archivo único fácil de respaldar y migrar
+  - Ideal para desarrollo local y pruebas
+  - Sin dependencias externas (incluida en Python)
+  - Rendimiento excelente para aplicaciones pequeñas a medianas
+
+#### 6.3.4 Casos de Uso Específicos
+
+- **core/database.py:**
+  - Gestión de conexiones a SQLite
+  - Creación e inicialización de esquema de base de datos
+  - Operaciones de base de datos mediante SQL
+  - Detección automática de tipo de base de datos
+  - Fallback automático a SQLite si Supabase no está disponible
+
+- **core/auth_service.py:**
+  - Almacenamiento de usuarios y credenciales en SQLite
+  - Gestión de sesiones de usuario
+  - Registro de actividades de autenticación
+
+- **core/progress_tracker.py:**
+  - Persistencia de progreso de niveles de aprendizaje
+  - Seguimiento de completación de niveles
+  - Historial de actividades del usuario
+
+- **core/quiz_system.py:**
+  - Almacenamiento de resultados de evaluaciones
+  - Historial de intentos de quizzes
+  - Estadísticas de rendimiento
+
+- **core/survey_system.py:**
+  - Persistencia de respuestas de encuestas
+  - Almacenamiento de datos de feedback
+
+- **core/dashboard_repository.py:**
+  - Guardado de configuraciones de dashboard
+  - Persistencia de componentes de dashboard personalizados
+
+#### 6.3.5 Configuración
+
+La configuración de SQLite es automática y no requiere configuración adicional:
+
+- **Ubicación del Archivo:**
+  - Por defecto: `tcc_database.db` en el directorio raíz del proyecto
+  - Configurable mediante `DB_PATH` en `core/database.py`
+
+- **Inicialización Automática:**
+  - La base de datos se crea automáticamente si no existe
+  - Las tablas se crean automáticamente al inicializar la aplicación
+  - No requiere migraciones manuales para el esquema inicial
+
+- **Selección de Base de Datos:**
+  - Se selecciona mediante `db_type` en configuración/secrets
+  - Valor por defecto: `"sqlite"` si no se especifica
+  - Se puede cambiar a `"supabase"` para usar PostgreSQL
+
+#### 6.3.6 Limitaciones y Consideraciones
+
+- **Escalabilidad:**
+  - SQLite es ideal para aplicaciones pequeñas a medianas
+  - Para aplicaciones con alto tráfico concurrente, se recomienda Supabase/PostgreSQL
+
+- **Persistencia en Streamlit Cloud:**
+  - En el tier gratuito de Streamlit Cloud, los archivos SQLite se reinician periódicamente
+  - Para producción con persistencia garantizada, se recomienda usar Supabase
+
+- **Acceso Concurrente:**
+  - SQLite maneja acceso concurrente de lectura bien
+  - Para escritura concurrente intensiva, PostgreSQL/Supabase es más adecuado
+
+#### 6.3.7 Migración y Respaldo
+
+- **Exportación de Datos:**
+  - Scripts de migración disponibles para exportar datos de SQLite a JSON
+  - `migrations/export_sqlite_data.py` - Exporta todos los datos a formato JSON
+  - `migrations/migrate_sqlite_to_supabase.py` - Migra datos de SQLite a Supabase
+
+- **Respaldo:**
+  - Respaldo simple: copiar el archivo `tcc_database.db`
+  - Exportación estructurada a JSON para migraciones
+
+#### 6.3.8 Archivos Principales de Uso
+
+- `core/database.py` - Gestión de conexiones y operaciones con SQLite
+- `core/config.py` - Configuración de tipo de base de datos
+- `migrations/export_sqlite_data.py` - Exportación de datos SQLite
+- `migrations/migrate_sqlite_to_supabase.py` - Migración a Supabase
+- Todos los módulos que requieren persistencia de datos
+
+---
+
 ## 7. Autenticación y Seguridad
 
 ### 7.1 bcrypt
@@ -687,8 +923,10 @@ Las dependencias principales (core dependencies) son aquellas esenciales para el
 1. **streamlit** - Framework web principal
 2. **pandas** - Manipulación de datos
 3. **numpy** - Operaciones numéricas (dependencia de pandas)
-4. **psycopg2-binary** - Conexión a base de datos
-5. **bcrypt** - Seguridad de contraseñas
+4. **SQLite** (sqlite3) - Base de datos embebida por defecto (incluida en Python)
+5. **Supabase** - Plataforma de base de datos PostgreSQL (alternativa a SQLite)
+6. **psycopg2-binary** - Conexión a base de datos PostgreSQL/Supabase
+7. **bcrypt** - Seguridad de contraseñas
 
 ### 9.2 Dependencias de Visualización
 
@@ -760,7 +998,8 @@ Algunas dependencias requieren bibliotecas del sistema:
 ### 11.3 Configuración de Entorno
 
 Variables de entorno potencialmente requeridas:
-- Credenciales de base de datos (Supabase)
+- Credenciales de base de datos Supabase (host, puerto, nombre de base de datos, usuario, contraseña)
+- URL de conexión a Supabase
 - Configuraciones de autenticación
 - Rutas de archivos de configuración
 
@@ -778,7 +1017,7 @@ Variables de entorno potencialmente requeridas:
 
 - **Tamaño de Archivos:** Limitaciones en carga de archivos grandes
 - **Rendimiento de Visualizaciones:** Gráficos complejos pueden ser lentos
-- **Base de Datos:** Dependencia de latencia de red para Supabase
+- **Base de Datos:** Dependencia de latencia de red para Supabase (conexión a servidor en la nube)
 
 ---
 
@@ -795,14 +1034,14 @@ Variables de entorno potencialmente requeridas:
 
 - No almacenar contraseñas en texto plano
 - Validar todas las entradas de usuario
-- Usar conexiones seguras (HTTPS) para comunicación con base de datos
+- Usar conexiones seguras (HTTPS/SSL) para comunicación con Supabase
 - Mantener dependencias actualizadas para parches de seguridad
 
 ---
 
 ## 14. Conclusiones
 
-El stack tecnológico de la Plataforma TCC está cuidadosamente seleccionado para proporcionar una base sólida y moderna para una aplicación educativa de análisis de datos. La combinación de Streamlit para la interfaz, Pandas para manipulación de datos, Plotly para visualizaciones interactivas, y PostgreSQL/Supabase para persistencia, crea un ecosistema coherente y potente.
+El stack tecnológico de la Plataforma TCC está cuidadosamente seleccionado para proporcionar una base sólida y moderna para una aplicación educativa de análisis de datos. La combinación de Streamlit para la interfaz, Pandas para manipulación de datos, Plotly para visualizaciones interactivas, y Supabase (PostgreSQL gestionado) para persistencia, crea un ecosistema coherente y potente.
 
 Las dependencias están bien organizadas y cada una cumple un propósito específico dentro de la arquitectura del sistema. La elección de versiones mínimas permite flexibilidad mientras garantiza funcionalidades esenciales.
 

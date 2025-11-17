@@ -1,0 +1,50 @@
+be8c6d9|2025-11-16|ADD: documentacion de niveles y stack, cambio de password
+cdbe838|2025-11-12|FIX: cambios basados en 12/11
+9e81d17|2025-11-11|FIX: aun mas tweaks al rendimiento
+d2a3e28|2025-11-11|FIX: mas tweaks al rendimiento
+9dc2199|2025-11-11|FIX: loading speed
+dbfffa4|2025-11-11|Revert "FIX: connection issues"
+2617126|2025-11-11|FIX: connection issues
+ae56a23|2025-11-10|FIX: Dashboard Builder ADD: Varios QOL
+d1a941d|2025-11-10|FIX: moviendo boton inicio
+678ba9c|2025-11-10|FIX: boton dentro de encuesta inicial
+5a2bc9d|2025-11-10|FIX: fix 2 survey system bugs
+147cca4|2025-11-10|FIX: cambio de placeholders para supabase
+eb8db55|2025-11-09|FIX: error psycopg2
+1383f54|2025-11-09|FIX: Validacion Login/Parseo
+0d788aa|2025-11-09|FIX: Agregando tablas faltantes
+71ff873|2025-11-09|FIX: scrips de creacion ajutados
+6a8a68a|2025-11-09|FIX: error de conexion a supabase, adaptando codigo para usar psycopg2
+f7ffc4e|2025-11-09|FIX: Apuntado a supabase
+151fffc|2025-11-06|ADD: Encuestas de experiencia de usuario y quizs para cada nivel de aprendizaje.
+3de5033|2025-11-05|ADD: Utilidades admin database.
+bca494b|2025-11-05|FIX: inicializacion base de datos
+2f4e674|2025-11-05|ADD: Pagina de administracion de la base de datos
+e4889d5|2025-11-05|FIX: conflicto sidebar en streamlit cloud
+5568398|2025-11-05|ADD: Cambio mail y recuperacion de contraseña, ver siempre el usuario activo en els idebar FIX: Conflicto master al registrar usuario
+bd42df6|2025-11-05|FIX: Conflicto maisl al registrar usuario
+d2e9f10|2025-11-04|Merge branch 'pruebas'
+a5e13e6|2025-11-04|FIX: reinicio de campos de formulario registro, tabulacion entre campos
+2f86db5|2025-11-04|REMOVE: pagina admin backup
+821aa8b|2025-11-04|FIX: Movido requerimients txt
+6a8f72a|2025-11-04|FIX: tracebacks con rutas de archivos sensibles, requirements.txt para streamlit cloud
+86ed216|2025-11-04|Merge branch 'pruebas'
+4c6ae01|2025-11-04|ADD: error reinicio contraseña, preparacion migrar completamente a supabase
+8977d6a|2025-11-02|Added Dev Container Folder
+623d380|2025-11-02|Preparacion para Streamlit Cloud - Supabase
+0b36923|2025-10-26|Merge branch 'pruebas'
+18ed5c9|2025-10-25|Optimizando archivos/validando funcionamiento.
+7a29b4b|2025-10-13|Documentacion para el flujo demo y presentacion de proyecto
+22e26d7|2025-09-14|Ajustes contenido para mejorar flujo
+82f7145|2025-09-13|Flujo de aprendizaje - ejemplo
+7d01be0|2025-09-09|Modificaicones a limpieza de datos
+343f423|2025-09-06|Nivel 0, PNG en vez de emojis
+b9be537|2025-09-03|Merge branch 'pruebas'
+b64073e|2025-09-03|Organizacion de utils, ajustes de seguridad y progreso de usuario. Ajustes estilizado. Modulacion de archivos y carpetas.
+1655567|2025-09-02|Separacion de componentes para reutilizacion
+ea07d62|2025-09-01|Ajustes visuales a nivel 1, que usare de base para los otros niveles.
+b55ca58|2025-08-31|Cambios generales niveles
+c2c1ad8|2025-08-29|Separacion de modulos de Inicio para mejor orden
+4f00c43|2025-08-27|Migracion YAML a SQLite
+802a100|2025-08-26|Error en export.py
+e71ab45|2025-08-25|Cambios a la interfaz de inicio, se agregaron plantillas y dashboard en blanco
