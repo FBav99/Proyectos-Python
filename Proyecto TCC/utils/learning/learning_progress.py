@@ -34,7 +34,7 @@ def show_learning_section(total_progress, completed_count, progress):
         if not survey_system.has_completed_survey(user_id, 'initial'):
             st.markdown(f"""
             <div style="background: rgba(0, 123, 255, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #007bff;">
-                <h3 style="color: #007bff; margin-bottom: 1rem;">{get_icon('📋')} Encuesta Inicial</h3>
+                <h3 style="color: #007bff; margin-bottom: 1rem;">{get_icon('📋', 20)} Encuesta Inicial</h3>
                 <p style="color: #666; margin-bottom: 1rem;">Antes de comenzar con los niveles, nos gustaría conocer un poco sobre ti. Esto nos ayuda a mejorar la experiencia.</p>
             </div>
             """, unsafe_allow_html=True)
@@ -42,12 +42,12 @@ def show_learning_section(total_progress, completed_count, progress):
             if st.button("📝 Completar Encuesta Inicial", type="primary", use_container_width=True):
                 st.switch_page("pages/99_Survey_Inicial.py")
             
-            st.info("💡 Puedes completar la encuesta más tarde, pero te recomendamos hacerlo antes de comenzar.")
+            st.markdown(replace_emojis("💡 Puedes completar la encuesta más tarde, pero te recomendamos hacerlo antes de comenzar."), unsafe_allow_html=True)
             st.markdown("---")
     
     st.markdown(f"""
     <div style="background: rgba(255, 193, 7, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #ffc107;">
-        <h3 style="color: #ffc107; margin-bottom: 1rem;">{get_icon('🎓')} Sistema de Aprendizaje por Niveles</h3>
+        <h3 style="color: #ffc107; margin-bottom: 1rem;">{get_icon('🎓', 20)} Sistema de Aprendizaje por Niveles</h3>
         <p style="color: #666; margin-bottom: 1rem;">Completa nuestros niveles paso a paso para dominar todas las funcionalidades</p>
     </div>
     """, unsafe_allow_html=True)
@@ -134,7 +134,7 @@ def show_learning_section(total_progress, completed_count, progress):
             classes.append("completed" if completed else "pending")
             if not completed and level_key == next_pending_level:
                 classes.append("next")
-            icon = get_icon("✅") if completed else get_icon("⏳")
+            icon = get_icon("✅", 20) if completed else get_icon("⏳", 20)
             state_text = "Completado" if completed else ("Siguiente paso" if level_key == next_pending_level else "Pendiente")
             status_cards_html.append(
                 f"""
@@ -151,7 +151,7 @@ def show_learning_section(total_progress, completed_count, progress):
     
     # Add progress reset button in learning section
     st.markdown("---")
-    st.markdown(f"### {get_icon('🔄')} Opciones de Progreso", unsafe_allow_html=True)
+    st.markdown(f"### {get_icon('🔄', 20)} Opciones de Progreso", unsafe_allow_html=True)
     
     # Get user ID for reset functionality
     user = st.session_state.get('user')
@@ -161,18 +161,18 @@ def show_learning_section(total_progress, completed_count, progress):
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            if st.button(f"{get_icon('🔄')} Reiniciar Progreso", type="secondary", use_container_width=True):
+            if st.button("🔄 Reiniciar Progreso", type="secondary", use_container_width=True):
                 st.session_state.show_reset_confirmation = True
         
         with col2:
-            if st.button(f"{get_icon('📊')} Ver Progreso Detallado", use_container_width=True):
+            if st.button("📊 Ver Progreso Detallado", use_container_width=True):
                 st.session_state.show_detailed_progress = True
         
         # Reset confirmation dialog
         if st.session_state.get('show_reset_confirmation', False):
-            st.markdown("""
+            st.markdown(f"""
             <div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;">
-                <h4 style="color: #dc3545; margin-bottom: 1rem;">⚠️ Confirmar Reinicio de Progreso</h4>
+                <h4 style="color: #dc3545; margin-bottom: 1rem;">{get_icon("⚠️", 18)} Confirmar Reinicio de Progreso</h4>
                 <p style="color: #666; margin-bottom: 1rem;">Esta acción eliminará todo tu progreso en los niveles. <strong>Esta acción no se puede deshacer.</strong></p>
             </div>
             """, unsafe_allow_html=True)
@@ -182,11 +182,11 @@ def show_learning_section(total_progress, completed_count, progress):
             with col1:
                 if st.button("✅ Sí, Reiniciar", type="primary", use_container_width=True):
                     if reset_all_progress(user_id):
-                        st.success("✅ Progreso reiniciado exitosamente")
+                        st.markdown(replace_emojis("✅ Progreso reiniciado exitosamente"), unsafe_allow_html=True)
                         st.session_state.show_reset_confirmation = False
                         st.rerun()
                     else:
-                        st.error("❌ Error al reiniciar el progreso")
+                        st.markdown(replace_emojis("❌ Error al reiniciar el progreso"), unsafe_allow_html=True)
             
             with col2:
                 if st.button("❌ Cancelar", use_container_width=True):
@@ -201,7 +201,7 @@ def show_learning_section(total_progress, completed_count, progress):
         # Detailed progress view
         if st.session_state.get('show_detailed_progress', False):
             st.markdown("---")
-            st.markdown("### 📊 Progreso Detallado")
+            st.markdown(replace_emojis("### 📊 Progreso Detallado"), unsafe_allow_html=True)
             
             try:
                 progress_detail = progress_tracker.get_user_progress(user_id)
@@ -209,19 +209,19 @@ def show_learning_section(total_progress, completed_count, progress):
                 col1, col2, col3, col4 = st.columns(4)
                 
                 with col1:
-                    status = "✅ Completado" if progress_detail.get('nivel1_completed', False) else "⏳ Pendiente"
+                    status = replace_emojis("✅ Completado") if progress_detail.get('nivel1_completed', False) else "⏳ Pendiente"
                     st.metric("Nivel 1: Básico", status)
                 
                 with col2:
-                    status = "✅ Completado" if progress_detail.get('nivel2_completed', False) else "⏳ Pendiente"
+                    status = replace_emojis("✅ Completado") if progress_detail.get('nivel2_completed', False) else "⏳ Pendiente"
                     st.metric("Nivel 2: Filtros", status)
                 
                 with col3:
-                    status = "✅ Completado" if progress_detail.get('nivel3_completed', False) else "⏳ Pendiente"
+                    status = replace_emojis("✅ Completado") if progress_detail.get('nivel3_completed', False) else "⏳ Pendiente"
                     st.metric("Nivel 3: Métricas", status)
                 
                 with col4:
-                    status = "✅ Completado" if progress_detail.get('nivel4_completed', False) else "⏳ Pendiente"
+                    status = replace_emojis("✅ Completado") if progress_detail.get('nivel4_completed', False) else "⏳ Pendiente"
                     st.metric("Nivel 4: Avanzado", status)
                 
                 # Additional metrics
@@ -229,7 +229,7 @@ def show_learning_section(total_progress, completed_count, progress):
                 with col1:
                     st.metric("⏱️ Tiempo Total", f"{progress_detail.get('total_time_spent', 0)} min")
                 with col2:
-                    st.metric("📊 Análisis Creados", f"{progress_detail.get('data_analyses_created', 0)}")
+                    st.metric(replace_emojis("📊 Análisis Creados"), f"{progress_detail.get('data_analyses_created', 0)}")
                 
                 # Last updated
                 last_updated = progress_detail.get('last_updated', 'N/A')
@@ -247,10 +247,10 @@ def show_learning_section(total_progress, completed_count, progress):
 
     level_navigation = [
         ("nivel0", "🧭 Nivel 0: Introducción", "pages/00_Nivel_0_Introduccion.py"),
-        ("nivel1", "📚 Nivel 1: Básico", "pages/01_Nivel_1_Basico.py"),
-        ("nivel2", "🔍 Nivel 2: Filtros", "pages/02_Nivel_2_Filtros.py"),
-        ("nivel3", "📊 Nivel 3: Métricas", "pages/03_Nivel_3_Metricas.py"),
-        ("nivel4", "🚀 Nivel 4: Avanzado", "pages/04_Nivel_4_Avanzado.py"),
+        ("nivel1", replace_emojis("📚 Nivel 1: Básico"), "pages/01_Nivel_1_Basico.py"),
+        ("nivel2", replace_emojis("🔍 Nivel 2: Filtros"), "pages/02_Nivel_2_Filtros.py"),
+        ("nivel3", replace_emojis("📊 Nivel 3: Métricas"), "pages/03_Nivel_3_Metricas.py"),
+        ("nivel4", replace_emojis("🚀 Nivel 4: Avanzado"), "pages/04_Nivel_4_Avanzado.py"),
     ]
 
     next_pending_level = next((level for level, _, _ in level_navigation if not progress.get(level, False)), None)
@@ -278,15 +278,15 @@ def show_learning_section(total_progress, completed_count, progress):
 def show_user_profile_section(username, total_progress, completed_count, user_id):
     """Show user profile section with progress metrics"""
     st.markdown("---")
-    st.markdown("### 👤 Tu Progreso")
+    st.markdown(replace_emojis("### 👤 Tu Progreso"), unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("📊 Niveles Completados", f"{completed_count}/5")
+        st.metric(replace_emojis("📊 Niveles Completados"), f"{completed_count}/5")
     with col2:
-        st.metric("📈 Progreso Total", f"{total_progress:.1f}%")
+        st.metric(replace_emojis("📈 Progreso Total"), f"{total_progress:.1f}%")
     with col3:
-        st.metric("🎯 Usuario", username)
+        st.metric(replace_emojis("🎯 Usuario"), username)
     
     # Progress reset and detailed view options
     if user_id:
@@ -295,9 +295,9 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
     
     # Quick navigation for experienced users
     if completed_count >= 2:
-        st.markdown("""
+        st.markdown(f"""
         <div style="background: rgba(40, 167, 69, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #28a745;">
-            <p style="color: #28a745; margin: 0; font-weight: 500;">💡 <strong>¡Ya tienes experiencia!</strong> Puedes ir directamente a crear dashboards avanzados.</p>
+            <p style="color: #28a745; margin: 0; font-weight: 500;">{get_icon("💡", 16)} <strong>¡Ya tienes experiencia!</strong> Puedes ir directamente a crear dashboards avanzados.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -358,7 +358,7 @@ def reset_all_progress(user_id):
 def show_progress_reset_button(user_id):
     """Show a button to reset progress with confirmation"""
     st.markdown("---")
-    st.markdown("### 🔄 Opciones de Progreso")
+    st.markdown(replace_emojis("### 🔄 Opciones de Progreso"), unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 1])
     
@@ -372,9 +372,9 @@ def show_progress_reset_button(user_id):
     
     # Reset confirmation dialog
     if st.session_state.get('show_reset_confirmation', False):
-        st.markdown("""
+        st.markdown(f"""
         <div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;">
-            <h4 style="color: #dc3545; margin-bottom: 1rem;">⚠️ Confirmar Reinicio de Progreso</h4>
+            <h4 style="color: #dc3545; margin-bottom: 1rem;">{get_icon("⚠️", 18)} Confirmar Reinicio de Progreso</h4>
             <p style="color: #666; margin-bottom: 1rem;">Esta acción eliminará todo tu progreso en los niveles. <strong>Esta acción no se puede deshacer.</strong></p>
         </div>
         """, unsafe_allow_html=True)
@@ -384,11 +384,11 @@ def show_progress_reset_button(user_id):
         with col1:
             if st.button("✅ Sí, Reiniciar", type="primary", use_container_width=True):
                 if reset_all_progress(user_id):
-                    st.success("✅ Progreso reiniciado exitosamente")
+                    st.markdown(replace_emojis("✅ Progreso reiniciado exitosamente"), unsafe_allow_html=True)
                     st.session_state.show_reset_confirmation = False
                     st.rerun()
                 else:
-                    st.error("❌ Error al reiniciar el progreso")
+                    st.markdown(replace_emojis("❌ Error al reiniciar el progreso"), unsafe_allow_html=True)
         
         with col2:
             if st.button("❌ Cancelar", use_container_width=True):
@@ -404,7 +404,7 @@ def show_detailed_progress(user_id):
     """Show detailed progress information"""
     if st.session_state.get('show_detailed_progress', False):
         st.markdown("---")
-        st.markdown("### 📊 Progreso Detallado")
+        st.markdown(replace_emojis("### 📊 Progreso Detallado"), unsafe_allow_html=True)
         
         try:
             progress = progress_tracker.get_user_progress(user_id)
@@ -412,19 +412,19 @@ def show_detailed_progress(user_id):
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
-                status = "✅ Completado" if progress.get('nivel1_completed', False) else "⏳ Pendiente"
+                status = replace_emojis("✅ Completado") if progress.get('nivel1_completed', False) else "⏳ Pendiente"
                 st.metric("Nivel 1: Básico", status)
             
             with col2:
-                status = "✅ Completado" if progress.get('nivel2_completed', False) else "⏳ Pendiente"
+                status = replace_emojis("✅ Completado") if progress.get('nivel2_completed', False) else "⏳ Pendiente"
                 st.metric("Nivel 2: Filtros", status)
             
             with col3:
-                status = "✅ Completado" if progress.get('nivel3_completed', False) else "⏳ Pendiente"
+                status = replace_emojis("✅ Completado") if progress.get('nivel3_completed', False) else "⏳ Pendiente"
                 st.metric("Nivel 3: Métricas", status)
             
             with col4:
-                status = "✅ Completado" if progress.get('nivel4_completed', False) else "⏳ Pendiente"
+                status = replace_emojis("✅ Completado") if progress.get('nivel4_completed', False) else "⏳ Pendiente"
                 st.metric("Nivel 4: Avanzado", status)
             
             # Additional metrics
@@ -432,7 +432,7 @@ def show_detailed_progress(user_id):
             with col1:
                 st.metric("⏱️ Tiempo Total", f"{progress.get('total_time_spent', 0)} min")
             with col2:
-                st.metric("📊 Análisis Creados", f"{progress.get('data_analyses_created', 0)}")
+                st.metric(replace_emojis("📊 Análisis Creados"), f"{progress.get('data_analyses_created', 0)}")
             
             # Last updated
             last_updated = progress.get('last_updated', 'N/A')

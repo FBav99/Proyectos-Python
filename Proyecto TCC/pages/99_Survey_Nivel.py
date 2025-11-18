@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Level-specific Survey - After Each Level
 Rating questions (1-5 scale) and suggestions box
@@ -15,7 +16,7 @@ configure_streamlit_error_handling()
 
 st.set_page_config(
     page_title="Encuesta de Nivel",
-    page_icon="📝",
+    page_icon=get_icon("📝", 20),
     layout="wide"
 )
 
@@ -35,7 +36,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a esta encuesta.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a esta encuesta."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -46,7 +47,7 @@ def main():
     level = st.session_state.get('survey_level', None)
     
     if not level or level not in LEVEL_INFO:
-        st.error("❌ No se especificó el nivel para la encuesta.")
+        st.markdown(replace_emojis("❌ No se especificó el nivel para la encuesta."), unsafe_allow_html=True)
         if st.button("Volver al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -55,7 +56,8 @@ def main():
     
     # Check if user has already completed this survey for this level
     if survey_system.has_completed_survey(user_id, 'level', level):
-        st.success(f"✅ Ya completaste la encuesta para el {level_info['name']}.")
+        icon_html = get_icon('✅', 20)
+        st.markdown(f"{icon_html} Ya completaste la encuesta para el {level_info['name']}.", unsafe_allow_html=True)
         
         # Determine next level
         next_level = get_next_level(level)
@@ -75,7 +77,7 @@ def main():
                 st.switch_page("pages/99_Survey_Final.py")
         return
     
-    st.title(f"📝 Encuesta: {level_info['name']}")
+    st.markdown(f"# {get_icon('📝', 24)} Encuesta: {level_info['name']}", unsafe_allow_html=True)
     st.markdown(f"### ¡Felicitaciones por completar el {level_info['name']}!")
     st.markdown("Tu opinión es muy valiosa. Por favor, comparte tus comentarios sobre esta experiencia.")
     
@@ -83,7 +85,7 @@ def main():
     
     # Survey questions
     with st.form("level_survey_form"):
-        st.subheader("📊 Calificación del Contenido")
+        st.subheader(replace_emojis("📊 Calificación del Contenido"))
         
         # Question 1: Clarity rating
         clarity_rating = st.slider(
@@ -171,7 +173,7 @@ def main():
         st.divider()
         
         # Submit button
-        submitted = st.form_submit_button("✅ Enviar Encuesta", type="primary", use_container_width=True)
+        submitted = st.form_submit_button(replace_emojis("✅ Enviar Encuesta"), type="primary", use_container_width=True)
         
         if submitted:
             # Compile responses
@@ -190,11 +192,11 @@ def main():
             # Save to database
             if survey_system.save_survey_response(user_id, 'level', responses, level):
                 st.session_state[f'survey_{level}_submitted'] = True
-                st.success("✅ ¡Gracias por tu feedback!")
+                st.markdown(replace_emojis("✅ ¡Gracias por tu feedback!"), unsafe_allow_html=True)
                 st.balloons()
                 st.rerun()
             else:
-                st.error("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo.")
+                st.markdown(replace_emojis("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo."), unsafe_allow_html=True)
     
     # Show navigation buttons after form submission (outside the form)
     if st.session_state.get(f'survey_{level}_submitted', False):

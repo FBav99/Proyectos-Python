@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Data cleaning service for TCC Data Analysis Platform
 Main orchestrator for data cleaning, validation, and quality operations
@@ -154,29 +155,29 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
     quality_report = cleaner.get_quality_report()
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("📊 Calidad", f"{quality_report['quality_score']:.1f}%")
+        st.metric(replace_emojis("📊 Calidad"), f"{quality_report['quality_score']:.1f}%")
     with col2:
-        st.metric("📈 Filas", quality_report['total_rows'])
+        st.metric(replace_emojis("📈 Filas"), quality_report['total_rows'])
     with col3:
         st.metric("🏷️ Columnas", quality_report['total_columns'])
     with col4:
         missing_count = sum(info['missing_count'] for info in quality_report['missing_values'].values())
-        st.metric("❌ Faltantes", missing_count)
+        st.metric(replace_emojis("❌ Faltantes"), missing_count)
     
     st.markdown("---")
     
     # Main cleaning interface with better organization
-    tab1, tab2, tab3, tab4 = st.tabs(["🚀 Limpieza Rápida", "🔧 Limpieza Avanzada", "📊 Análisis", "📋 Historial"])
+    tab1, tab2, tab3, tab4 = st.tabs([replace_emojis("🚀 Limpieza Rápida"), "🔧 Limpieza Avanzada", "📊 Análisis", "📋 Historial"])
     
     with tab1:
-        st.markdown("### 🚀 Limpieza Rápida")
+        st.markdown(replace_emojis("### 🚀 Limpieza Rápida"), unsafe_allow_html=True)
         st.markdown("Limpieza automática con configuraciones predefinidas")
         
         # Quick cleaning presets
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("#### 🎯 Presets de Limpieza")
+            st.markdown(replace_emojis("#### 🎯 Presets de Limpieza"), unsafe_allow_html=True)
             
             if st.button("🧹 Limpieza Básica", use_container_width=True, type="primary"):
                 with st.spinner("Aplicando limpieza básica..."):
@@ -191,11 +192,10 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                     cleaner.apply_auto_cleaning(cleaning_options)
                     # Update session state cleaner
                     st.session_state.data_cleaner = cleaner
-                    st.success("✅ Limpieza básica completada!")
+                    st.markdown(replace_emojis("✅ Limpieza básica completada!"), unsafe_allow_html=True)
                     st.rerun()
             
             if st.button("🔧 Limpieza Completa", use_container_width=True):
-                with st.spinner("Aplicando limpieza completa..."):
                     cleaning_options = {
                         'whitespace': True,
                         'case_normalization': True,
@@ -213,23 +213,23 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                     
                     # Update session state cleaner
                     st.session_state.data_cleaner = cleaner
-                    st.success("✅ Limpieza completa finalizada!")
+                    st.markdown(replace_emojis("✅ Limpieza completa finalizada!"), unsafe_allow_html=True)
                     st.rerun()
     
     with col2:
             st.markdown("#### ⚙️ Opciones Personalizadas")
             
             # Collapsible advanced options
-            with st.expander("🔧 Configuración Avanzada"):
+            with st.expander(replace_emojis("🔧 Configuración Avanzada")):
                 auto_whitespace = st.checkbox("🧹 Limpiar espacios", value=True)
-                auto_case = st.checkbox("📝 Normalizar capitalización", value=True)
-                auto_duplicates = st.checkbox("🔄 Remover duplicados", value=True)
-                auto_missing = st.checkbox("❌ Llenar faltantes", value=True)
-                auto_special_chars = st.checkbox("🔤 Remover caracteres especiales", value=False)
+                auto_case = st.checkbox(replace_emojis("📝 Normalizar capitalización"), value=True)
+                auto_duplicates = st.checkbox(replace_emojis("🔄 Remover duplicados"), value=True)
+                auto_missing = st.checkbox(replace_emojis("❌ Llenar faltantes"), value=True)
+                auto_special_chars = st.checkbox(replace_emojis("🔤 Remover caracteres especiales"), value=False)
                 auto_accents = st.checkbox("🌍 Normalizar acentos", value=False)
                 auto_phones = st.checkbox("📞 Estandarizar teléfonos", value=False)
                 auto_emails = st.checkbox("📧 Estandarizar emails", value=False)
-                auto_dates = st.checkbox("📅 Estandarizar fechas", value=False)
+                auto_dates = st.checkbox(replace_emojis("📅 Estandarizar fechas"), value=False)
                 
                 # Advanced options
                 if auto_case:
@@ -299,11 +299,11 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                         
                         # Update session state cleaner
                         st.session_state.data_cleaner = cleaner
-                        st.success("✅ Limpieza personalizada completada!")
+                        st.markdown(replace_emojis("✅ Limpieza personalizada completada!"), unsafe_allow_html=True)
                         st.rerun()
     
     with tab2:
-        st.markdown("### 🔧 Limpieza Avanzada")
+        st.markdown(replace_emojis("### 🔧 Limpieza Avanzada"), unsafe_allow_html=True)
         st.markdown("Control granular sobre cada operación de limpieza")
         
         # Initialize global_replacements in session state if not exists
@@ -341,7 +341,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                     result_df = cleaner.cleaning_ops.clean_whitespace(columns=selected_columns)
                     cleaner.cleaned_df = result_df.copy()
                     st.session_state.data_cleaner = cleaner
-                    st.success("✅ Espacios limpiados!")
+                    st.markdown(replace_emojis("✅ Espacios limpiados!"), unsafe_allow_html=True)
                     st.rerun()
                 
                 # Enhanced case normalization
@@ -359,19 +359,9 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 
                 if st.button("📝 Normalizar Capitalización", use_container_width=True):
-                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
-                    result_df = cleaner.cleaning_ops.normalize_text_case(columns=selected_columns, case_type=case_type)
-                    cleaner.cleaned_df = result_df.copy()
-                    st.session_state.data_cleaner = cleaner
-                    st.success(f"✅ Capitalización normalizada a {case_type}!")
                     st.rerun()
                 
                 if st.button("🔤 Remover Caracteres Especiales", use_container_width=True):
-                    cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
-                    result_df = cleaner.cleaning_ops.remove_special_characters(columns=selected_columns)
-                    cleaner.cleaned_df = result_df.copy()
-                    st.session_state.data_cleaner = cleaner
-                    st.success("✅ Caracteres especiales removidos!")
                     st.rerun()
                 
                 if st.button("🌍 Normalizar Acentos", use_container_width=True):
@@ -379,24 +369,24 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                     result_df = cleaner.cleaning_ops.normalize_accents(columns=selected_columns)
                     cleaner.cleaned_df = result_df.copy()
                     st.session_state.data_cleaner = cleaner
-                    st.success("✅ Acentos normalizados!")
+                    st.markdown(replace_emojis("✅ Acentos normalizados!"), unsafe_allow_html=True)
                     st.rerun()
                 
                 # Data preview button
                 st.markdown("---")
                 if st.button("👁️ Vista Previa de Datos", use_container_width=True, type="secondary"):
-                    st.markdown("### 📊 Vista Previa de Datos Limpiados")
+                    st.markdown(replace_emojis("### 📊 Vista Previa de Datos Limpiados"), unsafe_allow_html=True)
                     st.dataframe(cleaner.cleaned_df.head(10), use_container_width=True)
                     
                     # Show some basic stats
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.metric("📊 Filas", len(cleaner.cleaned_df))
+                        st.metric(replace_emojis("📊 Filas"), len(cleaner.cleaned_df))
                     with col2:
-                        st.metric("📋 Columnas", len(cleaner.cleaned_df.columns))
+                        st.metric(replace_emojis("📋 Columnas"), len(cleaner.cleaned_df.columns))
                     with col3:
                         missing_count = cleaner.cleaned_df.isnull().sum().sum()
-                        st.metric("❌ Valores Faltantes", missing_count)
+                        st.metric(replace_emojis("❌ Valores Faltantes"), missing_count)
         
         with col2:
             st.markdown("#### 📞 Estandarización")
@@ -420,7 +410,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                 result_df = cleaner.cleaning_ops.standardize_phone_numbers(format_type=phone_format)
                 cleaner.cleaned_df = result_df.copy()
                 st.session_state.data_cleaner = cleaner
-                st.success("✅ Teléfonos estandarizados!")
+                st.markdown(replace_emojis("✅ Teléfonos estandarizados!"), unsafe_allow_html=True)
                 st.rerun()
             
             if st.button("📧 Estandarizar Emails", use_container_width=True):
@@ -428,7 +418,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                 result_df = cleaner.cleaning_ops.standardize_emails()
                 cleaner.cleaned_df = result_df.copy()
                 st.session_state.data_cleaner = cleaner
-                st.success("✅ Emails estandarizados!")
+                st.markdown(replace_emojis("✅ Emails estandarizados!"), unsafe_allow_html=True)
                 st.rerun()
             
             # Date standardization options
@@ -446,22 +436,17 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
             )
             
             if st.button("📅 Estandarizar Fechas", use_container_width=True):
-                cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
-                result_df = cleaner.cleaning_ops.standardize_dates(format_type=date_format)
-                cleaner.cleaned_df = result_df.copy()
-                st.session_state.data_cleaner = cleaner
-                st.success(f"✅ Fechas estandarizadas a {date_format}!")
                 st.rerun()
             
             # Data preview button for standardization section
             st.markdown("---")
             if st.button("👁️ Vista Previa", use_container_width=True, type="secondary"):
-                st.markdown("### 📊 Vista Previa de Datos Estandarizados")
+                st.markdown(replace_emojis("### 📊 Vista Previa de Datos Estandarizados"), unsafe_allow_html=True)
                 st.dataframe(cleaner.cleaned_df.head(10), use_container_width=True)
         
         # Global value replacements in a separate section
         st.markdown("---")
-        st.markdown("#### 🔄 Reemplazos Globales")
+        st.markdown(replace_emojis("#### 🔄 Reemplazos Globales"), unsafe_allow_html=True)
         
         # Column selection for replacements
         st.markdown("**Aplicar reemplazos a:**")
@@ -494,13 +479,13 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
             st.markdown("")  # Spacer
             if st.button("➕ Agregar", use_container_width=True) and old_value and new_value:
                 st.session_state.global_replacements[old_value] = new_value
-                st.success(f"✅ Reemplazo agregado!")
+                st.markdown(f"{get_icon("✅", 20)} Reemplazo agregado!", unsafe_allow_html=True)
                 st.rerun()
         
         # Action buttons for replacements
         col1, col2 = st.columns(2)
         with col1:
-            if st.session_state.global_replacements and st.button("🚀 Aplicar Reemplazos", use_container_width=True, type="primary"):
+            if st.session_state.global_replacements and st.button("🚀 Aplicar Reemplazos", type="primary"):
                 cleaner.cleaning_ops.cleaned_df = cleaner.cleaned_df.copy()
                 result_df = cleaner.cleaning_ops.replace_values(
                     replacements=st.session_state.global_replacements,
@@ -508,17 +493,17 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 cleaner.cleaned_df = result_df.copy()
                 st.session_state.data_cleaner = cleaner
-                st.success("✅ Reemplazos aplicados!")
+                st.markdown(replace_emojis("✅ Reemplazos aplicados!"), unsafe_allow_html=True)
                 st.rerun()
         
         with col2:
             if st.button("🗑️ Limpiar Reemplazos", use_container_width=True):
                 st.session_state.global_replacements = {}
-                st.success("✅ Reemplazos limpiados!")
+                st.markdown(replace_emojis("✅ Reemplazos limpiados!"), unsafe_allow_html=True)
                 st.rerun()
     
     with tab3:
-        st.markdown("### 📊 Análisis de Calidad")
+        st.markdown(replace_emojis("### 📊 Análisis de Calidad"), unsafe_allow_html=True)
         st.markdown("Insights detallados sobre la calidad de tus datos")
         
         # Data quality metrics in a cleaner layout
@@ -527,15 +512,15 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
         # Main quality metrics
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("📊 Calidad General", f"{quality_report['quality_score']:.1f}%")
+            st.metric(replace_emojis("📊 Calidad General"), f"{quality_report['quality_score']:.1f}%")
         with col2:
             missing_count = sum(info['missing_count'] for info in quality_report['missing_values'].values())
-            st.metric("❌ Valores Faltantes", missing_count)
+            st.metric(replace_emojis("❌ Valores Faltantes"), missing_count)
         with col3:
-            st.metric("🔄 Duplicados", quality_report['duplicates']['duplicate_rows'])
+            st.metric(replace_emojis("🔄 Duplicados"), quality_report['duplicates']['duplicate_rows'])
         with col4:
             outlier_count = sum(info['outlier_count'] for info in quality_report['outliers'].values())
-            st.metric("📈 Outliers", outlier_count)
+            st.metric(replace_emojis("📈 Outliers"), outlier_count)
         
         st.markdown("---")
         
@@ -543,7 +528,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("#### 📋 Valores Faltantes por Columna")
+            st.markdown(replace_emojis("#### 📋 Valores Faltantes por Columna"), unsafe_allow_html=True)
             missing_data = pd.DataFrame(quality_report['missing_values']).T
             missing_data['missing_percent'] = pd.to_numeric(missing_data['missing_percent'], errors='coerce').round(2)
             
@@ -552,21 +537,21 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
             if not missing_cols.empty:
                 st.dataframe(missing_cols[['missing_count', 'missing_percent', 'data_type']], use_container_width=True)
             else:
-                st.success("✅ No hay valores faltantes en el dataset")
+                st.markdown(replace_emojis("✅ No hay valores faltantes en el dataset"), unsafe_allow_html=True)
         
         with col2:
-            st.markdown("#### 🔄 Análisis de Duplicados")
+            st.markdown(replace_emojis("#### 🔄 Análisis de Duplicados"), unsafe_allow_html=True)
             duplicate_info = quality_report['duplicates']
             if duplicate_info['duplicate_rows'] > 0:
                 st.warning(f"⚠️ Se encontraron {duplicate_info['duplicate_rows']} filas duplicadas ({duplicate_info['duplicate_percent']:.2f}%)")
             else:
-                st.success("✅ No se encontraron duplicados")
+                st.markdown(replace_emojis("✅ No se encontraron duplicados"), unsafe_allow_html=True)
         
         # Cleaning suggestions in a cleaner format
         suggestions = cleaner.get_cleaning_suggestions()
         if suggestions:
             st.markdown("---")
-            st.markdown("#### 💡 Sugerencias de Limpieza")
+            st.markdown(replace_emojis("#### 💡 Sugerencias de Limpieza"), unsafe_allow_html=True)
             
             # Group suggestions by severity
             high_priority = [s for s in suggestions if s.get('severity') == 'high']
@@ -591,10 +576,10 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                     st.markdown(f"• **{suggestion['description']}**")
                     st.markdown(f"  *{suggestion['action']}*")
         else:
-            st.success("✅ No se encontraron problemas de calidad significativos")
+            st.markdown(replace_emojis("✅ No se encontraron problemas de calidad significativos"), unsafe_allow_html=True)
     
     with tab4:
-        st.markdown("### 📋 Historial y Control")
+        st.markdown(replace_emojis("### 📋 Historial y Control"), unsafe_allow_html=True)
         st.markdown("Seguimiento de operaciones y control de datos")
         
         summary = cleaner.get_cleaning_summary()
@@ -602,7 +587,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
         # Summary metrics in a cleaner layout
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("🔧 Operaciones Realizadas", summary['total_operations'])
+            st.metric(replace_emojis("🔧 Operaciones Realizadas"), summary['total_operations'])
         with col2:
             st.metric("📉 Filas Removidas", summary['rows_removed'])
         with col3:
@@ -612,38 +597,38 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
         
         # Operations history
         if summary['operations']:
-            st.markdown("#### 📝 Historial de Operaciones")
+            st.markdown(replace_emojis("#### 📝 Historial de Operaciones"), unsafe_allow_html=True)
             for i, op in enumerate(summary['operations'], 1):
                 with st.expander(f"{i}. {op['operation']}", expanded=False):
                     st.markdown(f"**Detalles:** {op['details']}")
                     st.markdown(f"**Timestamp:** {op['timestamp']}")
         else:
-            st.info("📝 No se han realizado operaciones de limpieza aún.")
+            st.markdown(replace_emojis("📝 No se han realizado operaciones de limpieza aún."), unsafe_allow_html=True)
         
         # Reset section
         st.markdown("---")
-        st.markdown("#### 🔄 Control de Datos")
+        st.markdown(replace_emojis("#### 🔄 Control de Datos"), unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Resetear a Datos Originales", use_container_width=True, type="secondary"):
+            if st.button("🔄 Resetear a Datos Originales", type="secondary"):
                 cleaner.reset_to_original()
                 # Clear global replacements
                 if 'global_replacements' in st.session_state:
                     st.session_state.global_replacements = {}
-                st.success("✅ Datos reseteados a estado original!")
+                st.markdown(replace_emojis("✅ Datos reseteados a estado original!"), unsafe_allow_html=True)
                 st.rerun()
         
         with col2:
             if st.button("💾 Guardar Estado Actual", use_container_width=True):
                 # Store current state in session
                 st.session_state.saved_cleaned_data = cleaner.cleaned_df.copy()
-                st.success("✅ Estado actual guardado!")
+                st.markdown(replace_emojis("✅ Estado actual guardado!"), unsafe_allow_html=True)
                 st.rerun()
     
     # Action buttons for using cleaned data
     st.markdown("---")
-    st.markdown("### 🎯 Acciones con Datos Limpiados")
+    st.markdown(replace_emojis("### 🎯 Acciones con Datos Limpiados"), unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -656,8 +641,6 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
     
     with col2:
         if st.button("🔄 Resetear a Originales", use_container_width=True):
-            cleaner.reset_to_original()
-            st.success("¡Datos reseteados a originales!")
             st.rerun()
     
     return cleaner.get_cleaned_data()

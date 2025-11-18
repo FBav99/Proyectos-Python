@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import logging
 
+from utils.ui.icon_system import get_icon, replace_emojis
 class SecureErrorHandler:
     """Maneja errores de forma segura ocultando información sensible"""
     
@@ -97,28 +98,28 @@ class SecureErrorHandler:
         error_type = type(error).__name__
         
         if "FileNotFoundError" in error_type:
-            user_message = "❌ **Error de archivo no encontrado**\n\nEl archivo solicitado no está disponible."
+            user_message = replace_emojis("❌ **Error de archivo no encontrado**\n\nEl archivo solicitado no está disponible.")
         elif "PermissionError" in error_type:
-            user_message = "❌ **Error de permisos**\n\nNo tienes permisos para acceder a este recurso."
+            user_message = replace_emojis("❌ **Error de permisos**\n\nNo tienes permisos para acceder a este recurso.")
         elif "ValueError" in error_type:
-            user_message = f"❌ **Error de datos**\n\n{sanitized_msg}"
+            user_message = f"{get_icon("❌", 20)} **Error de datos**\n\n{sanitized_msg}"
         elif "KeyError" in error_type:
-            user_message = "❌ **Error de configuración**\n\nFalta información requerida en la configuración."
+            user_message = replace_emojis("❌ **Error de configuración**\n\nFalta información requerida en la configuración.")
         elif "ConnectionError" in error_type:
-            user_message = "❌ **Error de conexión**\n\nNo se pudo conectar con el servicio solicitado."
+            user_message = replace_emojis("❌ **Error de conexión**\n\nNo se pudo conectar con el servicio solicitado.")
         elif "TimeoutError" in error_type:
-            user_message = "❌ **Error de tiempo de espera**\n\nLa operación tardó demasiado en completarse."
+            user_message = replace_emojis("❌ **Error de tiempo de espera**\n\nLa operación tardó demasiado en completarse.")
         elif "MemoryError" in error_type:
-            user_message = "❌ **Error de memoria**\n\nNo hay suficiente memoria para procesar los datos."
+            user_message = replace_emojis("❌ **Error de memoria**\n\nNo hay suficiente memoria para procesar los datos.")
         else:
-            user_message = f"❌ **Error inesperado**\n\n{sanitized_msg}"
+            user_message = f"{get_icon("❌", 20)} **Error inesperado**\n\n{sanitized_msg}"
         
         # Mostrar error al usuario
         st.error(user_message)
         
         # Información adicional para debugging (solo en desarrollo)
         if show_details and st.session_state.get('debug_mode', False):
-            with st.expander("🔧 Información técnica (Solo para desarrolladores)"):
+            with st.expander(replace_emojis("🔧 Información técnica (Solo para desarrolladores)")):
                 st.code(f"Error ID: {error_id}")
                 st.code(f"Tipo: {error_type}")
                 st.code(f"Contexto: {context}")
@@ -127,7 +128,7 @@ class SecureErrorHandler:
         # Botón para reportar error
         col1, col2 = st.columns([3, 1])
         with col1:
-            st.info("💡 Si el problema persiste, contacta al soporte técnico.")
+            st.markdown(replace_emojis("💡 Si el problema persiste, contacta al soporte técnico."), unsafe_allow_html=True)
         with col2:
             if st.button("📋 Reportar Error", key=f"report_{error_id}"):
                 self.show_error_report_form(error_id)
@@ -136,15 +137,15 @@ class SecureErrorHandler:
     
     def show_error_report_form(self, error_id):
         """Muestra un formulario para reportar errores"""
-        st.markdown("### 📋 Reportar Error")
+        st.markdown(replace_emojis("### 📋 Reportar Error"), unsafe_allow_html=True)
         
         with st.form(f"error_report_{error_id}"):
             user_email = st.text_input("📧 Tu email (opcional):")
             user_description = st.text_area(
-                "📝 Describe qué estabas haciendo cuando ocurrió el error:",
+                replace_emojis("📝 Describe qué estabas haciendo cuando ocurrió el error:"),
                 placeholder="Ej: Estaba subiendo un archivo CSV cuando..."
             )
-            include_technical = st.checkbox("📊 Incluir información técnica")
+            include_technical = st.checkbox(replace_emojis("📊 Incluir información técnica"))
             
             if st.form_submit_button("📤 Enviar Reporte"):
                 self.submit_error_report(error_id, user_email, user_description, include_technical)
@@ -169,10 +170,10 @@ class SecureErrorHandler:
             
             st.session_state.error_reports.append(report_data)
             
-            st.success("✅ Reporte enviado exitosamente. Gracias por tu ayuda.")
+            st.markdown(replace_emojis("✅ Reporte enviado exitosamente. Gracias por tu ayuda."), unsafe_allow_html=True)
             
         except Exception as e:
-            st.error("❌ Error al enviar el reporte. Por favor, intenta más tarde.")
+            st.markdown(replace_emojis("❌ Error al enviar el reporte. Por favor, intenta más tarde."), unsafe_allow_html=True)
     
     def safe_execute(self, func, *args, **kwargs):
         """Ejecuta una función de forma segura con manejo de errores"""

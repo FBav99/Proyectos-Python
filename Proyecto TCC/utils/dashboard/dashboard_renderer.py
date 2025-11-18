@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from utils.ui import display_error
 
+from utils.ui.icon_system import get_icon, replace_emojis
 def display_metric(config, df):
     """Display a metric component"""
     metric_type = config.get('metric_type', 'count')
@@ -242,37 +243,37 @@ def render_component(component, df):
     st.markdown(f"### {component.get('title', component_type)}")
     
     # Render based on component type
-    if component_type == "📈 Métricas":
+    if component_type == replace_emojis("📈 Métricas"):
         display_metric(config, df)
     
-    elif component_type == "📊 Gráfico de Líneas":
+    elif component_type == replace_emojis("📊 Gráfico de Líneas"):
         display_line_chart(config, df)
     
-    elif component_type == "📋 Gráfico de Barras":
+    elif component_type == replace_emojis("📋 Gráfico de Barras"):
         display_bar_chart(config, df)
     
     elif component_type == "🥧 Gráfico Circular":
         display_pie_chart(config, df)
     
-    elif component_type == "📈 Gráfico de Área":
+    elif component_type == replace_emojis("📈 Gráfico de Área"):
         display_area_chart(config, df)
     
-    elif component_type == "📈 Gráfico de Dispersión":
+    elif component_type == replace_emojis("📈 Gráfico de Dispersión"):
         display_scatter_plot(config, df)
     
-    elif component_type == "📊 Histograma":
+    elif component_type == replace_emojis("📊 Histograma"):
         display_histogram(config, df)
     
-    elif component_type == "📊 Box Plot":
+    elif component_type == replace_emojis("📊 Box Plot"):
         display_box_plot(config, df)
     
-    elif component_type == "📈 Gráfico de Violín":
+    elif component_type == replace_emojis("📈 Gráfico de Violín"):
         display_violin_plot(config, df)
     
-    elif component_type == "📊 Matriz de Correlación":
+    elif component_type == replace_emojis("📊 Matriz de Correlación"):
         display_correlation_matrix(config, df)
     
-    elif component_type == "📋 Tabla de Datos":
+    elif component_type == replace_emojis("📋 Tabla de Datos"):
         display_data_table(config, df)
     
     else:
@@ -299,7 +300,7 @@ def render_dashboard(df):
     """Render the complete dashboard"""
     components = st.session_state.get('dashboard_components', [])
     if not components:
-        st.info("🎨 No hay componentes en tu dashboard. Usa la barra lateral para agregar componentes.")
+        st.markdown(replace_emojis("🎨 No hay componentes en tu dashboard. Usa la barra lateral para agregar componentes."), unsafe_allow_html=True)
         return
 
     layout_rows = {}

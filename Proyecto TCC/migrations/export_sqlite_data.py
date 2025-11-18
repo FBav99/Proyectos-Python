@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Export SQLite data to JSON format for backup and migration
 This script exports all user data from SQLite database to a JSON file
@@ -118,7 +119,7 @@ def export_all_data(output_file=None):
     # Create backups directory if it doesn't exist
     os.makedirs(os.path.dirname(output_file) if os.path.dirname(output_file) else '.', exist_ok=True)
     
-    logger.info("🔄 Starting SQLite data export...")
+    logger.info(replace_emojis("🔄 Starting SQLite data export..."))
     
     # Export all data
     data = {
@@ -134,35 +135,35 @@ def export_all_data(output_file=None):
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
-        logger.info(f"✅ Data exported successfully to: {output_file}")
+        logger.info(f"{get_icon("✅", 20)} Data exported successfully to: {output_file}")
         logger.info(f"   - Users: {len(data['users'])}")
         logger.info(f"   - User Progress: {len(data['user_progress'])}")
         logger.info(f"   - Quiz Attempts: {len(data['quiz_attempts'])}")
         
         return output_file
     except Exception as e:
-        logger.error(f"❌ Error writing export file: {e}")
+        logger.error(f"{get_icon("❌", 20)} Error writing export file: {e}")
         return None
 
 def main():
     """Main export function"""
-    logger.info("🚀 Starting SQLite data export...")
+    logger.info(replace_emojis("🚀 Starting SQLite data export..."))
     
     # Check if database exists
     if not db_manager.check_database_exists():
-        logger.error("❌ Database does not exist")
+        logger.error(replace_emojis("❌ Database does not exist"))
         return False
     
     # Export data
     output_file = export_all_data()
     
     if output_file:
-        logger.info("🎉 Export completed successfully!")
-        logger.info(f"📁 Backup file: {output_file}")
-        logger.info("💡 You can use this file to restore data or migrate to Supabase")
+        logger.info(replace_emojis("🎉 Export completed successfully!"))
+        logger.info(f"{get_icon("📁", 20)} Backup file: {output_file}")
+        logger.info(replace_emojis("💡 You can use this file to restore data or migrate to Supabase"))
         return True
     else:
-        logger.error("❌ Export failed")
+        logger.error(replace_emojis("❌ Export failed"))
         return False
 
 if __name__ == "__main__":

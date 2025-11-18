@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from utils.data import create_data_cleaning_interface, show_upload_section, show_examples_section
 from utils.ui import auth_ui
+from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.config import setup_page_config, apply_custom_css
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
@@ -20,19 +21,19 @@ def main():
     init_sidebar()
     
     # Título principal
-    st.markdown('<h1 class="main-header">🧹 Limpieza Automática de Datos</h1>', unsafe_allow_html=True)
+    st.markdown(f'<h1 class="main-header">{get_icon("🧹", 28)} Limpieza Automática de Datos</h1>', unsafe_allow_html=True)
     
     # Descripción
-    st.markdown("""
+    st.markdown(f"""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <h2 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.5rem;">🧽 Limpieza Automática de Datos</h2>
+        <h2 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.5rem;">{get_icon("🧽", 24)} Limpieza Automática de Datos</h2>
         <p style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.1rem;">
             Limpia y prepara tus datos automáticamente antes del análisis
         </p>
         <div style="color: rgba(255,255,255,0.9); text-align: center; font-size: 0.9rem;">
             <p><strong>Funcionalidades incluidas:</strong></p>
-            <p>🧹 Limpieza de espacios • 📝 Normalización de texto • 🔄 Reemplazo de valores</p>
-            <p>📞 Estandarización de teléfonos • 📧 Estandarización de emails • ❌ Manejo de valores faltantes</p>
+            <p>{get_icon("🧹", 16)} Limpieza de espacios • {get_icon("📝", 16)} Normalización de texto • {get_icon("🔄", 16)} Reemplazo de valores</p>
+            <p>{get_icon("📞", 16)} Estandarización de teléfonos • {get_icon("📧", 16)} Estandarización de emails • {get_icon("❌", 16)} Manejo de valores faltantes</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -42,7 +43,7 @@ def main():
         # Header with current file info and upload new file option
         col1, col2 = st.columns([3, 1])
         with col1:
-            st.markdown(f"### 📊 Datos Actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas")
+            st.markdown(f"### {get_icon("📊", 20)} Datos Actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas")
         with col2:
             if st.button("📁 Subir Nuevo Archivo", type="secondary", use_container_width=True):
                 # Show confirmation dialog
@@ -71,7 +72,7 @@ def main():
         
         # Always show comparison stats using the session state cleaner
         st.markdown("---")
-        st.markdown("### 📊 Comparación de Datos")
+        st.markdown(replace_emojis("### 📊 Comparación de Datos"), unsafe_allow_html=True)
         
         # Get the current cleaner from session state
         if 'data_cleaner' in st.session_state:
@@ -79,17 +80,17 @@ def main():
             original_df = cleaner.original_df
             current_df = cleaner.cleaned_df
             # Debug info
-            st.write(f"🔍 Debug: Original rows: {len(original_df)}, Current rows: {len(current_df)}")
-            st.write(f"🔍 Debug: Original columns: {len(original_df.columns)}, Current columns: {len(current_df.columns)}")
+            st.write(f"{get_icon("🔍", 20)} Debug: Original rows: {len(original_df)}, Current rows: {len(current_df)}")
+            st.write(f"{get_icon("🔍", 20)} Debug: Original columns: {len(original_df.columns)}, Current columns: {len(current_df.columns)}")
         else:
             # Fallback to uploaded data if no cleaner in session state
             original_df = st.session_state.uploaded_data
             current_df = cleaned_df
-            st.write("🔍 Debug: Using fallback data")
+            st.write(replace_emojis("🔍 Debug: Using fallback data"))
         
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("📈 Filas Originales", len(original_df))
+            st.metric(replace_emojis("📈 Filas Originales"), len(original_df))
         with col2:
             st.metric("🧹 Filas Limpiadas", len(current_df))
         with col3:
@@ -103,7 +104,7 @@ def main():
         col1, col2 = st.columns([2, 1])
         with col1:
             if st.button("👀 Ver Vista Previa de Datos Limpiados"):
-                st.subheader("📊 Vista Previa de Datos Limpiados")
+                st.subheader(replace_emojis("📊 Vista Previa de Datos Limpiados"))
                 st.dataframe(cleaned_df.head(20), use_container_width=True)
         
         with col2:
@@ -120,10 +121,10 @@ def main():
     
     else:
         # Mostrar opciones para cargar datos
-        st.markdown("### 📤 Cargar Datos para Limpiar")
+        st.markdown(replace_emojis("### 📤 Cargar Datos para Limpiar"), unsafe_allow_html=True)
         
         # Tabs para diferentes opciones de carga
-        tab1, tab2 = st.tabs(["📁 Subir Archivo", "📊 Datasets de Ejemplo"])
+        tab1, tab2 = st.tabs([replace_emojis("📁 Subir Archivo"), "📊 Datasets de Ejemplo"])
         
         with tab1:
             show_upload_section()

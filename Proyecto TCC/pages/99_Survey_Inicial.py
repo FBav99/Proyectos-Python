@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Initial Survey - Before Starting Levels
 Asks about user's data analysis experience, Excel usage, etc.
@@ -15,7 +16,7 @@ configure_streamlit_error_handling()
 
 st.set_page_config(
     page_title="Encuesta Inicial",
-    page_icon="📋",
+    page_icon=get_icon("📋", 20),
     layout="wide"
 )
 
@@ -26,7 +27,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a esta encuesta.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a esta encuesta."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -35,13 +36,13 @@ def main():
     
     # Check if user has already completed this survey
     if survey_system.has_completed_survey(user_id, 'initial'):
-        st.success("✅ Ya completaste esta encuesta. ¡Gracias por tu participación!")
+        st.markdown(replace_emojis("✅ Ya completaste esta encuesta. ¡Gracias por tu participación!"), unsafe_allow_html=True)
         st.info("Puedes continuar con los niveles de aprendizaje.")
         if st.button("Ir a los Niveles", type="primary"):
             st.switch_page("Inicio.py")
         return
     
-    st.title("📋 Encuesta Inicial")
+    st.title(replace_emojis("📋 Encuesta Inicial"))
     st.markdown("### Antes de comenzar, nos gustaría conocer un poco sobre ti")
     st.markdown("Esta encuesta nos ayuda a mejorar la experiencia de aprendizaje. Toma aproximadamente 2 minutos.")
     
@@ -49,7 +50,7 @@ def main():
     
     # Survey questions
     with st.form("initial_survey_form"):
-        st.subheader("📊 Experiencia con Análisis de Datos")
+        st.subheader(replace_emojis("📊 Experiencia con Análisis de Datos"))
         
         # Question 1: Data analysis experience
         data_analysis_exp = st.selectbox(
@@ -116,7 +117,7 @@ def main():
         
         st.divider()
         
-        st.subheader("🎯 Objetivos de Aprendizaje")
+        st.subheader(replace_emojis("🎯 Objetivos de Aprendizaje"))
         
         # Question 4: Learning goals
         learning_goals = st.multiselect(
@@ -149,7 +150,7 @@ def main():
         st.divider()
         
         # Submit button
-        submitted = st.form_submit_button("✅ Enviar Encuesta", type="primary", use_container_width=True)
+        submitted = st.form_submit_button(replace_emojis("✅ Enviar Encuesta"), type="primary", use_container_width=True)
         
         if submitted:
             # Validate required fields
@@ -173,14 +174,14 @@ def main():
             
             # Save to database
             if survey_system.save_survey_response(user_id, 'initial', responses):
-                st.success("✅ ¡Gracias por completar la encuesta!")
+                st.markdown(replace_emojis("✅ ¡Gracias por completar la encuesta!"), unsafe_allow_html=True)
                 st.balloons()
                 st.info("Ahora puedes comenzar con los niveles de aprendizaje.")
                 
                 # Auto-redirect after 2 seconds
                 st.session_state.initial_survey_completed = True
             else:
-                st.error("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo.")
+                st.markdown(replace_emojis("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo."), unsafe_allow_html=True)
     
     if st.session_state.get("initial_survey_completed"):
         if st.button("Comenzar con los Niveles", type="primary", use_container_width=True):

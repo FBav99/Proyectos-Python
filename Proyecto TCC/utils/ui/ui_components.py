@@ -4,9 +4,10 @@ import numpy as np
 from datetime import datetime
 from utils.system import export_data, get_csv_data, create_summary_report
 
+from utils.ui.icon_system import get_icon, replace_emojis
 def create_sidebar_controls():
     """Crear controles de la barra lateral"""
-    st.sidebar.title("🔧 Controles")
+    st.sidebar.title(replace_emojis("🔧 Controles"))
     
     # Carga de archivos
     uploaded_file = st.sidebar.file_uploader(
@@ -19,7 +20,7 @@ def create_sidebar_controls():
 
 def create_custom_calculations_ui(df):
     """Crear interfaz para cálculos personalizados"""
-    st.sidebar.subheader("🧮 Cálculos Personalizados")
+    st.sidebar.subheader(replace_emojis("🧮 Cálculos Personalizados"))
     
     # Obtener columnas numéricas para cálculos
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -117,27 +118,27 @@ def create_custom_calculations_ui(df):
 
 def display_metrics_dashboard(metrics, df):
     """Mostrar panel de métricas clave de forma flexible"""
-    st.subheader("🎯 Métricas Clave de Rendimiento")
+    st.subheader(replace_emojis("🎯 Métricas Clave de Rendimiento"))
     
     # Determinar cuántas columnas usar basado en las métricas disponibles
     available_metrics = []
     
     # Métricas básicas que siempre están disponibles
     if 'total_records' in metrics:
-        available_metrics.append(('📊 Total Registros', f"{metrics['total_records']:,}", None))
+        available_metrics.append((replace_emojis("📊 Total Registros"), f"{metrics['total_records']:,}", None))
     
     if 'total_columns' in metrics:
-        available_metrics.append(('📋 Total Columnas', f"{metrics['total_columns']}", None))
+        available_metrics.append((replace_emojis("📋 Total Columnas"), f"{metrics['total_columns']}", None))
     
     # Métricas numéricas
     if 'total_value' in metrics:
-        available_metrics.append(('💰 Valor Total', f"{metrics['total_value']:,.2f}", None))
+        available_metrics.append((replace_emojis("💰 Valor Total"), f"{metrics['total_value']:,.2f}", None))
     
     if 'avg_value' in metrics:
-        available_metrics.append(('📈 Promedio', f"{metrics['avg_value']:,.2f}", None))
+        available_metrics.append((replace_emojis("📈 Promedio"), f"{metrics['avg_value']:,.2f}", None))
     
     if 'max_value' in metrics:
-        available_metrics.append(('📊 Valor Máximo', f"{metrics['max_value']:,.2f}", None))
+        available_metrics.append((replace_emojis("📊 Valor Máximo"), f"{metrics['max_value']:,.2f}", None))
     
     if 'min_value' in metrics:
         available_metrics.append(('📉 Valor Mínimo', f"{metrics['min_value']:,.2f}", None))
@@ -148,14 +149,14 @@ def display_metrics_dashboard(metrics, df):
     
     # Métricas de fechas
     if 'date_range_days' in metrics:
-        available_metrics.append(('📅 Rango de Días', f"{metrics['date_range_days']} días", None))
+        available_metrics.append((replace_emojis("📅 Rango de Días"), f"{metrics['date_range_days']} días", None))
     
     # Métricas adicionales
     if 'total_value_2' in metrics:
-        available_metrics.append(('💰 Valor Total 2', f"{metrics['total_value_2']:,.2f}", None))
+        available_metrics.append((replace_emojis("💰 Valor Total 2"), f"{metrics['total_value_2']:,.2f}", None))
     
     if 'avg_value_2' in metrics:
-        available_metrics.append(('📈 Promedio 2', f"{metrics['avg_value_2']:,.2f}", None))
+        available_metrics.append((replace_emojis("📈 Promedio 2"), f"{metrics['avg_value_2']:,.2f}", None))
     
     # Mostrar métricas en columnas
     if len(available_metrics) >= 4:
@@ -177,12 +178,12 @@ def display_metrics_dashboard(metrics, df):
     if not available_metrics:
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("📊 Registros", f"{len(df):,}")
+            st.metric(replace_emojis("📊 Registros"), f"{len(df):,}")
         with col2:
-            st.metric("📋 Columnas", len(df.columns))
+            st.metric(replace_emojis("📋 Columnas"), len(df.columns))
         with col3:
             numeric_cols = df.select_dtypes(include=[np.number]).columns
-            st.metric("🔢 Numéricas", len(numeric_cols))
+            st.metric(replace_emojis("🔢 Numéricas"), len(numeric_cols))
         with col4:
             categorical_cols = df.select_dtypes(include=['object']).columns
             st.metric("🏷️ Categóricas", len(categorical_cols))
@@ -192,7 +193,7 @@ def display_custom_calculations_metrics(df, custom_calculations):
     if not custom_calculations:
         return
     
-    st.subheader("🧮 Tus Cálculos Personalizados")
+    st.subheader(replace_emojis("🧮 Tus Cálculos Personalizados"))
     
     calc_cols = st.columns(min(3, len(custom_calculations)))
     for i, calc_info in enumerate(custom_calculations):
@@ -203,7 +204,7 @@ def display_custom_calculations_metrics(df, custom_calculations):
                 total_value = df[calc_name].sum()
                 
                 st.metric(
-                    f"📊 {calc_name}",
+                    replace_emojis(f"📊 {calc_name}"),
                     f"{avg_value:.2f}" if not np.isnan(avg_value) else "N/A",
                     delta=f"Total: {total_value:.2f}" if not np.isnan(total_value) else "N/A"
                 )
@@ -215,7 +216,7 @@ def display_custom_calculations_metrics(df, custom_calculations):
 
 def display_export_section(df, filters_applied, metrics):
     """Mostrar sección de exportación"""
-    st.subheader("📤 Exportar Datos")
+    st.subheader(replace_emojis("📤 Exportar Datos"))
     
     col1, col2, col3 = st.columns(3)
     
@@ -232,7 +233,7 @@ def display_export_section(df, filters_applied, metrics):
     with col2:
         csv_data = get_csv_data(df)
         st.download_button(
-            label="📄 Descargar como CSV",
+            label=replace_emojis("📄 Descargar como CSV"),
             data=csv_data,
             file_name=f"datos_filtrados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             mime="text/csv"
@@ -242,7 +243,7 @@ def display_export_section(df, filters_applied, metrics):
         # Crear reporte de resumen
         summary_text = create_summary_report(df, filters_applied, metrics)
         st.download_button(
-            label="📋 Descargar Reporte Resumen",
+            label=replace_emojis("📋 Descargar Reporte Resumen"),
             data=summary_text,
             file_name=f"reporte_resumen_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
             mime="text/markdown"

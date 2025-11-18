@@ -1,6 +1,7 @@
 import streamlit as st
 from core.auth_service import login_user, logout_user, get_current_user as db_get_current_user
 
+from utils.ui.icon_system import get_icon, replace_emojis
 HIDDEN_NAVIGATION_PATTERNS = [
     "pages/99_Survey",
     "pages/99_Admin",
@@ -56,9 +57,9 @@ def hide_restricted_sidebar_entries():
 
 def show_login_form():
     """Display the login form for unauthenticated users"""
-    st.markdown("""
+    st.markdown(f"""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
-        <h1 style="color: white; margin-bottom: 1rem;">🔐 Iniciar Sesión</h1>
+        <h1 style="color: white; margin-bottom: 1rem;">{get_icon("🔐", 28)} Iniciar Sesión</h1>
         <p style="color: white; font-size: 1.1rem;">Accede a tu cuenta para continuar</p>
     </div>
     """, unsafe_allow_html=True)
@@ -77,14 +78,14 @@ def show_login_form():
     if login_submitted and username and password:
         success, message = login_user(username, password)
         if success:
-            st.success("✅ ¡Inicio de sesión exitoso!")
+            st.markdown(replace_emojis("✅ ¡Inicio de sesión exitoso!"), unsafe_allow_html=True)
             st.rerun()
         else:
-            st.error(f"❌ {message}")
+            st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
     
     # Add additional options
     st.markdown("---")
-    st.markdown("### 🔐 ¿Necesitas ayuda?")
+    st.markdown(replace_emojis("### 🔐 ¿Necesitas ayuda?"), unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📝 Crear Nueva Cuenta", type="primary", use_container_width=True):
@@ -100,7 +101,7 @@ def show_user_sidebar(current_user=None):
     """Display user information and logout button in sidebar - Always shows username prominently"""
     hide_restricted_sidebar_entries()
     with st.sidebar:
-        st.markdown("### 👤 Usuario")
+        st.markdown(replace_emojis("### 👤 Usuario"), unsafe_allow_html=True)
         st.markdown("---")
         
         if current_user:
@@ -123,7 +124,7 @@ def show_user_sidebar(current_user=None):
                             padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center;">
                     <h3 style="color: white; margin: 0;">@{username}</h3>
                     <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.9rem;">{name}</p>
-                    <p style="color: white; margin: 0.3rem 0 0 0; font-size: 0.8rem;">🔐 {provider}</p>
+                    <p style="color: white; margin: 0.3rem 0 0 0; font-size: 0.8rem;">{get_icon("🔐", 16)} {provider}</p>
                 </div>
                 """, unsafe_allow_html=True)
             else:
@@ -137,7 +138,7 @@ def show_user_sidebar(current_user=None):
                             padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center;">
                     <h3 style="color: white; margin: 0;">@{username}</h3>
                     <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.9rem;">{name}</p>
-                    <p style="color: white; margin: 0.3rem 0 0 0; font-size: 0.8rem;">✅ Sesión activa</p>
+                    <p style="color: white; margin: 0.3rem 0 0 0; font-size: 0.8rem;">{get_icon("✅", 16)} Sesión activa</p>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -156,8 +157,8 @@ def show_user_sidebar(current_user=None):
             # Not authenticated - show login prompt with clear indication
             st.markdown(f"""
             <div style="background: #f0f0f0; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center; border: 2px solid #ff6b6b;">
-                <p style="color: #666; margin: 0; font-weight: bold;">⚠️ No autenticado</p>
-                <p style="color: #999; margin: 0.5rem 0 0 0; font-size: 0.9rem;">👤 Usuario: Invitado</p>
+                <p style="color: #666; margin: 0; font-weight: bold;">{get_icon("⚠️", 16)} No autenticado</p>
+                <p style="color: #999; margin: 0.5rem 0 0 0; font-size: 0.9rem;">{get_icon("👤", 16)} Usuario: Invitado</p>
             </div>
             """, unsafe_allow_html=True)
             st.markdown("---")

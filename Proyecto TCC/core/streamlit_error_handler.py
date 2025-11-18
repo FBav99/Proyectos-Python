@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Global error handler for Streamlit to prevent exposing file paths in tracebacks
 This wraps all page functions to catch and sanitize errors before Streamlit displays them
@@ -80,21 +81,21 @@ def safe_streamlit_page(func: Callable) -> Callable:
             
             # Determine user-friendly message based on error type
             if error_type == "FileNotFoundError":
-                user_msg = "❌ **Archivo no encontrado**\n\nEl archivo o recurso solicitado no está disponible."
+                user_msg = replace_emojis("❌ **Archivo no encontrado**\n\nEl archivo o recurso solicitado no está disponible.")
             elif error_type == "PermissionError":
-                user_msg = "❌ **Error de permisos**\n\nNo se tienen permisos para realizar esta operación."
+                user_msg = replace_emojis("❌ **Error de permisos**\n\nNo se tienen permisos para realizar esta operación.")
             elif error_type == "OSError":
-                user_msg = "❌ **Error del sistema**\n\nNo se pudo completar la operación solicitada."
+                user_msg = replace_emojis("❌ **Error del sistema**\n\nNo se pudo completar la operación solicitada.")
             elif error_type == "IOError":
-                user_msg = "❌ **Error de entrada/salida**\n\nHubo un problema al acceder a los archivos."
+                user_msg = replace_emojis("❌ **Error de entrada/salida**\n\nHubo un problema al acceder a los archivos.")
             elif error_type == "KeyError":
-                user_msg = "❌ **Error de configuración**\n\nFalta información requerida en la configuración."
+                user_msg = replace_emojis("❌ **Error de configuración**\n\nFalta información requerida en la configuración.")
             elif error_type == "ValueError":
-                user_msg = f"❌ **Error de datos**\n\n{sanitized_msg}"
+                user_msg = f"{get_icon("❌", 20)} **Error de datos**\n\n{sanitized_msg}"
             elif error_type == "ConnectionError":
-                user_msg = "❌ **Error de conexión**\n\nNo se pudo conectar con el servicio."
+                user_msg = replace_emojis("❌ **Error de conexión**\n\nNo se pudo conectar con el servicio.")
             else:
-                user_msg = f"❌ **Error inesperado**\n\nOcurrió un error al procesar tu solicitud. Por favor, intenta nuevamente."
+                user_msg = f"{get_icon("❌", 20)} **Error inesperado**\n\nOcurrió un error al procesar tu solicitud. Por favor, intenta nuevamente."
             
             # Display user-friendly error
             st.error(user_msg)
@@ -102,7 +103,7 @@ def safe_streamlit_page(func: Callable) -> Callable:
             # Optionally show a generic technical message (without paths)
             # Temporarily enable debug mode for troubleshooting
             if st.session_state.get('debug_mode', False) or True:  # Temporarily always True for debugging
-                with st.expander("🔧 Detalles técnicos (modo debug)"):
+                with st.expander(replace_emojis("🔧 Detalles técnicos (modo debug)")):
                     st.code(f"Tipo: {error_type}\nMensaje: {sanitized_msg}\nError original: {error_message}", language=None)
                     import traceback
                     st.code(traceback.format_exc(), language='python')

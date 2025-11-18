@@ -5,6 +5,7 @@ from core.database import db_manager
 from utils.ui import auth_ui
 import re
 
+from utils.ui.icon_system import get_icon, replace_emojis
 # Import init_sidebar - using module import for better compatibility
 init_sidebar = auth_ui.init_sidebar
 
@@ -60,10 +61,10 @@ def main():
     """, unsafe_allow_html=True)
     
     # Tab selection for different recovery options
-    tab1, tab2, tab3 = st.tabs(["🔑 Recuperar Contraseña", "📧 Cambiar Email", "🔐 Cambiar Contraseña"])
+    tab1, tab2, tab3 = st.tabs(["🔑 Recuperar Contraseña", "📧 Cambiar Email", replace_emojis("🔐 Cambiar Contraseña")])
     
     with tab1:
-        st.markdown("### 🔐 Recuperar Contraseña")
+        st.markdown(replace_emojis("### 🔐 Recuperar Contraseña"), unsafe_allow_html=True)
         st.info("""
         **Proceso de recuperación:**
         1. Ingresa tu nombre de usuario
@@ -83,7 +84,7 @@ def main():
             
             if submitted:
                 if not username:
-                    st.session_state.recovery_error = "❌ Por favor ingresa tu nombre de usuario"
+                    st.session_state.recovery_error = replace_emojis("❌ Por favor ingresa tu nombre de usuario")
                     st.rerun()
                 else:
                     # Check if user exists and get email
@@ -109,14 +110,14 @@ def main():
                         st.session_state.recovery_step = 'verify_email'
                         st.rerun()
                     else:
-                        st.session_state.recovery_error = '❌ Usuario no encontrado o cuenta inactiva'
+                        st.session_state.recovery_error = replace_emojis('❌ Usuario no encontrado o cuenta inactiva')
                         st.rerun()
         
         # Email verification step (2FA-like)
         if st.session_state.get('recovery_step') == 'verify_email' and st.session_state.get('recovery_user'):
             user_info = st.session_state.recovery_user
             st.markdown("---")
-            st.markdown("### 🔒 Verificación de Seguridad")
+            st.markdown(replace_emojis("### 🔒 Verificación de Seguridad"), unsafe_allow_html=True)
             st.warning(f"""
             **Verificación requerida:**
             
@@ -133,13 +134,13 @@ def main():
                     help="Ingresa el email completo registrado en tu cuenta"
                 )
                 
-                verify_submitted = st.form_submit_button("✅ Verificar y Recuperar", type="primary", use_container_width=True)
+                verify_submitted = st.form_submit_button(replace_emojis("✅ Verificar y Recuperar"), type="primary", use_container_width=True)
                 
                 if verify_submitted:
                     if not verification_email:
-                        st.error("❌ Por favor ingresa tu email")
+                        st.markdown(replace_emojis("❌ Por favor ingresa tu email"), unsafe_allow_html=True)
                     elif verification_email.lower().strip() != user_info['email'].lower().strip():
-                        st.error("❌ El email no coincide con el registrado. Por favor verifica e intenta nuevamente.")
+                        st.markdown(replace_emojis("❌ El email no coincide con el registrado. Por favor verifica e intenta nuevamente."), unsafe_allow_html=True)
                         st.info("💡 Si no recuerdas tu email, puedes usar la opción 'Cambiar Email' después de iniciar sesión")
                     else:
                         # Email verified - proceed with password recovery
@@ -159,14 +160,14 @@ def main():
                                 del st.session_state.recovery_user
                             st.rerun()
                         else:
-                            st.error("❌ Error al generar la nueva contraseña")
+                            st.markdown(replace_emojis("❌ Error al generar la nueva contraseña"), unsafe_allow_html=True)
         
         # Show success message
         if st.session_state.get('recovery_success', False):
             recovery_data = st.session_state.get('recovery_data', {})
             st.markdown("---")
-            st.success('✅ Nueva contraseña generada exitosamente!')
-            st.info(f'👤 Usuario: {recovery_data.get("username", "")}')
+            st.markdown(replace_emojis('✅ Nueva contraseña generada exitosamente!'), unsafe_allow_html=True)
+            st.markdown(f'{get_icon("👤", 20)} Usuario: {recovery_data.get("username", "")}', unsafe_allow_html=True)
             st.info(f'📧 Email: {recovery_data.get("email", "")}')
             st.warning(f'🔑 Nueva contraseña: **{recovery_data.get("password", "")}**')
             
@@ -209,7 +210,7 @@ def main():
             if st.button("🔐 Ir a Iniciar Sesión", type="primary", use_container_width=True):
                 st.switch_page("Inicio.py")
         else:
-            st.success(f"✅ Autenticado como: **@{current_user['username']}**")
+            st.markdown(f"{get_icon('✅', 20)} Autenticado como: **@{current_user['username']}**", unsafe_allow_html=True)
             st.info(f"📧 Email actual: **{current_user['email']}**")
             
             with st.form("change_email_form", clear_on_submit=False):
@@ -229,11 +230,11 @@ def main():
                 
                 if submitted:
                     if not new_email or not confirm_new_email:
-                        st.error("❌ Por favor completa ambos campos")
+                        st.markdown(replace_emojis("❌ Por favor completa ambos campos"), unsafe_allow_html=True)
                     elif new_email != confirm_new_email:
-                        st.error("❌ Los emails no coinciden")
+                        st.markdown(replace_emojis("❌ Los emails no coinciden"), unsafe_allow_html=True)
                     elif not validate_email(new_email):
-                        st.error("❌ Formato de email inválido")
+                        st.markdown(replace_emojis("❌ Formato de email inválido"), unsafe_allow_html=True)
                     elif new_email.lower().strip() == current_user['email'].lower().strip():
                         st.warning("⚠️ Este es tu email actual. No se requiere cambio.")
                     else:
@@ -241,17 +242,17 @@ def main():
                         success, message = auth_service.update_email(current_user['id'], new_email)
                         
                         if success:
-                            st.success(f"✅ {message}")
+                            st.markdown(f"{get_icon("✅", 20)} {message}", unsafe_allow_html=True)
                             st.info(f"📧 Tu nuevo email es: **{new_email}**")
-                            st.info("🔄 Por favor, inicia sesión nuevamente para actualizar tu sesión")
+                            st.markdown(replace_emojis("🔄 Por favor, inicia sesión nuevamente para actualizar tu sesión"), unsafe_allow_html=True)
                             
                             # Clear form by rerunning
                             st.rerun()
                         else:
-                            st.error(f"❌ {message}")
+                            st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
     
     with tab3:
-        st.markdown("### 🔐 Cambiar Contraseña")
+        st.markdown(replace_emojis("### 🔐 Cambiar Contraseña"), unsafe_allow_html=True)
         st.info("""
         **Para cambiar tu contraseña:**
         1. Debes estar autenticado (iniciar sesión primero)
@@ -269,7 +270,7 @@ def main():
             if st.button("🔐 Ir a Iniciar Sesión", type="primary", use_container_width=True):
                 st.switch_page("Inicio.py")
         else:
-            st.success(f"✅ Autenticado como: **@{current_user['username']}**")
+            st.markdown(f"{get_icon('✅', 20)} Autenticado como: **@{current_user['username']}**", unsafe_allow_html=True)
             
             # Password requirements help text
             password_help = "La contraseña debe tener: mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
@@ -300,7 +301,7 @@ def main():
                 if new_password:
                     is_valid, message = validate_password(new_password)
                     if is_valid:
-                        st.success(f"✅ {message}")
+                        st.markdown(f"{get_icon("✅", 20)} {message}", unsafe_allow_html=True)
                     else:
                         st.warning(f"⚠️ {message}")
                         st.info("""
@@ -311,18 +312,18 @@ def main():
                         - Al menos un número (0-9)
                         """)
                 
-                submitted = st.form_submit_button("🔐 Cambiar Contraseña", type="primary", use_container_width=True)
+                submitted = st.form_submit_button(replace_emojis("🔐 Cambiar Contraseña"), type="primary", use_container_width=True)
                 
                 if submitted:
                     if not current_password or not new_password or not confirm_new_password:
-                        st.error("❌ Por favor completa todos los campos")
+                        st.markdown(replace_emojis("❌ Por favor completa todos los campos"), unsafe_allow_html=True)
                     elif new_password != confirm_new_password:
-                        st.error("❌ Las contraseñas nuevas no coinciden")
+                        st.markdown(replace_emojis("❌ Las contraseñas nuevas no coinciden"), unsafe_allow_html=True)
                     else:
                         # Validate password strength
                         is_valid, message = validate_password(new_password)
                         if not is_valid:
-                            st.error(f"❌ {message}")
+                            st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
                         else:
                             # Update password
                             success, message = auth_service.update_password(
@@ -332,13 +333,13 @@ def main():
                             )
                             
                             if success:
-                                st.success(f"✅ {message}")
-                                st.info("🔄 Por favor, inicia sesión nuevamente con tu nueva contraseña")
+                                st.markdown(f"{get_icon("✅", 20)} {message}", unsafe_allow_html=True)
+                                st.markdown(replace_emojis("🔄 Por favor, inicia sesión nuevamente con tu nueva contraseña"), unsafe_allow_html=True)
                                 
                                 # Clear form by rerunning
                                 st.rerun()
                             else:
-                                st.error(f"❌ {message}")
+                                st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
     
     # Navigation
     st.markdown("---")

@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 #!/usr/bin/env python3
 """
 Migration script to add nivel0_completed column to user_progress table
@@ -36,20 +37,20 @@ def migrate_database():
         """)
         
         conn.commit()
-        print("✅ Migration completed successfully!")
+        print(replace_emojis("✅ Migration completed successfully!"))
         
         # Verify the column was added
         cursor.execute("PRAGMA table_info(user_progress)")
         columns = [column[1] for column in cursor.fetchall()]
         if 'nivel0_completed' in columns:
-            print("✅ nivel0_completed column verified in database")
+            print(replace_emojis("✅ nivel0_completed column verified in database"))
         else:
-            print("❌ Error: nivel0_completed column not found after migration")
+            print(replace_emojis("❌ Error: nivel0_completed column not found after migration"))
         
         conn.close()
         
     except Exception as e:
-        print(f"❌ Migration failed: {e}")
+        print(f"{get_icon("❌", 20)} Migration failed: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

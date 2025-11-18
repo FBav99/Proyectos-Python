@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Reset database - Wipe all data and start fresh
 Use this to start with a clean database
@@ -21,13 +22,13 @@ def reset_sqlite_database():
     try:
         if os.path.exists(DB_PATH):
             os.remove(DB_PATH)
-            logger.info(f"✅ Deleted SQLite database: {DB_PATH}")
+            logger.info(f"{get_icon("✅", 20)} Deleted SQLite database: {DB_PATH}")
             return True
         else:
             logger.info("ℹ️  SQLite database doesn't exist, nothing to delete")
             return True
     except Exception as e:
-        logger.error(f"❌ Error deleting database: {e}")
+        logger.error(f"{get_icon("❌", 20)} Error deleting database: {e}")
         return False
 
 def reset_supabase_database():
@@ -66,16 +67,16 @@ def reset_supabase_database():
                     logger.debug(f"  Could not drop {table}: {e}")
             
             conn.commit()
-            logger.info("✅ Supabase database reset complete")
+            logger.info(replace_emojis("✅ Supabase database reset complete"))
             return True
     
     except Exception as e:
-        logger.error(f"❌ Error resetting Supabase: {e}")
+        logger.error(f"{get_icon("❌", 20)} Error resetting Supabase: {e}")
         return False
 
 def main():
     """Main reset function"""
-    logger.info("🔄 Starting database reset...")
+    logger.info(replace_emojis("🔄 Starting database reset..."))
     
     # Check database type
     db_type = db_manager.db_type
@@ -85,7 +86,7 @@ def main():
         logger.warning("⚠️  WARNING: You are about to DELETE ALL DATA from Supabase!")
         response = input("Type 'RESET' to confirm: ")
         if response != "RESET":
-            logger.info("❌ Reset cancelled")
+            logger.info(replace_emojis("❌ Reset cancelled"))
             return False
         
         success = reset_supabase_database()
@@ -94,17 +95,17 @@ def main():
         success = reset_sqlite_database()
     
     if success:
-        logger.info("🔄 Reinitializing database with fresh tables...")
+        logger.info(replace_emojis("🔄 Reinitializing database with fresh tables..."))
         try:
             init_database()
-            logger.info("✅ Database reset and reinitialized successfully!")
-            logger.info("🎉 You now have a clean, empty database")
+            logger.info(replace_emojis("✅ Database reset and reinitialized successfully!"))
+            logger.info(replace_emojis("🎉 You now have a clean, empty database"))
             return True
         except Exception as e:
-            logger.error(f"❌ Error reinitializing database: {e}")
+            logger.error(f"{get_icon("❌", 20)} Error reinitializing database: {e}")
             return False
     else:
-        logger.error("❌ Reset failed")
+        logger.error(replace_emojis("❌ Reset failed"))
         return False
 
 if __name__ == "__main__":

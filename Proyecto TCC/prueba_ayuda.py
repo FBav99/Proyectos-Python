@@ -1,5 +1,6 @@
 import streamlit as st
 
+from utils.ui.icon_system import get_icon, replace_emojis
 # Page config
 st.set_page_config(page_title="Guía Paso a Paso", layout="centered")
 

@@ -11,6 +11,7 @@ from core.security import security_manager, secure_oauth_callback
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 import yaml
 
+from utils.ui.icon_system import get_icon, replace_emojis
 # Configure error handling
 configure_streamlit_error_handling()
 
@@ -43,7 +44,7 @@ def main():
     if not current_user:
         current_user = get_current_user()
     if current_user:
-        st.success(f"✅ Ya estás autenticado como {current_user['username']}")
+        st.markdown(f"{get_icon('✅', 20)} Ya estás autenticado como {current_user['username']}", unsafe_allow_html=True)
         st.info("Redirigiendo al inicio...")
         st.switch_page("Inicio.py")
         return
@@ -60,7 +61,7 @@ def main():
         return  # If callback was handled, stop here
     
     # OAuth Configuration
-    st.markdown("### 🔐 Opciones de Inicio de Sesión")
+    st.markdown(replace_emojis("### 🔐 Opciones de Inicio de Sesión"), unsafe_allow_html=True)
     
     # Check if OAuth is configured
     try:
@@ -141,10 +142,10 @@ def show_local_login():
     if login_submitted and username and password:
         success, message = login_user(username, password)
         if success:
-            st.success("✅ ¡Inicio de sesión exitoso!")
+            st.markdown(replace_emojis("✅ ¡Inicio de sesión exitoso!"), unsafe_allow_html=True)
             st.rerun()
         else:
-            st.error(f"❌ {message}")
+            st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
 
 def handle_google_oauth():
     """Handle Google OAuth flow"""
@@ -153,7 +154,7 @@ def handle_google_oauth():
         try:
             google_config = st.secrets.get("google_oauth", {})
         except Exception:
-            st.error("❌ Error al acceder a la configuración de OAuth")
+            st.markdown(replace_emojis("❌ Error al acceder a la configuración de OAuth"), unsafe_allow_html=True)
             st.info("Verifica que el archivo `.streamlit/secrets.toml` esté configurado correctamente")
             return
             
@@ -162,7 +163,7 @@ def handle_google_oauth():
         redirect_uri = google_config.get("redirect_uri", "http://localhost:8501/oauth_callback")
         
         if not client_id or not client_secret:
-            st.error("❌ Google OAuth no está configurado correctamente")
+            st.markdown(replace_emojis("❌ Google OAuth no está configurado correctamente"), unsafe_allow_html=True)
             st.info("Configura las credenciales de Google en `.streamlit/secrets.toml`")
             return
         
@@ -189,7 +190,7 @@ def handle_google_oauth():
         auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(auth_params)}"
         
         # Show the URL for manual navigation instead of auto-redirect
-        st.info("🔄 Para continuar con Google OAuth:")
+        st.markdown(replace_emojis("🔄 Para continuar con Google OAuth:"), unsafe_allow_html=True)
         st.markdown(f"""
         <div style="background: #f0f2f6; padding: 1rem; border-radius: 8px; border-left: 4px solid #4285f4;">
             <p><strong>1.</strong> Copia y pega este enlace en tu navegador:</p>
@@ -204,7 +205,7 @@ def handle_google_oauth():
         st.markdown(f"[🔗 **Hacer clic aquí para abrir Google OAuth**]({auth_url})")
         
     except Exception as e:
-        st.error(f"❌ Error en Google OAuth: {str(e)}")
+        st.markdown(f"{get_icon("❌", 20)} Error en Google OAuth: {str(e)}", unsafe_allow_html=True)
 
 def handle_microsoft_oauth():
     """Handle Microsoft OAuth flow"""
@@ -213,7 +214,7 @@ def handle_microsoft_oauth():
         try:
             microsoft_config = st.secrets.get("microsoft_oauth", {})
         except Exception:
-            st.error("❌ Error al acceder a la configuración de OAuth")
+            st.markdown(replace_emojis("❌ Error al acceder a la configuración de OAuth"), unsafe_allow_html=True)
             st.info("Verifica que el archivo `.streamlit/secrets.toml` esté configurado correctamente")
             return
             
@@ -222,7 +223,7 @@ def handle_microsoft_oauth():
         redirect_uri = microsoft_config.get("redirect_uri", "http://localhost:8501/oauth_callback")
         
         if not client_id or not client_secret:
-            st.error("❌ Microsoft OAuth no está configurado correctamente")
+            st.markdown(replace_emojis("❌ Microsoft OAuth no está configurado correctamente"), unsafe_allow_html=True)
             st.info("Configura las credenciales de Microsoft en `.streamlit/secrets.toml`")
             return
         
@@ -249,7 +250,7 @@ def handle_microsoft_oauth():
         auth_url = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?{urlencode(auth_params)}"
         
         # Show the URL for manual navigation instead of auto-redirect
-        st.info("🔄 Para continuar con Microsoft OAuth:")
+        st.markdown(replace_emojis("🔄 Para continuar con Microsoft OAuth:"), unsafe_allow_html=True)
         st.markdown(f"""
         <div style="background: #f0f2f6; padding: 1rem; border-radius: 8px; border-left: 4px solid #ea4335;">
             <p><strong>1.</strong> Copia y pega este enlace en tu navegador:</p>
@@ -264,7 +265,7 @@ def handle_microsoft_oauth():
         st.markdown(f"[🔗 **Hacer clic aquí para abrir Microsoft OAuth**]({auth_url})")
         
     except Exception as e:
-        st.error(f"❌ Error en Microsoft OAuth: {str(e)}")
+        st.markdown(f"{get_icon("❌", 20)} Error en Microsoft OAuth: {str(e)}", unsafe_allow_html=True)
 
 def handle_oauth_callback():
     """Handle OAuth callback and token exchange"""
@@ -280,7 +281,7 @@ def handle_oauth_callback():
         callback_valid, callback_msg = secure_oauth_callback(code, state, stored_state)
         
         if not callback_valid:
-            st.error(f"❌ {callback_msg}")
+            st.markdown(f"{get_icon("❌", 20)} {callback_msg}", unsafe_allow_html=True)
             return True  # Indicate callback was handled
         
         provider = st.session_state.get('oauth_provider')
@@ -290,7 +291,7 @@ def handle_oauth_callback():
         elif provider == "microsoft":
             success = handle_microsoft_callback(code)
         else:
-            st.error("❌ Proveedor OAuth no reconocido")
+            st.markdown(replace_emojis("❌ Proveedor OAuth no reconocido"), unsafe_allow_html=True)
             return True
         
         # Clear OAuth session state
@@ -299,7 +300,7 @@ def handle_oauth_callback():
                 del st.session_state[key]
         
         if success:
-            st.success("✅ ¡Inicio de sesión exitoso!")
+            st.markdown(replace_emojis("✅ ¡Inicio de sesión exitoso!"), unsafe_allow_html=True)
             st.info("Redirigiendo al inicio...")
             st.switch_page("Inicio.py")
         
@@ -313,7 +314,7 @@ def handle_google_callback(code):
         try:
             google_config = st.secrets.get("google_oauth", {})
         except Exception:
-            st.error("❌ Error al acceder a la configuración de OAuth")
+            st.markdown(replace_emojis("❌ Error al acceder a la configuración de OAuth"), unsafe_allow_html=True)
             return False
             
         client_id = google_config.get("client_id")
@@ -343,18 +344,18 @@ def handle_google_callback(code):
             username = create_oauth_user(user_info, "google")
             
             if username:
-                st.success(f"✅ ¡Bienvenido, {user_info.get('name', 'Usuario')}!")
-                st.info("🔐 Sesión iniciada con Google")
+                st.markdown(f"{get_icon('✅', 20)} ¡Bienvenido, {user_info.get('name', 'Usuario')}!", unsafe_allow_html=True)
+                st.markdown(replace_emojis("🔐 Sesión iniciada con Google"), unsafe_allow_html=True)
                 return True
             else:
-                st.error("❌ Error al crear usuario OAuth")
+                st.markdown(replace_emojis("❌ Error al crear usuario OAuth"), unsafe_allow_html=True)
                 return False
         else:
-            st.error("❌ Error al obtener token de acceso")
+            st.markdown(replace_emojis("❌ Error al obtener token de acceso"), unsafe_allow_html=True)
             return False
             
     except Exception as e:
-        st.error(f"❌ Error en callback de Google: {str(e)}")
+        st.markdown(f"{get_icon("❌", 20)} Error en callback de Google: {str(e)}", unsafe_allow_html=True)
         return False
 
 def handle_microsoft_callback(code):
@@ -363,7 +364,7 @@ def handle_microsoft_callback(code):
         try:
             microsoft_config = st.secrets.get("microsoft_oauth", {})
         except Exception:
-            st.error("❌ Error al acceder a la configuración de OAuth")
+            st.markdown(replace_emojis("❌ Error al acceder a la configuración de OAuth"), unsafe_allow_html=True)
             return False
             
         client_id = microsoft_config.get("client_id")
@@ -393,18 +394,18 @@ def handle_microsoft_callback(code):
             username = create_oauth_user(user_info, "microsoft")
             
             if username:
-                st.success(f"✅ ¡Bienvenido, {user_info.get('displayName', 'Usuario')}!")
-                st.info("🔐 Sesión iniciada con Microsoft")
+                st.markdown(f"{get_icon('✅', 20)} ¡Bienvenido, {user_info.get('displayName', 'Usuario')}!", unsafe_allow_html=True)
+                st.markdown(replace_emojis("🔐 Sesión iniciada con Microsoft"), unsafe_allow_html=True)
                 return True
             else:
-                st.error("❌ Error al crear usuario OAuth")
+                st.markdown(replace_emojis("❌ Error al crear usuario OAuth"), unsafe_allow_html=True)
                 return False
         else:
-            st.error("❌ Error al obtener token de acceso")
+            st.markdown(replace_emojis("❌ Error al obtener token de acceso"), unsafe_allow_html=True)
             return False
             
     except Exception as e:
-        st.error(f"❌ Error en callback de Microsoft: {str(e)}")
+        st.markdown(f"{get_icon("❌", 20)} Error en callback de Microsoft: {str(e)}", unsafe_allow_html=True)
         return False
 
 def get_google_user_info(access_token):
@@ -448,7 +449,7 @@ def create_oauth_user(user_info, provider):
         return username
         
     except Exception as e:
-        st.error(f"❌ Error al crear usuario OAuth: {str(e)}")
+        st.markdown(f"{get_icon("❌", 20)} Error al crear usuario OAuth: {str(e)}", unsafe_allow_html=True)
         return None
 
 if __name__ == "__main__":

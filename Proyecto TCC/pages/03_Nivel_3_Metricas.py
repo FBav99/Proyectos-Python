@@ -8,6 +8,7 @@ from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
 from utils.ui import auth_ui
+from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
@@ -17,7 +18,7 @@ configure_streamlit_error_handling()
 # Page config
 st.set_page_config(
     page_title="Nivel 3: Métricas - Análisis de Datos",
-    page_icon="📊",
+    page_icon=get_icon("📊", 20),
     layout="wide"
 )
 
@@ -33,7 +34,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -41,13 +42,13 @@ def main():
     # Get current user
     user = current_user
     if not user or 'id' not in user:
-        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
     # 1. Title (level name and description)
-    st.title("📊 Nivel 3: Métricas")
+    st.title(replace_emojis("📊 Nivel 3: Métricas"))
     st.subheader("KPIs y Análisis de Rendimiento")
     
     # 2. Progress Bar (showing progress across levels)
@@ -78,7 +79,7 @@ def main():
     create_level_preview('nivel3')
     
     # 6. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("Ahora que ya sabes **preparar datos** (Nivel 1) y **filtrar información** (Nivel 2), en este nivel aprenderás a entender qué son las métricas y KPIs, cómo interpretarlas y cómo usarlas para tomar mejores decisiones basadas en datos.")
     
     # Add connection to previous levels
@@ -89,7 +90,7 @@ def main():
     )
     
     # 7. Steps Section (clear, actionable instructions)
-    st.header("📋 Pasos para Entender Métricas y KPIs")
+    st.header(replace_emojis("📋 Pasos para Entender Métricas y KPIs"))
     
     # Step 1
     create_step_card(
@@ -97,16 +98,16 @@ def main():
         title="Entender qué son las métricas y KPIs",
         description="<strong>¿Qué son las métricas?</strong> Las métricas son números que te dicen algo importante sobre tu negocio o actividad. Son como 'termómetros' que miden el estado de las cosas.",
         sections={
-            "📊 Tipos de métricas:": [
+            replace_emojis("📊 Tipos de métricas:"): [
                 "<strong>Métricas de cantidad:</strong> Cuántos productos vendiste, cuántos clientes tienes",
                 "<strong>Métricas de dinero:</strong> Cuánto dinero ganaste, cuánto gastaste",
                 "<strong>Métricas de tiempo:</strong> Cuánto tiempo tardas en hacer algo",
                 "<strong>Métricas de calidad:</strong> Qué tan bien funciona algo, qué tan satisfechos están los clientes"
             ],
-            "🎯 ¿Qué son los KPIs?": [
+            replace_emojis("🎯 ¿Qué son los KPIs?"): [
                 "<strong>KPI</strong> significa 'Indicador Clave de Rendimiento'. Son las métricas más importantes que te ayudan a saber si tu negocio va bien o mal."
             ],
-            "✅ Ejemplos de KPIs comunes:": [
+            replace_emojis("✅ Ejemplos de KPIs comunes:"): [
                 "<strong>Ventas totales:</strong> Cuánto dinero generaste en total",
                 "<strong>Número de clientes:</strong> Cuántas personas compran de ti",
                 "<strong>Satisfacción del cliente:</strong> Qué tan contentos están con tu servicio",
@@ -121,13 +122,13 @@ def main():
         title="Identificar métricas clave para tu negocio",
         description="<strong>¿Por qué es importante?</strong> No todas las métricas son igual de importantes. Necesitas enfocarte en las que realmente importan para tu objetivo.",
         sections={
-            "🔍 Cómo identificar métricas clave:": [
+            replace_emojis("🔍 Cómo identificar métricas clave:"): [
                 "Pregúntate: ¿Qué quiero lograr?",
                 "Identifica qué números te dirán si lo estás logrando",
                 "Elige 3-5 métricas principales para enfocarte",
                 "Evita medir todo, enfócate en lo importante"
             ],
-            "💡 Ejemplos por tipo de negocio:": [
+            replace_emojis("💡 Ejemplos por tipo de negocio:"): [
                 "<strong>Tienda online:</strong> Ventas, visitantes, tasa de conversión",
                 "<strong>Servicio de consultoría:</strong> Horas facturables, satisfacción del cliente, proyectos completados",
                 "<strong>Restaurante:</strong> Ventas por mesa, tiempo de espera, calificaciones de clientes"
@@ -141,13 +142,13 @@ def main():
         title="Interpretar y analizar métricas",
         description="<strong>¿Qué significa interpretar?</strong> No solo ver los números, sino entender qué te están diciendo y qué acciones tomar.",
         sections={
-            "📈 Tipos de análisis:": [
+            replace_emojis("📈 Tipos de análisis:"): [
                 "<strong>Análisis de tendencias:</strong> ¿Los números van subiendo o bajando?",
                 "<strong>Comparaciones:</strong> ¿Cómo se comparan con el mes pasado o el año anterior?",
                 "<strong>Análisis de patrones:</strong> ¿Hay patrones que se repiten?",
                 "<strong>Análisis de correlación:</strong> ¿Cuando una cosa sube, otra también sube?"
             ],
-            "✅ Preguntas clave para interpretar:": [
+            replace_emojis("✅ Preguntas clave para interpretar:"): [
                 "¿Este número es bueno o malo?",
                 "¿Por qué cambió este número?",
                 "¿Qué puedo hacer para mejorarlo?",
@@ -162,7 +163,7 @@ def main():
         title="Usar métricas para tomar decisiones",
         description="<strong>¿Cómo usar las métricas?</strong> Las métricas no son solo para ver, son para actuar. Te ayudan a tomar decisiones informadas.",
         sections={
-            "🎯 Proceso de decisión basada en datos:": [
+            replace_emojis("🎯 Proceso de decisión basada en datos:"): [
                 "Revisa las métricas regularmente",
                 "Identifica problemas o oportunidades",
                 "Genera hipótesis sobre qué está pasando",
@@ -179,7 +180,7 @@ def main():
     )
     
     # 5. Practical Example Section
-    st.header("💡 Ejemplo Práctico: Análisis de Ventas")
+    st.header(replace_emojis("💡 Ejemplo Práctico: Análisis de Ventas"))
     
     # Show data quality insight for this level
     create_data_quality_insight('nivel3', 'clean')
@@ -188,29 +189,29 @@ def main():
     df = create_sample_data('clean')  # Use clean data for Level 3
     
     # Show data overview
-    st.subheader("📊 Datos de Ejemplo")
+    st.subheader(replace_emojis("📊 Datos de Ejemplo"))
     
     # Reinforce data types concept
     create_info_box(
         "info-box",
-        "📚 Recordando Tipos de Datos",
+        replace_emojis("📚 Recordando Tipos de Datos"),
         "<p>Como aprendiste en el <strong>Nivel 0</strong>, los datos tienen diferentes tipos. En este análisis usaremos principalmente los datos <strong>numéricos</strong> (Ventas, Cantidad, Calificación) para calcular métricas importantes.</p>"
     )
     
     st.dataframe(df.head(10), use_container_width=True)
     
     # Basic metrics calculation
-    st.subheader("🔢 Cálculo de Métricas Básicas")
+    st.subheader(replace_emojis("🔢 Cálculo de Métricas Básicas"))
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         total_sales = df['Ventas'].sum()
-        st.metric("💰 Ventas Totales", f"${total_sales:,.2f}")
+        st.metric(replace_emojis("💰 Ventas Totales"), f"${total_sales:,.2f}")
     
     with col2:
         avg_sales = df['Ventas'].mean()
-        st.metric("📊 Promedio de Ventas", f"${avg_sales:.2f}")
+        st.metric(replace_emojis("📊 Promedio de Ventas"), f"${avg_sales:.2f}")
     
     with col3:
         total_quantity = df['Cantidad'].sum()
@@ -245,7 +246,7 @@ def main():
         st.dataframe(region_sales.reset_index().rename(columns={'Ventas': 'Ventas Totales'}), use_container_width=True)
     
     # 6. Interactive Practice Section
-    st.header("🎯 Práctica Interactiva")
+    st.header(replace_emojis("🎯 Práctica Interactiva"))
     
     st.markdown("Ahora es tu turno de practicar. Usa los filtros de abajo para analizar diferentes aspectos de los datos.")
     
@@ -274,22 +275,22 @@ def main():
         filtered_df = filtered_df[filtered_df['Region'] == selected_region]
     
     # Show filtered results
-    st.subheader("📊 Resultados Filtrados")
+    st.subheader(replace_emojis("📊 Resultados Filtrados"))
     
     if not filtered_df.empty:
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             filtered_sales = filtered_df['Ventas'].sum()
-            st.metric("💰 Ventas Filtradas", f"${filtered_sales:,.2f}")
+            st.metric(replace_emojis("💰 Ventas Filtradas"), f"${filtered_sales:,.2f}")
         
         with col2:
             filtered_avg = filtered_df['Ventas'].mean()
-            st.metric("📊 Promedio Filtrado", f"${filtered_avg:.2f}")
+            st.metric(replace_emojis("📊 Promedio Filtrado"), f"${filtered_avg:.2f}")
         
         with col3:
             filtered_count = len(filtered_df)
-            st.metric("📋 Registros", f"{filtered_count}")
+            st.metric(replace_emojis("📋 Registros"), f"{filtered_count}")
         
         with col4:
             filtered_rating = filtered_df['Calificacion'].mean()
@@ -317,13 +318,13 @@ def main():
     # 7. Quiz Section - Must complete quiz before marking level as complete
     st.header("🧠 Quiz del Nivel")
     st.markdown("### Pon a prueba tus conocimientos")
-    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
+    st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
     # Check if user passed the quiz
     quiz_passed = st.session_state.get(f'quiz_nivel3_passed', False)
     
     if quiz_passed:
-        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+        st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     else:
         # Show quiz using unified system
         from core.quiz_system import create_quiz
@@ -339,7 +340,7 @@ def main():
     st.divider()
     
     # 8. Navigation or next steps
-    st.header("✅ Verificación del Nivel")
+    st.header(replace_emojis("✅ Verificación del Nivel"))
     
     # Only allow marking as complete if quiz is passed
     if not quiz_passed:
@@ -358,13 +359,13 @@ def main():
         if save_level_progress(user_id, 'nivel3', True):
             st.session_state['nivel3_completed'] = True
         else:
-            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            st.markdown(replace_emojis("❌ Error al guardar el progreso. Intenta de nuevo."), unsafe_allow_html=True)
             return
         
         # Show achievement
         create_achievement_display('nivel3', progress)
         
-        st.success("✅ ¡Nivel 3 completado! Puedes continuar al siguiente nivel.")
+        st.markdown(replace_emojis("✅ ¡Nivel 3 completado! Puedes continuar al siguiente nivel."), unsafe_allow_html=True)
         
         # Show next level preview
         create_level_preview('nivel4')

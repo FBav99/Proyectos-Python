@@ -8,6 +8,7 @@ from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
 from utils.ui import auth_ui
+from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
@@ -17,7 +18,7 @@ configure_streamlit_error_handling()
 # Page config
 st.set_page_config(
     page_title="Nivel 2: Filtros - Análisis de Datos",
-    page_icon="🔍",
+    page_icon=get_icon("🔍", 20),
     layout="wide"
 )
 
@@ -35,7 +36,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -43,13 +44,13 @@ def main():
     # Get current user
     user = current_user
     if not user or 'id' not in user:
-        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
     # 1. Title (level name and description)
-    st.title("🔍 Nivel 2: Filtros")
+    st.title(replace_emojis("🔍 Nivel 2: Filtros"))
     st.subheader("Organizar y Filtrar Información")
     
     # 2. Progress Bar (showing progress across levels)
@@ -80,7 +81,7 @@ def main():
     create_level_preview('nivel2')
     
     # 6. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("Ahora que ya sabes **preparar y cargar datos** correctamente (como aprendiste en el Nivel 1), en este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. Los filtros te ayudan a organizar y analizar datos de manera más efectiva.")
     
     # Add connection to previous level
@@ -91,7 +92,7 @@ def main():
     )
     
     # 7. Steps Section (clear, actionable instructions)
-    st.header("📋 Pasos para Organizar y Filtrar Datos")
+    st.header(replace_emojis("📋 Pasos para Organizar y Filtrar Datos"))
     
     # Step 1
     create_step_card(
@@ -99,12 +100,12 @@ def main():
         title="Usar filtros de fecha para analizar períodos específicos",
         description="<strong>¿Por qué es útil?</strong> Los filtros de fecha te permiten ver información de un período específico, como las ventas del último mes o de un trimestre particular.",
         sections={
-            "📅 Tipos de filtros de fecha:": [
+            replace_emojis("📅 Tipos de filtros de fecha:"): [
                 "<strong>Rango de fechas:</strong> Desde una fecha hasta otra",
                 "<strong>Período específico:</strong> Último mes, este año, etc.",
                 "<strong>Fecha única:</strong> Un día específico"
             ],
-            "✅ Ejemplos de uso:": [
+            replace_emojis("✅ Ejemplos de uso:"): [
                 "Ver ventas del último trimestre",
                 "Comparar resultados entre dos meses",
                 "Analizar tendencias por estación"
@@ -137,7 +138,7 @@ def main():
         title="Aplicar filtros numéricos con deslizadores",
         description="<strong>¿Cómo funcionan?</strong> Los filtros numéricos te permiten establecer rangos de valores, como ver solo productos entre ciertos precios o ventas por encima de un monto mínimo.",
         sections={
-            "🔢 Tipos de filtros numéricos:": [
+            replace_emojis("🔢 Tipos de filtros numéricos:"): [
                 "<strong>Rango de precios:</strong> Desde $100 hasta $500",
                 "<strong>Ventas mínimas:</strong> Solo productos que vendieron más de 50 unidades",
                 "<strong>Calificaciones:</strong> Solo productos con 4 estrellas o más",
@@ -163,7 +164,7 @@ def main():
                 "<strong>Categoría + Calificación:</strong> Ropa con 5 estrellas",
                 "<strong>Fecha + Región + Precio:</strong> Ventas altas en el sur este mes"
             ],
-            "💡 Consejos para combinar filtros:": [
+            replace_emojis("💡 Consejos para combinar filtros:"): [
                 "Empieza con un filtro y ve agregando más gradualmente",
                 "Verifica que no estés filtrando demasiado (pocos resultados)",
                 "Usa filtros que tengan sentido juntos"
@@ -177,7 +178,7 @@ def main():
         title="Entender cómo los filtros afectan las métricas",
         description="<strong>¿Qué significa?</strong> Cuando aplicas filtros, los totales, promedios y otras métricas cambian para mostrar solo la información filtrada.",
         sections={
-            "📊 Métricas que cambian con filtros:": [
+            replace_emojis("📊 Métricas que cambian con filtros:"): [
                 "<strong>Total de ventas:</strong> Solo suma los productos filtrados",
                 "<strong>Promedio de precios:</strong> Solo considera los productos visibles",
                 "<strong>Número de registros:</strong> Solo cuenta los resultados filtrados",
@@ -192,18 +193,18 @@ def main():
     )
     
     # 5. Optional media (images, diagrams, icons)
-    st.header("🎥 Demostración Visual")
+    st.header(replace_emojis("🎥 Demostración Visual"))
     try:
         display_level_gif("nivel2", "filtros_demo")
     except:
-        st.info("📹 GIF de demostración no disponible. El proceso incluye: 1) Seleccionar filtros, 2) Aplicar criterios, 3) Ver resultados filtrados.")
+        st.info(replace_emojis("📹 GIF de demostración no disponible. El proceso incluye: 1) Seleccionar filtros, 2) Aplicar criterios, 3) Ver resultados filtrados."))
     
     # Example section
-    st.header("🎯 Ejemplo Práctico")
+    st.header(replace_emojis("🎯 Ejemplo Práctico"))
     
     create_info_box(
         "info-box",
-        "📊 Vamos a practicar con filtros usando datos de ventas",
+        replace_emojis("📊 Vamos a practicar con filtros usando datos de ventas"),
         "<p>Te mostraré cómo aplicar diferentes tipos de filtros y ver cómo cambian los resultados.</p>"
     )
     
@@ -218,24 +219,24 @@ def main():
     )
     
     df = create_sample_data('clean')  # Use clean data for Level 2
-    st.subheader("📁 Datos de ejemplo (Ventas de TechStore - Datos preparados)")
+    st.subheader(replace_emojis("📁 Datos de ejemplo (Ventas de TechStore - Datos preparados)"))
     
     col1, col2 = st.columns([2, 1])
     with col1:
         st.dataframe(df.head(10), use_container_width=True)
         st.caption("Primeras 10 filas de datos")
     with col2:
-        st.markdown("**📊 Información básica:**")
+        st.markdown(replace_emojis("**📊 Información básica:**"), unsafe_allow_html=True)
         st.metric("Total de registros", len(df))
         st.metric("Columnas", len(df.columns))
         st.metric("Período", f"{df['Fecha'].min().strftime('%d/%m/%Y')} - {df['Fecha'].max().strftime('%d/%m/%Y')}")
     
-    st.subheader("🔍 Aplicar Filtros")
+    st.subheader(replace_emojis("🔍 Aplicar Filtros"))
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**📅 Filtro por fecha:**")
+        st.markdown(replace_emojis("**📅 Filtro por fecha:**"), unsafe_allow_html=True)
         fecha_inicio = st.date_input(
             "Fecha de inicio",
             value=df['Fecha'].min().date(),
@@ -258,9 +259,9 @@ def main():
         region_seleccionada = st.selectbox("Seleccionar región", regiones)
     
     with col2:
-        st.markdown("**🔢 Filtros numéricos:**")
+        st.markdown(replace_emojis("**🔢 Filtros numéricos:**"), unsafe_allow_html=True)
         
-        st.markdown("**💰 Rango de ventas:**")
+        st.markdown(replace_emojis("**💰 Rango de ventas:**"), unsafe_allow_html=True)
         ventas_min = st.slider(
             "Ventas mínimas",
             min_value=float(df['Ventas'].min()),
@@ -309,7 +310,7 @@ def main():
     ]
     
     # Mostrar resultados filtrados
-    st.markdown("### 📊 Resultados Filtrados")
+    st.markdown(replace_emojis("### 📊 Resultados Filtrados"), unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     
@@ -331,32 +332,32 @@ def main():
     
     # Mostrar datos filtrados
     if len(df_filtrado) > 0:
-        st.markdown("**📋 Datos filtrados:**")
+        st.markdown(replace_emojis("**📋 Datos filtrados:**"), unsafe_allow_html=True)
         st.dataframe(df_filtrado, use_container_width=True)
     else:
         st.warning("⚠️ No hay datos que coincidan con los filtros seleccionados. Intenta ajustar los filtros.")
     
     # Tips section
-    st.header("💡 Consejos Importantes")
+    st.header(replace_emojis("💡 Consejos Importantes"))
     
     st.markdown('<div class="warning-box"><h3>⚠️ Errores comunes a evitar:</h3><ul><li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li><li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li><li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li><li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li></ul></div>', unsafe_allow_html=True)
     
     st.markdown('<div class="success-box"><h3>✅ Buenas prácticas:</h3><ul><li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li><li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li><li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li><li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li></ul></div>', unsafe_allow_html=True)
     
     # Practice activity
-    st.header("🎯 Actividad Práctica")
+    st.header(replace_emojis("🎯 Actividad Práctica"))
     st.markdown('<div class="card"><h3>📝 Ejercicio para practicar:</h3><ol><li><strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</li><li><strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</li><li><strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</li><li><strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</li><li><strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</li></ol></div>', unsafe_allow_html=True)
     
     # 6. Quiz Section - Must complete quiz before marking level as complete
     st.header("🧠 Quiz del Nivel")
     st.markdown("### Pon a prueba tus conocimientos")
-    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
+    st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
     # Check if user passed the quiz
     quiz_passed = st.session_state.get(f'quiz_nivel2_passed', False)
     
     if quiz_passed:
-        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+        st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     else:
         # Show quiz
         from core.quiz_system import create_quiz
@@ -372,7 +373,7 @@ def main():
     st.divider()
     
     # 7. Navigation or next steps
-    st.header("✅ Verificación del Nivel")
+    st.header(replace_emojis("✅ Verificación del Nivel"))
     
     # Only allow marking as complete if quiz is passed
     if not quiz_passed:
@@ -391,7 +392,7 @@ def main():
         if save_level_progress(user_id, 'nivel2', True):
             st.session_state['nivel2_completed'] = True
         else:
-            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            st.markdown(replace_emojis("❌ Error al guardar el progreso. Intenta de nuevo."), unsafe_allow_html=True)
             return
         
         # Show achievement
@@ -399,11 +400,11 @@ def main():
         
         create_info_box(
             "success-box",
-            "🎉 ¡Felicidades! Has completado el Nivel 2",
+            replace_emojis("🎉 ¡Felicidades! Has completado el Nivel 2"),
             "<p>Ahora sabes cómo filtrar y organizar datos. Estás listo para continuar con el siguiente nivel.</p>"
         )
         
-        st.subheader("🚀 ¿Qué sigue?")
+        st.subheader(replace_emojis("🚀 ¿Qué sigue?"))
         st.markdown("Antes de continuar, nos gustaría conocer tu opinión sobre este nivel.")
         
         # Show next level preview
@@ -416,7 +417,7 @@ def main():
     # Additional resources
     create_info_box(
         "info-box",
-        "📚 ¿Quieres saber más?",
+        replace_emojis("📚 ¿Quieres saber más?"),
         "<p>Este nivel está basado en metodologías de análisis exploratorio de datos y mejores prácticas de la industria. Si quieres profundizar en los fundamentos teóricos, consulta la documentación del proyecto.</p>"
     )
 

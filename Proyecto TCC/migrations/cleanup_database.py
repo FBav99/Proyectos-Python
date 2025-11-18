@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 #!/usr/bin/env python3
 """
 🗑️ Script de Limpieza de Base de Datos - Plataforma TCC
@@ -35,7 +36,7 @@ def cleanup_unused_tables():
             cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
             existing_tables = [row['name'] for row in cursor.fetchall()]
             
-            print(f"📊 Tablas existentes antes de la limpieza: {len(existing_tables)}")
+            print(f"{get_icon("📊", 20)} Tablas existentes antes de la limpieza: {len(existing_tables)}")
             for table in existing_tables:
                 print(f"   - {table}")
             
@@ -43,7 +44,7 @@ def cleanup_unused_tables():
             for table in tables_to_drop:
                 if table in existing_tables:
                     conn.execute(f"DROP TABLE IF EXISTS {table}")
-                    print(f"✅ Tabla eliminada: {table}")
+                    print(f"{get_icon("✅", 20)} Tabla eliminada: {table}")
                 else:
                     print(f"ℹ️  Tabla no encontrada: {table}")
             
@@ -51,7 +52,7 @@ def cleanup_unused_tables():
             for index in indexes_to_drop:
                 try:
                     conn.execute(f"DROP INDEX IF EXISTS {index}")
-                    print(f"✅ Índice eliminado: {index}")
+                    print(f"{get_icon("✅", 20)} Índice eliminado: {index}")
                 except Exception as e:
                     print(f"ℹ️  Índice no encontrado: {index}")
             
@@ -59,7 +60,7 @@ def cleanup_unused_tables():
             cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
             remaining_tables = [row['name'] for row in cursor.fetchall()]
             
-            print(f"\n📊 Tablas restantes después de la limpieza: {len(remaining_tables)}")
+            print(f"\n{get_icon("📊", 20)} Tablas restantes después de la limpieza: {len(remaining_tables)}")
             for table in remaining_tables:
                 print(f"   - {table}")
             
@@ -72,36 +73,36 @@ def cleanup_unused_tables():
             missing_essential = [table for table in essential_tables if table not in remaining_tables]
             
             if missing_essential:
-                print(f"❌ ERROR: Faltan tablas esenciales: {missing_essential}")
+                print(f"{get_icon("❌", 20)} ERROR: Faltan tablas esenciales: {missing_essential}")
                 return False
             else:
-                print("✅ Todas las tablas esenciales están presentes")
+                print(replace_emojis("✅ Todas las tablas esenciales están presentes"))
             
             conn.commit()
-            print("\n🎉 Limpieza de base de datos completada exitosamente!")
+            print(replace_emojis("\n🎉 Limpieza de base de datos completada exitosamente!"))
             return True
             
     except Exception as e:
-        print(f"❌ Error durante la limpieza: {e}")
+        print(f"{get_icon("❌", 20)} Error durante la limpieza: {e}")
         return False
 
 def show_database_info():
     """Mostrar información actual de la base de datos"""
     try:
         info = db_manager.get_database_info()
-        print("\n📊 Información de la Base de Datos:")
+        print(replace_emojis("\n📊 Información de la Base de Datos:"))
         print(f"   Existe: {info['exists']}")
         print(f"   Tamaño: {info['file_size_mb']} MB")
         print(f"   Usuarios: {info['user_count']}")
         print(f"   Tablas: {len(info['tables'])}")
         
         if info['exists']:
-            print("\n📋 Tablas actuales:")
+            print(replace_emojis("\n📋 Tablas actuales:"))
             for table in info['tables']:
                 print(f"   - {table}")
                 
     except Exception as e:
-        print(f"❌ Error obteniendo información: {e}")
+        print(f"{get_icon("❌", 20)} Error obteniendo información: {e}")
 
 def main():
     """Función principal"""
@@ -117,7 +118,7 @@ def main():
     print("   - achievements (sistema de logros)")
     print("   - system_metrics (métricas del sistema)")
     
-    print("\n✅ Las siguientes tablas se MANTENDRÁN:")
+    print(replace_emojis("\n✅ Las siguientes tablas se MANTENDRÁN:"))
     print("   - users (autenticación)")
     print("   - user_progress (progreso)")
     print("   - quiz_attempts (cuestionarios)")
@@ -133,14 +134,14 @@ def main():
     
     if response in ['s', 'si', 'sí', 'y', 'yes']:
         if cleanup_unused_tables():
-            print("\n🎯 Próximos pasos:")
+            print(replace_emojis("\n🎯 Próximos pasos:"))
             print("1. Actualizar core/database.py para no crear las tablas eliminadas")
             print("2. Verificar que la aplicación funcione correctamente")
             print("3. Ejecutar tests si están disponibles")
         else:
-            print("\n❌ La limpieza falló. Revisar errores antes de continuar.")
+            print(replace_emojis("\n❌ La limpieza falló. Revisar errores antes de continuar."))
     else:
-        print("\n❌ Limpieza cancelada por el usuario.")
+        print(replace_emojis("\n❌ Limpieza cancelada por el usuario."))
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Project Timeline Utility
 Parses git commits and groups them by weeks and action types for timeline visualization

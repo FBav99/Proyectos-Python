@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Progress tracking service for TCC Data Analysis Platform
 Handles user learning progress, level completion, and progress analytics
@@ -272,7 +273,7 @@ class ProgressTracker:
                 stats[level] = {
                     'completed': completed,
                     'completed_at': completed_at,
-                    'status': '✅ Completado' if completed else '⏳ Pendiente'
+                    'status': replace_emojis('✅ Completado') if completed else '⏳ Pendiente'
                 }
             
             # Add overall stats

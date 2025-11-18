@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Help content components for TCC Data Analysis Platform
 Handles help sections, learning guides, and content organization
@@ -19,7 +20,7 @@ def create_help_header():
 
 def create_learning_levels_section():
     """Create the learning levels overview section"""
-    st.markdown("## 📚 Niveles de Aprendizaje")
+    st.markdown(replace_emojis("## 📚 Niveles de Aprendizaje"), unsafe_allow_html=True)
     
     st.markdown("""
     Hemos creado **5 niveles progresivos** para guiarte paso a paso en el análisis de datos:
@@ -30,44 +31,44 @@ def create_learning_levels_section():
     with col1:
         create_step_card(
             step_number="0",
-            title="🌟 Nivel 0: Introducción",
+            title=replace_emojis("🌟 Nivel 0: Introducción"),
             description="Conceptos fundamentales de datos. Comienza aquí si eres completamente nuevo en análisis de datos"
         )
         
         create_step_card(
             step_number="1",
-            title="📚 Nivel 1: Básico",
+            title=replace_emojis("📚 Nivel 1: Básico"),
             description="Preparación y carga de datos. Aprende a preparar y cargar datos correctamente"
         )
         
         create_step_card(
             step_number="2",
-            title="🔍 Nivel 2: Filtros", 
+            title=replace_emojis("🔍 Nivel 2: Filtros"), 
             description="Análisis y segmentación. Aprende a filtrar y segmentar tus datos"
         )
     
     with col2:
         create_step_card(
             step_number="3",
-            title="📊 Nivel 3: Métricas",
+            title=replace_emojis("📊 Nivel 3: Métricas"),
             description="KPIs e interpretación. Crea métricas clave y entiende tus datos"
         )
         
         create_step_card(
             step_number="4",
-            title="🚀 Nivel 4: Avanzado",
+            title=replace_emojis("🚀 Nivel 4: Avanzado"),
             description="Cálculos y visualizaciones. Análisis avanzado y visualizaciones complejas"
         )
     
     create_info_box(
         "info-box",
-        "💡 Consejo",
+        replace_emojis("💡 Consejo"),
         "Si eres completamente nuevo, comienza con el Nivel 0. Si ya entiendes los conceptos básicos, puedes empezar en el Nivel 1."
     )
 
 def create_dashboard_blanco_section():
     """Create the Dashboard en Blanco section"""
-    st.markdown("## 🎨 Dashboard en Blanco - Herramienta Avanzada")
+    st.markdown(replace_emojis("## 🎨 Dashboard en Blanco - Herramienta Avanzada"), unsafe_allow_html=True)
     
     st.markdown("""
     **El Dashboard en Blanco** es una herramienta especial que te permite crear dashboards completamente personalizados 
@@ -76,7 +77,7 @@ def create_dashboard_blanco_section():
     
     create_info_box(
         "info-box",
-        "🎯 ¿Cuándo usar el Dashboard en Blanco?",
+        replace_emojis("🎯 ¿Cuándo usar el Dashboard en Blanco?"),
         "- **Tienes experiencia** con análisis de datos y visualizaciones\n"
         "- **Necesitas control total** sobre cada componente de tu dashboard\n"
         "- **Quieres crear visualizaciones específicas** para tu negocio\n"
@@ -86,17 +87,19 @@ def create_dashboard_blanco_section():
     
     create_info_box(
         "info-box",
-        "🚀 Características Principales",
-        "- **📈 Métricas personalizadas**: Crea KPIs específicos para tu análisis\n"
-        "- **📊 Gráficos básicos**: Líneas, barras, circulares, áreas\n"
-        "- **🔬 Gráficos avanzados**: Dispersión, histogramas, box plots, violín\n"
-        "- **🔍 Análisis estadístico**: Matrices de correlación, tablas de datos\n"
-        "- **💾 Guardado y exportación**: Conserva tu trabajo y compártelo"
+        replace_emojis("🚀 Características Principales"),
+        replace_emojis(
+            "- **📈 Métricas personalizadas**: Crea KPIs específicos para tu análisis\n"
+            "- **📊 Gráficos básicos**: Líneas, barras, circulares, áreas\n"
+            "- **🔬 Gráficos avanzados**: Dispersión, histogramas, box plots, violín\n"
+            "- **🔍 Análisis estadístico**: Matrices de correlación, tablas de datos\n"
+            "- **💾 Guardado y exportación**: Conserva tu trabajo y compártelo"
+        )
     )
 
 def create_visualization_guide():
     """Create the data visualization guide section"""
-    st.markdown("### 📊 Guía de Visualizaciones")
+    st.markdown(replace_emojis("### 📊 Guía de Visualizaciones"), unsafe_allow_html=True)
     
     st.markdown("**Los gráficos correctos te ayudan a contar historias con tus datos.**")
     
@@ -105,28 +108,32 @@ def create_visualization_guide():
     with col1:
         create_step_card(
             step_number="1",
-            title="📊 Gráfico de Barras",
-            description="Comparar cantidades entre categorías\n"
-            "Mostrar rankings (mejor a peor)\n"
-            "Datos categóricos simples\n\n"
-            "**Ejemplos:**\n"
-            "- Ventas por producto\n"
-            "- Ingresos por región\n"
-            "- Número de clientes por categoría\n\n"
-            "**💡 Consejo:** Ordena las barras de mayor a menor para mejor lectura"
+            title=replace_emojis("📊 Gráfico de Barras"),
+            description=replace_emojis(
+                "Comparar cantidades entre categorías\n"
+                "Mostrar rankings (mejor a peor)\n"
+                "Datos categóricos simples\n\n"
+                "**Ejemplos:**\n"
+                "- Ventas por producto\n"
+                "- Ingresos por región\n"
+                "- Número de clientes por categoría\n\n"
+                "**💡 Consejo:** Ordena las barras de mayor a menor para mejor lectura"
+            )
         )
         
         create_step_card(
             step_number="2",
-            title="📈 Gráfico de Líneas",
-            description="Mostrar cambios a lo largo del tiempo\n"
-            "Ver tendencias y patrones\n"
-            "Comparar múltiples series temporales\n\n"
-            "**Ejemplos:**\n"
-            "- Ventas diarias/mensuales\n"
-            "- Evolución de precios\n"
-            "- Crecimiento de usuarios\n\n"
-            "**💡 Consejo:** Usa colores diferentes para cada línea"
+            title=replace_emojis("📈 Gráfico de Líneas"),
+            description=replace_emojis(
+                "Mostrar cambios a lo largo del tiempo\n"
+                "Ver tendencias y patrones\n"
+                "Comparar múltiples series temporales\n\n"
+                "**Ejemplos:**\n"
+                "- Ventas diarias/mensuales\n"
+                "- Evolución de precios\n"
+                "- Crecimiento de usuarios\n\n"
+                "**💡 Consejo:** Usa colores diferentes para cada línea"
+            )
         )
     
     with col2:
@@ -145,20 +152,22 @@ def create_visualization_guide():
         
         create_step_card(
             step_number="4",
-            title="🔄 Gráfico de Dispersión",
-            description="Ver relaciones entre dos variables\n"
-            "Identificar correlaciones\n"
-            "Encontrar valores atípicos\n\n"
-            "**Ejemplos:**\n"
-            "- Precio vs Calificación\n"
-            "- Edad vs Gasto\n"
-            "- Tiempo vs Satisfacción\n\n"
-            "**💡 Consejo:** Agrega una línea de tendencia para ver la relación"
+            title=replace_emojis("🔄 Gráfico de Dispersión"),
+            description=replace_emojis(
+                "Ver relaciones entre dos variables\n"
+                "Identificar correlaciones\n"
+                "Encontrar valores atípicos\n\n"
+                "**Ejemplos:**\n"
+                "- Precio vs Calificación\n"
+                "- Edad vs Gasto\n"
+                "- Tiempo vs Satisfacción\n\n"
+                "**💡 Consejo:** Agrega una línea de tendencia para ver la relación"
+            )
         )
 
 def create_common_scenarios():
     """Create common analysis scenarios section"""
-    st.markdown("### 🎯 Casos de Uso Comunes")
+    st.markdown(replace_emojis("### 🎯 Casos de Uso Comunes"), unsafe_allow_html=True)
     
     with st.expander("🛒 Análisis de Ventas"):
         st.markdown("""
@@ -180,7 +189,7 @@ def create_common_scenarios():
         - Segmenta por valor de cliente
         """)
     
-    with st.expander("📈 Análisis de Tendencias"):
+    with st.expander(replace_emojis("📈 Análisis de Tendencias")):
         st.markdown("""
         **Cómo identificar y analizar tendencias:**
         
@@ -198,9 +207,9 @@ def create_common_scenarios():
 
 def create_troubleshooting_section():
     """Create troubleshooting and common mistakes section"""
-    st.markdown("### 🔧 Solución de Problemas Comunes")
+    st.markdown(replace_emojis("### 🔧 Solución de Problemas Comunes"), unsafe_allow_html=True)
     
-    with st.expander("🔍 ¿Por qué mis análisis no tienen sentido?"):
+    with st.expander(replace_emojis("🔍 ¿Por qué mis análisis no tienen sentido?")):
         st.markdown("""
         **Errores comunes de interpretación:**
         
@@ -241,7 +250,7 @@ def create_quick_reference():
     #### 🔧 **Controles Principales:**
     - **Agregar componente**: Usa los botones en el panel lateral
     - **Configurar**: Haz clic en "⚙️ Configurar" en cada componente
-    - **Actualizar**: Usa "🔄 Actualizar" para aplicar cambios
+    - **Actualizar**: Usa replace_emojis("🔄 Actualizar") para aplicar cambios
     - **Eliminar**: "🗑️ Eliminar" para quitar componentes
     - **Guardar**: "💾 Guardar" para conservar tu trabajo
     
@@ -296,7 +305,7 @@ def create_learning_resources():
 def create_navigation_section():
     """Create the navigation section with action buttons"""
     st.divider()
-    st.markdown("## 🎯 ¿Listo para Comenzar?")
+    st.markdown(replace_emojis("## 🎯 ¿Listo para Comenzar?"), unsafe_allow_html=True)
     
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     

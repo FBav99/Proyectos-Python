@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Migration script to transfer data from SQLite to Supabase PostgreSQL
 This script helps migrate existing users and data from SQLite to Supabase
@@ -77,15 +78,15 @@ def migrate_users_to_supabase(users_data):
             )
             
             if success:
-                logger.info(f"✅ Migrated user: {username}")
+                logger.info(f"{get_icon("✅", 20)} Migrated user: {username}")
                 migrated_count += 1
             else:
-                logger.error(f"❌ Failed to migrate user {username}: {message}")
+                logger.error(f"{get_icon("❌", 20)} Failed to migrate user {username}: {message}")
         
         except Exception as e:
             logger.error(f"Error migrating user {user_data.get('username', 'unknown')}: {e}")
     
-    logger.info(f"✅ Migrated {migrated_count} users, skipped {skipped_count} existing users")
+    logger.info(f"{get_icon("✅", 20)} Migrated {migrated_count} users, skipped {skipped_count} existing users")
     return migrated_count
 
 def migrate_progress_to_supabase(progress_data):
@@ -117,12 +118,12 @@ def migrate_progress_to_supabase(progress_data):
                 )
                 
                 migrated_count += 1
-                logger.info(f"✅ Migrated progress for user_id: {user_id}")
+                logger.info(f"{get_icon("✅", 20)} Migrated progress for user_id: {user_id}")
             
             except Exception as e:
                 logger.error(f"Error migrating progress for user_id {progress.get('user_id')}: {e}")
         
-        logger.info(f"✅ Migrated {migrated_count} progress records")
+        logger.info(f"{get_icon("✅", 20)} Migrated {migrated_count} progress records")
         return migrated_count
     
     except ImportError:
@@ -196,7 +197,7 @@ def migrate_quiz_attempts_to_supabase(quiz_attempts_data):
             
             conn.commit()
         
-        logger.info(f"✅ Migrated {migrated_count} quiz attempts")
+        logger.info(f"{get_icon("✅", 20)} Migrated {migrated_count} quiz attempts")
         return migrated_count
     
     except Exception as e:
@@ -205,11 +206,11 @@ def migrate_quiz_attempts_to_supabase(quiz_attempts_data):
 
 def main():
     """Main migration function"""
-    logger.info("🚀 Starting SQLite to Supabase migration...")
+    logger.info(replace_emojis("🚀 Starting SQLite to Supabase migration..."))
     
     # Check if Supabase is configured
     if db_manager.db_type != "supabase":
-        logger.error("❌ Supabase is not configured!")
+        logger.error(replace_emojis("❌ Supabase is not configured!"))
         logger.error("   Please set db_type = 'supabase' in Streamlit Cloud secrets")
         logger.error("   And add your Supabase connection string")
         return False
@@ -228,14 +229,14 @@ def main():
                 logger.info(f"Using latest export file: {export_file}")
     
     if not export_file:
-        logger.error("❌ No export file found!")
+        logger.error(replace_emojis("❌ No export file found!"))
         logger.error("   Please run export_sqlite_data.py first to create a backup")
         logger.error("   Or provide export file path as argument:")
         logger.error("   python migrate_sqlite_to_supabase.py backups/export_file.json")
         return False
     
     # Load exported data
-    logger.info("📄 Loading exported data...")
+    logger.info(replace_emojis("📄 Loading exported data..."))
     data = load_export_file(export_file)
     if not data:
         return False
@@ -244,9 +245,9 @@ def main():
     logger.info("🗄️ Initializing Supabase database...")
     try:
         init_database()
-        logger.info("✅ Database initialized")
+        logger.info(replace_emojis("✅ Database initialized"))
     except Exception as e:
-        logger.error(f"❌ Database initialization failed: {e}")
+        logger.error(f"{get_icon("❌", 20)} Database initialization failed: {e}")
         return False
     
     # Migrate users
@@ -254,14 +255,14 @@ def main():
     users_migrated = migrate_users_to_supabase(data.get('users', []))
     
     # Migrate progress
-    logger.info("📊 Migrating user progress...")
+    logger.info(replace_emojis("📊 Migrating user progress..."))
     progress_migrated = migrate_progress_to_supabase(data.get('user_progress', []))
     
     # Migrate quiz attempts
-    logger.info("📝 Migrating quiz attempts...")
+    logger.info(replace_emojis("📝 Migrating quiz attempts..."))
     attempts_migrated = migrate_quiz_attempts_to_supabase(data.get('quiz_attempts', []))
     
-    logger.info("🎉 Migration completed!")
+    logger.info(replace_emojis("🎉 Migration completed!"))
     logger.info(f"   - Users: {users_migrated}")
     logger.info(f"   - Progress records: {progress_migrated}")
     logger.info(f"   - Quiz attempts: {attempts_migrated}")

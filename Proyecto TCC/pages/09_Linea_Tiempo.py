@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Project Timeline Page
 Displays the project development timeline based on git commits
@@ -29,7 +30,7 @@ configure_streamlit_error_handling()
 # Page config
 st.set_page_config(
     page_title="Línea de Tiempo del Proyecto",
-    page_icon="📅",
+    page_icon=get_icon("📅", 20),
     layout="wide"
 )
 
@@ -38,7 +39,7 @@ def main():
     # Initialize sidebar with user info
     auth_ui.init_sidebar()
     
-    st.title("📅 Línea de Tiempo del Proyecto")
+    st.title(replace_emojis("📅 Línea de Tiempo del Proyecto"))
     st.markdown("---")
     
     # Load commits
@@ -57,25 +58,25 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("📊 Total de Commits", summary['total_commits'])
+        st.metric(replace_emojis("📊 Total de Commits"), summary['total_commits'])
     
     with col2:
-        st.metric("📅 Semanas de Desarrollo", summary['total_weeks'])
+        st.metric(replace_emojis("📅 Semanas de Desarrollo"), summary['total_weeks'])
     
     with col3:
         if summary['first_week']:
             first_date = datetime.strptime(summary['first_week'], '%Y-%m-%d')
-            st.metric("🚀 Inicio", first_date.strftime('%d/%m/%Y'))
+            st.metric(replace_emojis("🚀 Inicio"), first_date.strftime('%d/%m/%Y'))
     
     with col4:
         if summary['last_week']:
             last_date = datetime.strptime(summary['last_week'], '%Y-%m-%d')
-            st.metric("🔄 Última Semana", last_date.strftime('%d/%m/%Y'))
+            st.metric(replace_emojis("🔄 Última Semana"), last_date.strftime('%d/%m/%Y'))
     
     st.markdown("---")
     
     # Action type summary
-    st.subheader("📈 Resumen por Tipo de Acción")
+    st.subheader(replace_emojis("📈 Resumen por Tipo de Acción"))
     action_counts = summary['action_counts']
     
     if action_counts:
@@ -95,7 +96,7 @@ def main():
     st.markdown("---")
     
     # Timeline visualization
-    st.subheader("📅 Línea de Tiempo por Semanas")
+    st.subheader(replace_emojis("📅 Línea de Tiempo por Semanas"))
     
     # Display timeline in reverse chronological order (most recent first)
     weeks = sorted(grouped_commits.keys(), reverse=True)
@@ -187,7 +188,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.caption("💡 Esta línea de tiempo se genera automáticamente a partir de los commits del repositorio Git.")
+    st.caption(replace_emojis("💡 Esta línea de tiempo se genera automáticamente a partir de los commits del repositorio Git."))
 
 if __name__ == "__main__":
     main()

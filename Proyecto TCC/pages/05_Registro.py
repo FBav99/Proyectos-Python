@@ -3,6 +3,7 @@ import re
 from core.auth_service import auth_service, login_user
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
+from utils.ui.icon_system import get_icon, replace_emojis
 # Import init_sidebar - using absolute import path
 from utils.ui import auth_ui
 init_sidebar = auth_ui.init_sidebar
@@ -44,22 +45,22 @@ def main():
     """Página de registro de usuarios"""
     st.set_page_config(
         page_title="Registro - Crear Cuenta",
-        page_icon="📝",
+        page_icon=get_icon("📝", 20),
         layout="wide"
     )
     
     # Initialize sidebar with user info (always visible)
     init_sidebar()
     
-    st.markdown("""
+    st.markdown(f"""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
-        <h1 style="color: white; margin-bottom: 1rem;">📝 Registro de Usuario</h1>
+        <h1 style="color: white; margin-bottom: 1rem;">{get_icon("📝", 28)} Registro de Usuario</h1>
         <p style="color: white; font-size: 1.1rem;">Crea tu cuenta para acceder al sistema de análisis de datos</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Create registration form
-    st.markdown("### 🔐 Crear Nueva Cuenta")
+    st.markdown(replace_emojis("### 🔐 Crear Nueva Cuenta"), unsafe_allow_html=True)
     
     # Password requirements tooltip text
     password_help = "La contraseña debe tener: mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
@@ -101,7 +102,7 @@ def main():
         if password:
             is_valid, message = validate_password(password)
             if is_valid:
-                st.success(f"✅ {message}")
+                st.markdown(f"{get_icon('✅', 20)} {message}", unsafe_allow_html=True)
             else:
                 st.warning(f"⚠️ {message}")
                 # Show detailed requirements
@@ -118,14 +119,14 @@ def main():
         
         # Email validation
         if email and not validate_email(email):
-            validation_messages.append("❌ Formato de email inválido")
+            validation_messages.append(replace_emojis("❌ Formato de email inválido"))
         
         # Username validation
         if username:
             if len(username) < 3:
-                validation_messages.append("❌ El nombre de usuario debe tener al menos 3 caracteres")
+                validation_messages.append(replace_emojis("❌ El nombre de usuario debe tener al menos 3 caracteres"))
             elif not username.isalnum():
-                validation_messages.append("❌ El nombre de usuario solo puede contener letras y números")
+                validation_messages.append(replace_emojis("❌ El nombre de usuario solo puede contener letras y números"))
         
         # Show validation messages if any
         if validation_messages:
@@ -139,19 +140,19 @@ def main():
             validation_error = None
             
             if not all([first_name, last_name, email, username, password, confirm_password]):
-                validation_error = "❌ Todos los campos son obligatorios"
+                validation_error = replace_emojis("❌ Todos los campos son obligatorios")
             elif not validate_email(email):
-                validation_error = "❌ Formato de email inválido"
+                validation_error = replace_emojis("❌ Formato de email inválido")
             else:
                 is_valid, message = validate_password(password)
                 if not is_valid:
-                    validation_error = f"❌ {message}"
+                    validation_error = f"{get_icon("❌", 20)} {message}"
                 elif password != confirm_password:
-                    validation_error = "❌ Las contraseñas no coinciden"
+                    validation_error = replace_emojis("❌ Las contraseñas no coinciden")
                 elif len(username) < 3:
-                    validation_error = "❌ El nombre de usuario debe tener al menos 3 caracteres"
+                    validation_error = replace_emojis("❌ El nombre de usuario debe tener al menos 3 caracteres")
                 elif not username.isalnum():
-                    validation_error = "❌ El nombre de usuario solo puede contener letras y números"
+                    validation_error = replace_emojis("❌ El nombre de usuario solo puede contener letras y números")
             
             if validation_error:
                 # Store error in session state to show outside form
@@ -186,14 +187,14 @@ def main():
                                 'first_name': first_name,
                                 'last_name': last_name
                             }
-                            st.session_state.registration_error = f'❌ Registro exitoso pero el inicio de sesión automático falló: {login_message}'
+                            st.session_state.registration_error = f'{get_icon("❌", 20)} Registro exitoso pero el inicio de sesión automático falló: {login_message}'
                             st.rerun()
                     else:
-                        st.session_state.registration_error = f'❌ Error durante el registro: {message}'
+                        st.session_state.registration_error = f'{get_icon("❌", 20)} Error durante el registro: {message}'
                         st.rerun()
                         
                 except Exception as e:
-                    st.session_state.registration_error = f'❌ Error durante el registro: {str(e)}'
+                    st.session_state.registration_error = f'{get_icon("❌", 20)} Error durante el registro: {str(e)}'
                     st.rerun()
     
     # Show error messages outside form (if any)
@@ -205,13 +206,13 @@ def main():
     # Show success message outside form (if registration was successful)
     if st.session_state.get('registration_success', False):
         user_info = st.session_state.get('registered_user', {})
-        st.success('✅ Usuario registrado exitosamente!')
+        st.markdown(replace_emojis('✅ Usuario registrado exitosamente!'), unsafe_allow_html=True)
         st.info(f'📧 Email: {user_info.get("email", "")}')
-        st.info(f'👤 Usuario: {user_info.get("username", "")}')
+        st.markdown(f'{get_icon("👤", 20)} Usuario: {user_info.get("username", "")}', unsafe_allow_html=True)
         st.info(f'👨‍💼 Nombre: {user_info.get("first_name", "")} {user_info.get("last_name", "")}')
         
         st.markdown("---")
-        st.markdown("### 🎉 ¡Registro Completado!")
+        st.markdown(replace_emojis("### 🎉 ¡Registro Completado!"), unsafe_allow_html=True)
         st.markdown("""
         Tu cuenta ha sido creada exitosamente. Ahora puedes:
         

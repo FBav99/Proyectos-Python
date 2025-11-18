@@ -12,6 +12,7 @@ from core.dashboard_repository import (
     list_user_dashboards,
     upsert_dashboard,
 )
+from utils.ui.icon_system import get_icon, replace_emojis
 from .dashboard_components import create_component_buttons, add_component_to_dashboard
 
 try:
@@ -31,10 +32,10 @@ def create_dashboard_sidebar(df, show_component_controls=True):
     """Create the dashboard sidebar with all controls"""
     with st.sidebar:
         # Header with gradient background
-        st.markdown("""
+        st.markdown(f"""
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                     padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center;">
-            <h3 style="color: white; margin: 0; font-size: 1.2rem;">🎨 Dashboard Builder</h3>
+            <h3 style="color: white; margin: 0; font-size: 1.2rem;">{get_icon("🎨", 20)} Dashboard Builder</h3>
             <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.9rem;">Construye tu dashboard</p>
         </div>
         """, unsafe_allow_html=True)
@@ -45,14 +46,14 @@ def create_dashboard_sidebar(df, show_component_controls=True):
         st.session_state.setdefault('dashboards_cache_dirty', True)
 
         # Data info with better styling
-        st.markdown("""
+        st.markdown(f"""
         <div style="background: rgba(0, 123, 255, 0.1); padding: 1rem; border-radius: 8px; 
                     border-left: 4px solid #007bff; margin-bottom: 1.5rem;">
-            <h4 style="color: #007bff; margin: 0 0 0.5rem 0; font-size: 1rem;">📊 Información de Datos</h4>
-            <p style="color: #666; margin: 0; font-size: 0.9rem;"><strong>Filas:</strong> {}</p>
-            <p style="color: #666; margin: 0; font-size: 0.9rem;"><strong>Columnas:</strong> {}</p>
+            <h4 style="color: #007bff; margin: 0 0 0.5rem 0; font-size: 1rem;">{get_icon("📊", 18)} Información de Datos</h4>
+            <p style="color: #666; margin: 0; font-size: 0.9rem;"><strong>Filas:</strong> {len(df)}</p>
+            <p style="color: #666; margin: 0; font-size: 0.9rem;"><strong>Columnas:</strong> {len(df.columns)}</p>
         </div>
-        """.format(len(df), len(df.columns)), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
         # Saved dashboards management
         user_id = st.session_state.get('auth_user_id')
@@ -64,7 +65,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
             saved_dashboards = st.session_state.get('cached_user_dashboards', [])
 
         if saved_dashboards:
-            st.markdown("#### 📁 Dashboards guardados")
+            st.markdown(replace_emojis("#### 📁 Dashboards guardados"), unsafe_allow_html=True)
             options = {"➕ Nuevo dashboard": None}
             for dashboard in saved_dashboards:
                 dataset_label = dashboard.get("dataset_info", {}).get("label") or "Dataset no especificado"
@@ -106,7 +107,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
             st.markdown("---")
 
         st.text_input(
-            "📝 Nombre del dashboard",
+            replace_emojis("📝 Nombre del dashboard"),
             value=st.session_state.dashboard_name_input,
             key="dashboard_name_input",
             help="Define el título que verás al guardar o exportar tu dashboard."
@@ -133,7 +134,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
             save_dashboard()
         
         # Export options
-        st.markdown("#### 📤 Exportar")
+        st.markdown(replace_emojis("#### 📤 Exportar"), unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         
         with col1:
@@ -145,7 +146,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
                 export_dashboard("Imagen")
         
         # Dashboard actions
-        st.markdown("#### 🔧 Acciones")
+        st.markdown(replace_emojis("#### 🔧 Acciones"), unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         
         with col1:
@@ -168,7 +169,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
         st.markdown("---")
         st.markdown("### ❓ Ayuda")
         
-        with st.expander("🎯 Cómo usar el Dashboard Builder", expanded=False):
+        with st.expander(replace_emojis("🎯 Cómo usar el Dashboard Builder"), expanded=False):
             st.markdown("""
             **1. Agregar Componentes:**
             - Usa los botones en la sección "Tipos de Componentes"
@@ -187,7 +188,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
             - Exporta en diferentes formatos según necesites
             """)
         
-        with st.expander("📊 Tipos de Componentes", expanded=False):
+        with st.expander(replace_emojis("📊 Tipos de Componentes"), expanded=False):
             st.markdown("""
             **📈 Métricas:** Números clave como totales, promedios, etc.
             **📊 Gráficos Básicos:** Líneas, barras, circular, área
@@ -254,9 +255,9 @@ def save_dashboard():
 
         st.session_state['active_dashboard_id'] = saved_id
         st.session_state['dashboards_cache_dirty'] = True
-        st.success("✅ Dashboard guardado en la base de datos.")
+        st.markdown(replace_emojis("✅ Dashboard guardado en la base de datos."), unsafe_allow_html=True)
     except Exception as e:
-        st.error(f"❌ Error al guardar dashboard: {e}")
+        st.markdown(f"{get_icon("❌", 20)} Error al guardar dashboard: {e}", unsafe_allow_html=True)
 
 def export_dashboard(format_type):
     """Export dashboard"""
@@ -288,7 +289,7 @@ def export_dashboard(format_type):
                 st.error(str(exc))
                 return
 
-            st.success("✅ PDF generado. Usa los botones para descargar los archivos.")
+            st.markdown(replace_emojis("✅ PDF generado. Usa los botones para descargar los archivos."), unsafe_allow_html=True)
             st.download_button(
                 "⬇️ Descargar PDF",
                 pdf_buffer,
@@ -315,7 +316,7 @@ def export_dashboard(format_type):
                 st.error(str(exc))
                 return
 
-            st.success("✅ Imagen generada. Usa el botón para descargarla.")
+            st.markdown(replace_emojis("✅ Imagen generada. Usa el botón para descargarla."), unsafe_allow_html=True)
             st.download_button(
                 "⬇️ Descargar PNG",
                 image_buffer,
@@ -328,7 +329,7 @@ def export_dashboard(format_type):
 
         st.warning("Formato de exportación no reconocido.")
     except Exception as e:
-        st.error(f"❌ Error al exportar dashboard: {e}")
+        st.markdown(f"{get_icon("❌", 20)} Error al exportar dashboard: {e}", unsafe_allow_html=True)
 
 def show_dashboard_info(df, *, show_divider=True, container_class=None):
     """Show dashboard information and statistics"""
@@ -338,15 +339,15 @@ def show_dashboard_info(df, *, show_divider=True, container_class=None):
     if container_class:
         st.markdown(f'<div class="{container_class}">', unsafe_allow_html=True)
 
-    st.markdown("### 📊 Información del Dashboard")
+    st.markdown(replace_emojis("### 📊 Información del Dashboard"), unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("📋 Componentes", len(st.session_state.dashboard_components))
+        st.metric(replace_emojis("📋 Componentes"), len(st.session_state.dashboard_components))
     
     with col2:
-        st.metric("📊 Filas de Datos", len(df))
+        st.metric(replace_emojis("📊 Filas de Datos"), len(df))
     
     with col3:
         st.metric("🏷️ Columnas", len(df.columns))
@@ -487,7 +488,7 @@ def _render_placeholder_card(width, body_height, fonts, title, message):
 
 def _render_metric_card(component, df, width, fonts):
     config = component.get('config', {})
-    title = component.get('title') or "📈 Métrica"
+    title = component.get('title') or replace_emojis("📈 Métrica")
     try:
         label, formatted_value = _calculate_metric_value(config, df, title)
     except ValueError as exc:
@@ -501,7 +502,7 @@ def _render_metric_card(component, df, width, fonts):
 
 
 def _build_plotly_figure(component_type, config, df):
-    if component_type == "📊 Gráfico de Líneas":
+    if component_type == replace_emojis("📊 Gráfico de Líneas"):
         x_col = config.get('x_column')
         y_col = config.get('y_column')
         color_col = config.get('color_column')
@@ -510,7 +511,7 @@ def _build_plotly_figure(component_type, config, df):
         if x_col not in df.columns or y_col not in df.columns:
             raise ValueError("Las columnas seleccionadas no existen en el dataset.")
         fig = px.line(df, x=x_col, y=y_col, color=color_col)
-    elif component_type == "📋 Gráfico de Barras":
+    elif component_type == replace_emojis("📋 Gráfico de Barras"):
         x_col = config.get('x_column')
         y_col = config.get('y_column')
         orientation = config.get('orientation', 'vertical')
@@ -531,21 +532,21 @@ def _build_plotly_figure(component_type, config, df):
             raise ValueError("Las columnas seleccionadas no existen en el dataset.")
         pie_data = df.groupby(names_col)[values_col].sum().reset_index()
         fig = px.pie(pie_data, values=values_col, names=names_col)
-    elif component_type == "📈 Gráfico de Área":
+    elif component_type == replace_emojis("📈 Gráfico de Área"):
         x_col = config.get('x_column')
         y_col = config.get('y_column')
         color_col = config.get('color_column')
         if not x_col or not y_col:
             raise ValueError("Selecciona columnas X e Y para el gráfico.")
         fig = px.area(df, x=x_col, y=y_col, color=color_col)
-    elif component_type == "📈 Gráfico de Dispersión":
+    elif component_type == replace_emojis("📈 Gráfico de Dispersión"):
         x_col = config.get('x_column')
         y_col = config.get('y_column')
         color_col = config.get('color_column')
         if not x_col or not y_col:
             raise ValueError("Selecciona columnas X e Y para el gráfico.")
         fig = px.scatter(df, x=x_col, y=y_col, color=color_col)
-    elif component_type == "📊 Histograma":
+    elif component_type == replace_emojis("📊 Histograma"):
         column = config.get('column')
         bins = config.get('bins', 20)
         if not column:
@@ -553,19 +554,19 @@ def _build_plotly_figure(component_type, config, df):
         if column not in df.columns:
             raise ValueError("La columna seleccionada no existe en el dataset.")
         fig = px.histogram(df, x=column, nbins=bins)
-    elif component_type == "📊 Box Plot":
+    elif component_type == replace_emojis("📊 Box Plot"):
         x_col = config.get('x_column')
         y_col = config.get('y_column')
         if not x_col or not y_col:
             raise ValueError("Selecciona columnas X e Y para el gráfico.")
         fig = px.box(df, x=x_col, y=y_col)
-    elif component_type == "📈 Gráfico de Violín":
+    elif component_type == replace_emojis("📈 Gráfico de Violín"):
         x_col = config.get('x_column')
         y_col = config.get('y_column')
         if not x_col or not y_col:
             raise ValueError("Selecciona columnas X e Y para el gráfico.")
         fig = px.violin(df, x=x_col, y=y_col)
-    elif component_type == "📊 Matriz de Correlación":
+    elif component_type == replace_emojis("📊 Matriz de Correlación"):
         columns = config.get('columns', [])
         if len(columns) < 2:
             raise ValueError("Selecciona al menos dos columnas numéricas para la matriz de correlación.")
@@ -615,7 +616,7 @@ def _render_table_card(component, df, width, fonts):
     config = component.get('config', {})
     columns = config.get('columns') or df.columns.tolist()
     rows = config.get('rows', min(20, len(df)))
-    title = component.get('title') or "📋 Tabla de Datos"
+    title = component.get('title') or replace_emojis("📋 Tabla de Datos")
 
     if not columns:
         return _render_placeholder_card(width, 140, fonts, title, "Selecciona columnas para la tabla.")
@@ -667,21 +668,21 @@ def _render_table_card(component, df, width, fonts):
 def _render_component_card(component, df, width, fonts):
     component_type = component.get('type')
     try:
-        if component_type == "📈 Métricas":
+        if component_type == replace_emojis("📈 Métricas"):
             return _render_metric_card(component, df, width, fonts)
         elif component_type in {
-            "📊 Gráfico de Líneas",
-            "📋 Gráfico de Barras",
+            replace_emojis("📊 Gráfico de Líneas"),
+            replace_emojis("📋 Gráfico de Barras"),
             "🥧 Gráfico Circular",
-            "📈 Gráfico de Área",
-            "📈 Gráfico de Dispersión",
-            "📊 Histograma",
-            "📊 Box Plot",
-            "📈 Gráfico de Violín",
-            "📊 Matriz de Correlación",
+            replace_emojis("📈 Gráfico de Área"),
+            replace_emojis("📈 Gráfico de Dispersión"),
+            replace_emojis("📊 Histograma"),
+            replace_emojis("📊 Box Plot"),
+            replace_emojis("📈 Gráfico de Violín"),
+            replace_emojis("📊 Matriz de Correlación"),
         }:
             return _render_chart_card(component, df, width, fonts)
-        elif component_type == "📋 Tabla de Datos":
+        elif component_type == replace_emojis("📋 Tabla de Datos"):
             return _render_table_card(component, df, width, fonts)
     except ImportError:
         raise

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+from utils.ui.icon_system import get_icon, replace_emojis
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_sample_data():
     """Generar conjunto de datos de muestra para demostración"""
@@ -43,7 +44,7 @@ def load_uploaded_file(uploaded_file):
                 except:
                     pass
                     
-        st.sidebar.success(f"✅ Cargadas {len(df)} filas de datos")
+        st.sidebar.success(f"{get_icon("✅", 20)} Cargadas {len(df)} filas de datos")
         return df
     except Exception as e:
         st.sidebar.error(f"Error al cargar archivo: {str(e)}")

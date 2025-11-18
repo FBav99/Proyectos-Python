@@ -3,20 +3,21 @@ import pandas as pd
 from data.sample_datasets import get_sample_datasets
 from .data_cleaner import create_data_cleaning_interface
 
+from utils.ui.icon_system import get_icon, replace_emojis
 def show_upload_section():
     """Show the file upload section"""
     st.markdown("---")
-    st.markdown("### 📤 Subir tus Propios Datos")
+    st.markdown(replace_emojis("### 📤 Subir tus Propios Datos"), unsafe_allow_html=True)
     
     # Show current data info if exists
     if 'uploaded_data' in st.session_state and st.session_state.uploaded_data is not None:
-        st.info(f"📊 Datos actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas")
+        st.markdown(f"{get_icon("📊", 20)} Datos actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas", unsafe_allow_html=True)
         if st.button("⬅️ Volver a Datos Actuales", type="secondary"):
             st.rerun()
         st.markdown("---")
     
     uploaded_file = st.file_uploader(
-        "📁 Sube tu archivo de datos",
+        replace_emojis("📁 Sube tu archivo de datos"),
         type=['csv', 'xlsx', 'xls'],
         help="Sube un archivo CSV o Excel para comenzar tu análisis"
     )
@@ -29,8 +30,8 @@ def show_upload_section():
             else:
                 df = pd.read_excel(uploaded_file)
             
-            st.success(f"✅ Archivo cargado exitosamente: {uploaded_file.name}")
-            st.info(f"📊 {len(df)} filas, {len(df.columns)} columnas")
+            st.markdown(f"{get_icon("✅", 20)} Archivo cargado exitosamente: {uploaded_file.name}", unsafe_allow_html=True)
+            st.markdown(f"{get_icon("📊", 20)} {len(df)} filas, {len(df.columns)} columnas", unsafe_allow_html=True)
             
             # Show data preview
             with st.expander("👀 Vista previa de datos"):
@@ -58,7 +59,7 @@ def show_upload_section():
                     st.rerun()
                     
         except Exception as e:
-            st.error(f"❌ Error al cargar el archivo: {str(e)}")
+            st.markdown(f"{get_icon("❌", 20)} Error al cargar el archivo: {str(e)}", unsafe_allow_html=True)
     
     # Back button
     if st.button("⬅️ Volver", key="back_from_upload"):
@@ -71,7 +72,7 @@ def show_upload_section():
 def show_examples_section():
     """Show the sample datasets section"""
     st.markdown("---")
-    st.markdown("### 📊 Datasets de Ejemplo")
+    st.markdown(replace_emojis("### 📊 Datasets de Ejemplo"), unsafe_allow_html=True)
     st.markdown("Elige un dataset para practicar:")
     
     sample_datasets = get_sample_datasets()

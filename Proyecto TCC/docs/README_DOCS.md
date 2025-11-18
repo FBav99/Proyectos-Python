@@ -28,6 +28,9 @@ Guías de funcionalidades específicas:
 
 - **`LIMPIEZA_DATOS_GUIDE.md`** - Guía de limpieza de datos
 - **`ERROR_HANDLING_GUIDE.md`** - Manejo de errores
+- **`LINEA_TIEMPO_GUIDE.md`** - Guía de línea de tiempo del proyecto
+- **`RESUMEN_LINEA_TIEMPO.md`** - Resumen de fases de desarrollo del proyecto
+- **`ICON_STANDARDIZATION_GUIDE.md`** - Guía de estandarización de iconos
 
 ### 04_learning/ - Aprendizaje
 

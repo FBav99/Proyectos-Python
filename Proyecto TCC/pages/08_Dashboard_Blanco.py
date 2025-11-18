@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
+from utils.ui.icon_system import get_icon, replace_emojis
 # Importar módulos personalizados
 from core.config import setup_page_config, apply_custom_css
 from core.auth_service import get_current_user, require_auth
@@ -160,7 +161,7 @@ def select_dashboard_data():
     col_upload, col_samples = st.columns(2)
 
     with col_upload:
-        st.markdown("#### 📤 Subir datos")
+        st.markdown(replace_emojis("#### 📤 Subir datos"), unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
             "Elige un archivo CSV o Excel",
             type=['csv', 'xlsx', 'xls'],
@@ -182,7 +183,7 @@ def select_dashboard_data():
                 st.error(f"No se pudo cargar el archivo. Detalle: {exc}")
 
     with col_samples:
-        st.markdown("#### 📊 Datasets de ejemplo")
+        st.markdown(replace_emojis("#### 📊 Datasets de ejemplo"), unsafe_allow_html=True)
         sample_datasets = get_sample_datasets()
         sample_names = list(sample_datasets.keys())
 
@@ -229,7 +230,7 @@ def select_dashboard_data():
     if current_df is not None:
         label = st.session_state.get('dashboard_data_label', 'Datos cargados')
         st.markdown("---")
-        st.markdown(f"#### ✅ Datos en uso: `{label}`")
+        st.markdown(f"#### {get_icon("✅", 20)} Datos en uso: `{label}`")
         st.caption(f"{len(current_df)} filas · {len(current_df.columns)} columnas")
     else:
         st.warning("Carga un archivo o elige un dataset de ejemplo para comenzar.")
@@ -258,7 +259,7 @@ def render_saved_dashboards_panel():
 
     saved_dashboards = get_cached_user_dashboards()
 
-    with st.expander("📁 Dashboards guardados", expanded=False):
+    with st.expander(replace_emojis("📁 Dashboards guardados"), expanded=False):
         if not saved_dashboards:
             st.info("No tienes dashboards guardados todavía. Puedes guardar uno desde la barra lateral.")
             return
@@ -308,18 +309,18 @@ def render_inline_builder_controls(df):
 
     quick_components = [
         {
-            "label": "📊 Métrica KPI",
-            "type": "📈 Métricas",
+            "label": replace_emojis("📊 Métrica KPI"),
+            "type": replace_emojis("📈 Métricas"),
             "description": "Resalta un indicador clave.",
         },
         {
-            "label": "📈 Línea",
-            "type": "📊 Gráfico de Líneas",
+            "label": replace_emojis("📈 Línea"),
+            "type": replace_emojis("📊 Gráfico de Líneas"),
             "description": "Muestra tendencias en el tiempo.",
         },
         {
-            "label": "📋 Barras",
-            "type": "📋 Gráfico de Barras",
+            "label": replace_emojis("📋 Barras"),
+            "type": replace_emojis("📋 Gráfico de Barras"),
             "description": "Compara categorías rápidamente.",
         },
         {
@@ -328,13 +329,13 @@ def render_inline_builder_controls(df):
             "description": "Visualiza proporciones.",
         },
         {
-            "label": "📈 Área",
-            "type": "📈 Gráfico de Área",
+            "label": replace_emojis("📈 Área"),
+            "type": replace_emojis("📈 Gráfico de Área"),
             "description": "Destaca acumulados y evolución.",
         },
         {
-            "label": "📋 Tabla",
-            "type": "📋 Tabla de Datos",
+            "label": replace_emojis("📋 Tabla"),
+            "type": replace_emojis("📋 Tabla de Datos"),
             "description": "Explora datos detallados.",
         },
     ]
@@ -345,7 +346,7 @@ def render_inline_builder_controls(df):
         col = cols[idx % len(cols)]
         with col:
             if st.button(
-                component["label"],
+                component["title"],
                 key=f"quick_component_{idx}",
                 help=component["description"],
                 use_container_width=True,
@@ -410,42 +411,42 @@ def build_executive_template(df):
 
     components = [
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Registros totales",
             layout={'row': 1, 'order': 1, 'col_span': 4},
             overrides={'metric_type': 'count'}
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Suma principal",
             layout={'row': 1, 'order': 2, 'col_span': 4},
             overrides=sum_overrides
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Promedio principal",
             layout={'row': 1, 'order': 3, 'col_span': 4},
             overrides=mean_overrides
         ),
         build_component_template(
-            "📊 Gráfico de Líneas",
+            replace_emojis("📊 Gráfico de Líneas"),
             df,
             title="Tendencia principal",
             layout={'row': 2, 'order': 1, 'col_span': 8},
             overrides=line_overrides
         ),
         build_component_template(
-            "📋 Gráfico de Barras",
+            replace_emojis("📋 Gráfico de Barras"),
             df,
             title="Top categorías",
             layout={'row': 2, 'order': 2, 'col_span': 4},
             overrides=bar_overrides
         ),
         build_component_template(
-            "📋 Tabla de Datos",
+            replace_emojis("📋 Tabla de Datos"),
             df,
             title="Detalle de registros",
             layout={'row': 3, 'order': 1, 'col_span': 12},
@@ -487,56 +488,56 @@ def build_performance_template(df):
 
     components = [
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Valor máximo",
             layout={'row': 1, 'order': 1, 'col_span': 3},
             overrides={'metric_type': 'max', 'column': first_numeric} if first_numeric else {'metric_type': 'count'}
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Valor mínimo",
             layout={'row': 1, 'order': 2, 'col_span': 3},
             overrides={'metric_type': 'min', 'column': first_numeric} if first_numeric else {'metric_type': 'count'}
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Mediana",
             layout={'row': 1, 'order': 3, 'col_span': 3},
             overrides={'metric_type': 'median', 'column': first_numeric} if first_numeric else {'metric_type': 'count'}
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Promedio secundario",
             layout={'row': 1, 'order': 4, 'col_span': 3},
             overrides={'metric_type': 'mean', 'column': second_numeric} if second_numeric else {'metric_type': 'count'}
         ),
         build_component_template(
-            "📊 Gráfico de Líneas",
+            replace_emojis("📊 Gráfico de Líneas"),
             df,
             title="Evolución temporal",
             layout={'row': 2, 'order': 1, 'col_span': 6},
             overrides=line_overrides
         ),
         build_component_template(
-            "📊 Gráfico de Barras",
+            replace_emojis("📊 Gráfico de Barras"),
             df,
             title="Comparativa por categoría",
             layout={'row': 2, 'order': 2, 'col_span': 6},
             overrides=bar_overrides
         ),
         build_component_template(
-            "📊 Matriz de Correlación",
+            replace_emojis("📊 Matriz de Correlación"),
             df,
             title="Relaciones entre variables",
             layout={'row': 3, 'order': 1, 'col_span': 6},
             overrides={'columns': numeric_cols[:min(5, len(numeric_cols))]} if len(numeric_cols) >= 2 else {}
         ),
         build_component_template(
-            "📋 Tabla de Datos",
+            replace_emojis("📋 Tabla de Datos"),
             df,
             title="Detalle filtrable",
             layout={'row': 3, 'order': 2, 'col_span': 6},
@@ -568,42 +569,42 @@ def build_operations_template(df):
 
     components = [
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Total de filas limpias",
             layout={'row': 1, 'order': 1, 'col_span': 4},
             overrides={'metric_type': 'count'}
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Suma principal",
             layout={'row': 1, 'order': 2, 'col_span': 4},
             overrides={'metric_type': 'sum', 'column': first_numeric}
         ),
         build_component_template(
-            "📈 Métricas",
+            replace_emojis("📈 Métricas"),
             df,
             title="Promedio operativo",
             layout={'row': 1, 'order': 3, 'col_span': 4},
             overrides={'metric_type': 'mean', 'column': second_numeric}
         ),
         build_component_template(
-            "📊 Histograma",
+            replace_emojis("📊 Histograma"),
             df,
             title="Distribución principal",
             layout={'row': 2, 'order': 1, 'col_span': 6},
             overrides=hist_overrides
         ),
         build_component_template(
-            "📊 Box Plot",
+            replace_emojis("📊 Box Plot"),
             df,
             title="Outliers por categoría",
             layout={'row': 2, 'order': 2, 'col_span': 6},
             overrides=box_overrides
         ),
         build_component_template(
-            "📋 Tabla de Datos",
+            replace_emojis("📋 Tabla de Datos"),
             df,
             title="Registro detallado",
             layout={'row': 3, 'order': 1, 'col_span': 12},
@@ -618,14 +619,14 @@ def get_dashboard_templates(df):
     return [
         {
             "key": "executive_overview",
-            "title": "🎯 Resumen Ejecutivo",
+            "title": replace_emojis("🎯 Resumen Ejecutivo"),
             "description": "Disposición tipo Power BI con KPIs en la parte superior y visualizaciones clave en la zona central.",
             "recommended_dataset": "E-commerce",
             "builder": build_executive_template,
         },
         {
             "key": "performance_insights",
-            "title": "📈 Rendimiento y correlaciones",
+            "title": replace_emojis("📈 Rendimiento y correlaciones"),
             "description": "Analiza tendencias, comparativas por categoría y relaciones entre variables numéricas.",
             "recommended_dataset": "Finance",
             "builder": build_performance_template,
@@ -721,7 +722,7 @@ def main():
     # Configurar página
     st.set_page_config(
         page_title="Dashboard en Blanco - Construcción Manual",
-        page_icon="🎨",
+        page_icon=get_icon("🎨", 20),
         layout="wide",
         initial_sidebar_state="expanded"
     )
@@ -747,7 +748,7 @@ def main():
     st.session_state.setdefault('cached_user_dashboards', [])
     
     # Header
-    st.markdown(f'<h1 class="main-header">🎨 Dashboard en Blanco</h1>', unsafe_allow_html=True)
+    st.markdown(f'<h1 class="main-header">{get_icon("🎨", 20)} Dashboard en Blanco</h1>', unsafe_allow_html=True)
     st.markdown(f'<p style="text-align: center; color: #666; font-size: 1.1rem;">Construye tu dashboard personalizado, <strong>{name}</strong></p>', unsafe_allow_html=True)
     
     # Initialize dashboard components in session state
@@ -792,7 +793,7 @@ def main():
         toggle_label = "Ocultar plantillas" if st.session_state.dashboard_template_gallery_expanded else "Mostrar plantillas"
         col_toggle, col_status = st.columns([1, 3])
         with col_toggle:
-            if st.button(toggle_label, key="toggle_template_gallery"):
+            if st.button("toggle_label, key="):
                 st.session_state.dashboard_template_gallery_expanded = not st.session_state.dashboard_template_gallery_expanded
                 st.rerun()
         with col_status:
@@ -840,9 +841,6 @@ def main():
             with col2:
                 if st.button("❌ Cancelar", use_container_width=True):
                     st.session_state.editing_component = None
-                    st.rerun()
-            
-            st.markdown("---")
         else:
             st.session_state.editing_component = None
     

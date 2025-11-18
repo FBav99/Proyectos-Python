@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from utils.ui.icon_system import get_icon, replace_emojis
 @st.cache_data(show_spinner=False, ttl=600)
 def analyze_data_quality(df):
     """Comprehensive data quality analysis"""
@@ -83,28 +84,28 @@ def analyze_data_quality(df):
 def create_quality_report(df, analysis):
     """Create comprehensive quality report"""
     
-    st.markdown("## 📊 Reporte de Calidad de Datos")
+    st.markdown(replace_emojis("## 📊 Reporte de Calidad de Datos"), unsafe_allow_html=True)
     
     # Basic Information
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("📈 Filas", f"{analysis['basic_info']['rows']:,}")
+        st.metric(replace_emojis("📈 Filas"), f"{analysis['basic_info']['rows']:,}")
     with col2:
-        st.metric("📋 Columnas", analysis['basic_info']['columns'])
+        st.metric(replace_emojis("📋 Columnas"), analysis['basic_info']['columns'])
     with col3:
         st.metric("💾 Memoria", f"{analysis['basic_info']['memory_usage']:.2f} MB")
     with col4:
-        st.metric("🔄 Duplicados", analysis['basic_info']['duplicates'])
+        st.metric(replace_emojis("🔄 Duplicados"), analysis['basic_info']['duplicates'])
     
     # Data Quality Score
     quality_score = calculate_quality_score(analysis)
-    st.markdown(f"### 🎯 Puntuación de Calidad: {quality_score:.1f}/100")
+    st.markdown(f"### {get_icon("🎯", 20)} Puntuación de Calidad: {quality_score:.1f}/100", unsafe_allow_html=True)
     
     # Progress bar for quality score
     st.progress(quality_score / 100)
     
     # Detailed Analysis Tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 General", "❌ Valores Faltantes", "🔢 Numéricas", "📝 Categóricas", "📅 Fechas"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([replace_emojis("📋 General"), "❌ Valores Faltantes", "🔢 Numéricas", "📝 Categóricas", "📅 Fechas"])
     
     with tab1:
         show_general_analysis(df, analysis)
@@ -155,7 +156,7 @@ def calculate_quality_score(analysis):
 
 def show_general_analysis(df, analysis):
     """Show general data analysis"""
-    st.markdown("### 📊 Información General")
+    st.markdown(replace_emojis("### 📊 Información General"), unsafe_allow_html=True)
     
     # Data types summary
     st.markdown("#### Tipos de Datos:")
@@ -176,7 +177,7 @@ def show_general_analysis(df, analysis):
 
 def show_missing_data_analysis(analysis):
     """Show missing data analysis"""
-    st.markdown("### ❌ Análisis de Valores Faltantes")
+    st.markdown(replace_emojis("### ❌ Análisis de Valores Faltantes"), unsafe_allow_html=True)
     
     if analysis['missing_data']['columns_with_missing']:
         # Missing data chart
@@ -190,20 +191,20 @@ def show_missing_data_analysis(analysis):
         st.plotly_chart(fig, use_container_width=True)
         
         # Recommendations
-        st.markdown("#### 💡 Recomendaciones:")
+        st.markdown(replace_emojis("#### 💡 Recomendaciones:"), unsafe_allow_html=True)
         for col, percentage in analysis['missing_data']['missing_percentages'].items():
             if percentage > 50:
                 st.warning(f"⚠️ **{col}**: {percentage:.1f}% faltantes - Considera eliminar esta columna")
             elif percentage > 20:
                 st.info(f"ℹ️ **{col}**: {percentage:.1f}% faltantes - Considera imputación")
             elif percentage > 5:
-                st.success(f"✅ **{col}**: {percentage:.1f}% faltantes - Manejo estándar")
+                st.markdown(f"{get_icon("✅", 20)} **{col}**: {percentage:.1f}% faltantes - Manejo estándar", unsafe_allow_html=True)
     else:
-        st.success("🎉 ¡No hay valores faltantes en tu dataset!")
+        st.markdown(replace_emojis("🎉 ¡No hay valores faltantes en tu dataset!"), unsafe_allow_html=True)
 
 def show_numeric_analysis(analysis):
     """Show numeric columns analysis"""
-    st.markdown("### 🔢 Análisis de Columnas Numéricas")
+    st.markdown(replace_emojis("### 🔢 Análisis de Columnas Numéricas"), unsafe_allow_html=True)
     
     if analysis['numeric_analysis']:
         # Summary statistics
@@ -211,7 +212,7 @@ def show_numeric_analysis(analysis):
         st.dataframe(numeric_summary, use_container_width=True)
         
         # Outliers analysis
-        st.markdown("#### 📊 Análisis de Outliers:")
+        st.markdown(replace_emojis("#### 📊 Análisis de Outliers:"), unsafe_allow_html=True)
         outliers_df = pd.DataFrame({
             'Columna': list(analysis['outliers'].keys()),
             'Cantidad': [info['count'] for info in analysis['outliers'].values()],
@@ -227,7 +228,7 @@ def show_numeric_analysis(analysis):
 
 def show_categorical_analysis(analysis):
     """Show categorical columns analysis"""
-    st.markdown("### 📝 Análisis de Columnas Categóricas")
+    st.markdown(replace_emojis("### 📝 Análisis de Columnas Categóricas"), unsafe_allow_html=True)
     
     if analysis['categorical_analysis']:
         # Categorical summary
@@ -235,7 +236,7 @@ def show_categorical_analysis(analysis):
         st.dataframe(cat_summary, use_container_width=True)
         
         # Inconsistencies
-        st.markdown("#### 🔍 Posibles Inconsistencias:")
+        st.markdown(replace_emojis("#### 🔍 Posibles Inconsistencias:"), unsafe_allow_html=True)
         for col, info in analysis['categorical_analysis'].items():
             if info['empty_strings'] > 0:
                 st.warning(f"⚠️ **{col}**: {info['empty_strings']} cadenas vacías")
@@ -246,7 +247,7 @@ def show_categorical_analysis(analysis):
 
 def show_date_analysis(analysis):
     """Show date columns analysis"""
-    st.markdown("### 📅 Análisis de Columnas de Fecha")
+    st.markdown(replace_emojis("### 📅 Análisis de Columnas de Fecha"), unsafe_allow_html=True)
     
     if analysis['date_analysis']:
         # Date summary
@@ -267,7 +268,7 @@ def create_data_cleaning_options(df, analysis):
     cleaned_df = df.copy()
     
     # Missing data handling
-    st.markdown("### ❌ Manejo de Valores Faltantes")
+    st.markdown(replace_emojis("### ❌ Manejo de Valores Faltantes"), unsafe_allow_html=True)
     
     for col in analysis['missing_data']['columns_with_missing']:
         missing_pct = analysis['missing_data']['missing_percentages'][col]
@@ -302,7 +303,7 @@ def create_data_cleaning_options(df, analysis):
                     cleaned_df[col] = cleaned_df[col].fillna(value)
     
     # Duplicate handling
-    st.markdown("### 🔄 Manejo de Duplicados")
+    st.markdown(replace_emojis("### 🔄 Manejo de Duplicados"), unsafe_allow_html=True)
     if analysis['basic_info']['duplicates'] > 0:
         duplicate_action = st.selectbox(
             "Acción para duplicados",
@@ -313,7 +314,7 @@ def create_data_cleaning_options(df, analysis):
             cleaned_df = cleaned_df.drop_duplicates()
     
     # Outlier handling
-    st.markdown("### 📊 Manejo de Outliers")
+    st.markdown(replace_emojis("### 📊 Manejo de Outliers"), unsafe_allow_html=True)
     for col in analysis['outliers']:
         outlier_pct = analysis['outliers'][col]['percentage']
         if outlier_pct > 5:
@@ -356,7 +357,7 @@ def data_quality_page(df):
     # Show comparison
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 📊 Datos Originales")
+        st.markdown(replace_emojis("### 📊 Datos Originales"), unsafe_allow_html=True)
         st.metric("Filas", len(df))
         st.metric("Columnas", len(df.columns))
         st.metric("Memoria", f"{df.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB")

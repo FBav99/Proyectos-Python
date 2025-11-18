@@ -1,9 +1,8 @@
-"""
-Nombre del Archivo: Inicio.py
-Descripción: Página principal de la aplicación con autenticación y dashboard
-Autor: Fernando Bavera Villalba
-Fecha: 25/10/2025
-"""
+from utils.ui.icon_system import get_icon, replace_emojis
+# Nombre del Archivo: Inicio.py
+# Descripción: Página principal de la aplicación con autenticación y dashboard
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
 
 import logging
 import streamlit as st
@@ -29,9 +28,11 @@ from data.sample_datasets import get_sample_datasets
 
 logger = logging.getLogger(__name__)
 
-HERO_BANNER_HTML = """
+def get_hero_banner_html():
+    """Get hero banner HTML with icons"""
+    return f"""
 <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 1.75rem; border-radius: 18px; margin: 1.5rem 0 2rem; box-shadow: 0 20px 35px rgba(15,23,42,0.18); border: 1px solid rgba(255,255,255,0.2);">
-    <h2 style="color: #e2e8f0; margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem;">🌟 Bienvenido al piloto de la Plataforma TCC</h2>
+    <h2 style="color: #e2e8f0; margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem;">{get_icon("🌟", 24)} Bienvenido al piloto de la Plataforma TCC</h2>
     <p style="color: rgba(226,232,240,0.95); font-size: 1rem; margin-bottom: 1rem; text-align: center;">
         Estás probando una versión en preparación de nuestra guía interactiva para analizar datos desde cero: carga tus propios archivos,
         evalúa la calidad, aplica limpiezas guiadas y diseña dashboards personalizados siguiendo niveles paso a paso.
@@ -104,7 +105,7 @@ def main():
     welcome_data = st.session_state.pop('registration_welcome', None)
     if welcome_data:
         welcome_name = current_user.get('first_name') or welcome_data.get('first_name') or current_user.get('username', '')
-        st.success(f"🎉 ¡Bienvenido, {welcome_name}! Tu cuenta se creó correctamente.")
+        st.markdown(f"{get_icon("🎉", 20)} ¡Bienvenido, {welcome_name}! Tu cuenta se creó correctamente.", unsafe_allow_html=True)
     
     # ============================================================================
     # SECCIÓN HEADER - Bienvenida e información del usuario
@@ -112,7 +113,7 @@ def main():
     show_header(name)
     
     # Resumen contextual durante la fase de pruebas
-    st.markdown(HERO_BANNER_HTML, unsafe_allow_html=True)
+    st.markdown(get_hero_banner_html(), unsafe_allow_html=True)
     
     # Obtener progreso del usuario desde la base de datos (solo para usuarios DB, no OAuth)
     if 'oauth_provider' not in current_user:
@@ -131,9 +132,9 @@ def main():
         from core.survey_system import survey_system
         user_id = current_user['id']
         if not survey_system.has_completed_survey(user_id, 'initial'):
-            st.markdown("""
+            st.markdown(f"""
             <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); padding: 2rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 3px solid #fff;">
-                <h2 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.6rem;">📋 Encuesta Inicial - Período de Pruebas</h2>
+                <h2 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.6rem;">{get_icon("📋", 24)} Encuesta Inicial - Período de Pruebas</h2>
                 <p style="color: white; text-align: center; margin-bottom: 1.5rem; font-size: 1.1rem; opacity: 0.95;">Ayúdanos a mejorar la plataforma completando nuestra encuesta inicial</p>
             </div>
             """, unsafe_allow_html=True)

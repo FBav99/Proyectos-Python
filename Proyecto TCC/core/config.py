@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Nombre del Archivo: config.py
 Descripción: Configuración general de la aplicación Streamlit
@@ -15,7 +16,7 @@ def setup_page_config():
     """Configura la página principal de Streamlit con título, icono y layout"""
     st.set_page_config(
         page_title="Dashboard Principal",
-        page_icon="📊",
+        page_icon=get_icon("📊", 20),
         layout="wide",
         initial_sidebar_state="expanded"
     )

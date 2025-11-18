@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Final Survey - After All Levels Completed
 General experience quiz and comment box
@@ -15,7 +16,7 @@ configure_streamlit_error_handling()
 
 st.set_page_config(
     page_title="Encuesta Final",
-    page_icon="🏆",
+    page_icon=get_icon("🏆", 20),
     layout="wide"
 )
 
@@ -26,7 +27,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a esta encuesta.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a esta encuesta."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -35,13 +36,13 @@ def main():
     
     # Check if user has already completed this survey
     if survey_system.has_completed_survey(user_id, 'final'):
-        st.success("✅ Ya completaste la encuesta final. ¡Gracias por tu participación!")
+        st.markdown(replace_emojis("✅ Ya completaste la encuesta final. ¡Gracias por tu participación!"), unsafe_allow_html=True)
         st.info("Puedes continuar explorando la plataforma.")
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
-    st.title("🏆 Encuesta Final")
+    st.title(replace_emojis("🏆 Encuesta Final"))
     st.markdown("### ¡Felicitaciones por completar todos los niveles!")
     st.markdown("Tu opinión es crucial para mejorar la plataforma. Por favor, comparte tu experiencia general.")
     
@@ -49,7 +50,7 @@ def main():
     
     # Survey questions
     with st.form("final_survey_form"):
-        st.subheader("📊 Experiencia General")
+        st.subheader(replace_emojis("📊 Experiencia General"))
         
         # Question 1: Overall satisfaction
         overall_satisfaction = st.slider(
@@ -108,7 +109,7 @@ def main():
         
         st.divider()
         
-        st.subheader("🎯 Aspectos Específicos")
+        st.subheader(replace_emojis("🎯 Aspectos Específicos"))
         
         # Question 6: Best aspect
         best_aspect = st.selectbox(
@@ -171,7 +172,7 @@ def main():
         st.divider()
         
         # Submit button
-        submitted = st.form_submit_button("✅ Enviar Encuesta Final", type="primary", use_container_width=True)
+        submitted = st.form_submit_button(replace_emojis("✅ Enviar Encuesta Final"), type="primary", use_container_width=True)
         
         if submitted:
             # Compile responses
@@ -191,16 +192,16 @@ def main():
             
             # Save to database
             if survey_system.save_survey_response(user_id, 'final', responses):
-                st.success("✅ ¡Gracias por completar la encuesta final!")
+                st.markdown(replace_emojis("✅ ¡Gracias por completar la encuesta final!"), unsafe_allow_html=True)
                 st.balloons()
                 st.balloons()
-                st.markdown("### 🎉 ¡Tu opinión es muy valiosa para nosotros!")
+                st.markdown(replace_emojis("### 🎉 ¡Tu opinión es muy valiosa para nosotros!"), unsafe_allow_html=True)
                 st.info("Hemos guardado todas tus respuestas. Gracias por ayudarnos a mejorar la plataforma.")
                 
                 if st.button("Volver al Inicio", type="primary", use_container_width=True):
                     st.switch_page("Inicio.py")
             else:
-                st.error("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo.")
+                st.markdown(replace_emojis("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo."), unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

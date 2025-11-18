@@ -11,6 +11,7 @@ from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
 from utils.ui import auth_ui
+from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
@@ -20,7 +21,7 @@ configure_streamlit_error_handling()
 # Page config
 st.set_page_config(
     page_title="Nivel 4: Avanzado - Análisis de Datos",
-    page_icon="🚀",
+    page_icon=get_icon("🚀", 20),
     layout="wide"
 )
 
@@ -36,7 +37,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -44,13 +45,13 @@ def main():
     # Get current user
     user = current_user
     if not user or 'id' not in user:
-        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
     # 1. Title (level name and description)
-    st.title("🚀 Nivel 4: Avanzado")
+    st.title(replace_emojis("🚀 Nivel 4: Avanzado"))
     st.subheader("Cálculos y Visualizaciones Avanzadas")
     
     # 2. Progress Bar (showing progress across levels)
@@ -81,18 +82,18 @@ def main():
     create_level_preview('nivel4')
     
     # 6. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("¡Felicidades! Has llegado al nivel más avanzado. Ahora que dominas **conceptos básicos** (Nivel 0), **preparación de datos** (Nivel 1), **filtros** (Nivel 2) y **métricas** (Nivel 3), en este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas y crear dashboards completos para presentar tu información de manera profesional.")
     
     # Add connection to all previous levels
     create_info_box(
         "success-box",
-        "🎓 Resumen de tu Jornada de Aprendizaje",
+        replace_emojis("🎓 Resumen de tu Jornada de Aprendizaje"),
         "<p><strong>Nivel 0:</strong> Aprendiste qué son los datos y cómo se organizan<br/><strong>Nivel 1:</strong> Aprendiste a preparar y cargar datos correctamente<br/><strong>Nivel 2:</strong> Aprendiste a filtrar y organizar información<br/><strong>Nivel 3:</strong> Aprendiste a calcular métricas y KPIs<br/><strong>Nivel 4:</strong> ¡Ahora crearás dashboards profesionales!</p>"
     )
     
     # 7. Steps Section (clear, actionable instructions)
-    st.header("📋 Pasos para Crear Análisis Avanzados")
+    st.header(replace_emojis("📋 Pasos para Crear Análisis Avanzados"))
     
     # Step 1
     create_step_card(
@@ -100,13 +101,13 @@ def main():
         title="Crear cálculos personalizados avanzados",
         description="<strong>¿Qué son los cálculos personalizados?</strong> Son fórmulas que creas tú mismo para obtener información específica que no está disponible directamente en tus datos.",
         sections={
-            "🔢 Tipos de cálculos que puedes crear:": [
+            replace_emojis("🔢 Tipos de cálculos que puedes crear:"): [
                 "<strong>Porcentajes:</strong> Qué parte del total representa algo",
                 "<strong>Promedios ponderados:</strong> Promedios que dan más importancia a ciertos valores",
                 "<strong>Cambios porcentuales:</strong> Cuánto aumentó o disminuyó algo",
                 "<strong>Ratios y proporciones:</strong> Comparaciones entre diferentes valores"
             ],
-            "📝 Ejemplos de fórmulas:": [
+            replace_emojis("📝 Ejemplos de fórmulas:"): [
                 "<strong>Margen de ganancia:</strong> (Precio de venta - Costo) / Precio de venta × 100",
                 "<strong>Porcentaje de crecimiento:</strong> (Valor actual - Valor anterior) / Valor anterior × 100",
                 "<strong>Promedio ponderado:</strong> Suma de (Valor × Peso) / Suma de pesos"
@@ -120,13 +121,13 @@ def main():
         title="Generar visualizaciones interactivas",
         description="<strong>¿Por qué visualizaciones interactivas?</strong> Los gráficos interactivos te permiten explorar los datos de manera más profunda y encontrar insights ocultos.",
         sections={
-            "📊 Tipos de visualizaciones:": [
+            replace_emojis("📊 Tipos de visualizaciones:"): [
                 "<strong>Gráficos de línea:</strong> Para mostrar tendencias a lo largo del tiempo",
                 "<strong>Gráficos de barras:</strong> Para comparar categorías",
                 "<strong>Gráficos de dispersión:</strong> Para ver relaciones entre dos variables",
                 "<strong>Mapas de calor:</strong> Para mostrar patrones en tablas de datos"
             ],
-            "🎯 Características de visualizaciones interactivas:": [
+            replace_emojis("🎯 Características de visualizaciones interactivas:"): [
                 "Zoom y panorámica para explorar detalles",
                 "Tooltips que muestran información al pasar el mouse",
                 "Filtros que permiten cambiar la vista de los datos",
@@ -147,7 +148,7 @@ def main():
                 "<strong>Filtros:</strong> Controles para cambiar la vista de los datos",
                 "<strong>Navegación:</strong> Forma de moverse entre diferentes vistas"
             ],
-            "💡 Principios de diseño:": [
+            replace_emojis("💡 Principios de diseño:"): [
                 "Mantén el diseño limpio y sin distracciones",
                 "Usa colores de manera consistente y significativa",
                 "Organiza la información de más importante a menos importante",
@@ -162,13 +163,13 @@ def main():
         title="Interpretar y comunicar insights",
         description="<strong>¿Qué son los insights?</strong> Son descubrimientos importantes en los datos que pueden llevar a acciones o decisiones valiosas.",
         sections={
-            "🔍 Cómo encontrar insights:": [
+            replace_emojis("🔍 Cómo encontrar insights:"): [
                 "Busca patrones inesperados en los datos",
                 "Compara diferentes períodos o grupos",
                 "Identifica valores atípicos o anomalías",
                 "Conecta diferentes métricas para ver el panorama completo"
             ],
-            "📢 Cómo comunicar insights:": [
+            replace_emojis("📢 Cómo comunicar insights:"): [
                 "Cuenta una historia con los datos",
                 "Explica qué significa cada insight para el negocio",
                 "Sugiere acciones específicas basadas en los datos",
@@ -178,7 +179,7 @@ def main():
     )
     
     # 5. Practical Example Section
-    st.header("💡 Ejemplo Práctico: Dashboard Avanzado")
+    st.header(replace_emojis("💡 Ejemplo Práctico: Dashboard Avanzado"))
     
     # Show data quality insight for this level
     create_data_quality_insight('nivel4', 'clean')
@@ -187,7 +188,7 @@ def main():
     df = create_sample_data('clean')  # Use clean data for Level 4
     
     # Show data overview
-    st.subheader("📊 Datos de Ejemplo")
+    st.subheader(replace_emojis("📊 Datos de Ejemplo"))
     
     # Show how all concepts come together
     create_info_box(
@@ -199,7 +200,7 @@ def main():
     st.dataframe(df.head(10), use_container_width=True)
     
     # Advanced calculations
-    st.subheader("🔢 Cálculos Avanzados")
+    st.subheader(replace_emojis("🔢 Cálculos Avanzados"))
     
     # Calculate advanced metrics
     df['Margen_Ganancia'] = ((df['Ventas'] - (df['Ventas'] * 0.6)) / df['Ventas'] * 100).round(2)
@@ -211,22 +212,22 @@ def main():
     
     with col1:
         total_revenue = df['Ingresos_Totales'].sum()
-        st.metric("💰 Ingresos Totales", f"${total_revenue:,.2f}")
+        st.metric(replace_emojis("💰 Ingresos Totales"), f"${total_revenue:,.2f}")
     
     with col2:
         avg_margin = df['Margen_Ganancia'].mean()
-        st.metric("📈 Margen Promedio", f"{avg_margin:.1f}%")
+        st.metric(replace_emojis("📈 Margen Promedio"), f"{avg_margin:.1f}%")
     
     with col3:
         total_orders = len(df)
-        st.metric("📋 Total de Pedidos", f"{total_orders:,}")
+        st.metric(replace_emojis("📋 Total de Pedidos"), f"{total_orders:,}")
     
     with col4:
         avg_efficiency = df['Eficiencia_Ventas'].mean()
         st.metric("⚡ Eficiencia Promedio", f"${avg_efficiency:.2f}")
     
     # Interactive visualizations
-    st.subheader("📊 Visualizaciones Interactivas")
+    st.subheader(replace_emojis("📊 Visualizaciones Interactivas"))
     
     # Filter controls
     col1, col2, col3 = st.columns(3)
@@ -276,7 +277,7 @@ def main():
             st.plotly_chart(fig_region, use_container_width=True)
         
         # Time series analysis
-        st.subheader("📈 Análisis de Tendencias Temporales")
+        st.subheader(replace_emojis("📈 Análisis de Tendencias Temporales"))
         
         if 'Fecha' in filtered_df.columns:
             daily_sales = filtered_df.groupby(filtered_df['Fecha'].dt.date).agg({
@@ -320,7 +321,7 @@ def main():
         st.plotly_chart(fig_corr, use_container_width=True)
         
         # Show correlation insights
-        st.markdown("**💡 Insights de Correlación:** - Los valores cercanos a 1 indican correlación positiva fuerte - Los valores cercanos a -1 indican correlación negativa fuerte - Los valores cercanos a 0 indican poca o ninguna correlación")
+        st.markdown(replace_emojis("**💡 Insights de Correlación:** - Los valores cercanos a 1 indican correlación positiva fuerte - Los valores cercanos a -1 indican correlación negativa fuerte - Los valores cercanos a 0 indican poca o ninguna correlación"), unsafe_allow_html=True)
     
     else:
         st.warning("No hay datos que coincidan con los filtros seleccionados.")
@@ -334,34 +335,34 @@ def main():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("📊 Métricas a Mostrar")
-        show_revenue = st.checkbox("💰 Ingresos Totales", value=True)
-        show_margin = st.checkbox("📈 Margen de Ganancia", value=True)
-        show_orders = st.checkbox("📋 Número de Pedidos", value=True)
+        st.subheader(replace_emojis("📊 Métricas a Mostrar"))
+        show_revenue = st.checkbox(replace_emojis("💰 Ingresos Totales"), value=True)
+        show_margin = st.checkbox(replace_emojis("📈 Margen de Ganancia"), value=True)
+        show_orders = st.checkbox(replace_emojis("📋 Número de Pedidos"), value=True)
         show_efficiency = st.checkbox("⚡ Eficiencia de Ventas", value=True)
     
     with col2:
-        st.subheader("📈 Visualizaciones a Incluir")
+        st.subheader(replace_emojis("📈 Visualizaciones a Incluir"))
         show_category_chart = st.checkbox("🏷️ Gráfico por Categoría", value=True)
         show_region_chart = st.checkbox("🌍 Gráfico por Región", value=True)
-        show_trends = st.checkbox("📈 Análisis de Tendencias", value=True)
+        show_trends = st.checkbox(replace_emojis("📈 Análisis de Tendencias"), value=True)
         show_correlation = st.checkbox("🔗 Matriz de Correlación", value=True)
     
     # Generate custom dashboard
     if st.button("🚀 Generar Dashboard Personalizado", type="primary"):
-        st.subheader("🎯 Tu Dashboard Personalizado")
+        st.subheader(replace_emojis("🎯 Tu Dashboard Personalizado"))
         
         # Show selected metrics
         if any([show_revenue, show_margin, show_orders, show_efficiency]):
-            st.markdown("### 📊 Métricas Clave")
+            st.markdown(replace_emojis("### 📊 Métricas Clave"), unsafe_allow_html=True)
             
             metrics_cols = []
             if show_revenue:
-                metrics_cols.append(("💰 Ingresos Totales", f"${filtered_df['Ingresos_Totales'].sum():,.2f}"))
+                metrics_cols.append((f"{get_icon('💰', 20)} Ingresos Totales", f"${filtered_df['Ingresos_Totales'].sum():,.2f}"))
             if show_margin:
-                metrics_cols.append(("📈 Margen Promedio", f"{filtered_df['Margen_Ganancia'].mean():.1f}%"))
+                metrics_cols.append((f"{get_icon('📈', 20)} Margen Promedio", f"{filtered_df['Margen_Ganancia'].mean():.1f}%"))
             if show_orders:
-                metrics_cols.append(("📋 Total de Pedidos", f"{len(filtered_df):,}"))
+                metrics_cols.append((f"{get_icon('📋', 20)} Total de Pedidos", f"{len(filtered_df):,}"))
             if show_efficiency:
                 metrics_cols.append(("⚡ Eficiencia Promedio", f"${filtered_df['Eficiencia_Ventas'].mean():.2f}"))
             
@@ -373,7 +374,7 @@ def main():
         
         # Show selected visualizations
         if any([show_category_chart, show_region_chart, show_trends, show_correlation]):
-            st.markdown("### 📈 Visualizaciones")
+            st.markdown(replace_emojis("### 📈 Visualizaciones"), unsafe_allow_html=True)
             
             if show_category_chart:
                 st.plotly_chart(fig_category, use_container_width=True)
@@ -390,13 +391,13 @@ def main():
     # 7. Quiz Section - Must complete quiz before marking level as complete
     st.header("🧠 Quiz del Nivel")
     st.markdown("### Pon a prueba tus conocimientos")
-    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
+    st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
     # Check if user passed the quiz
     quiz_passed = st.session_state.get(f'quiz_nivel4_passed', False)
     
     if quiz_passed:
-        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+        st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     else:
         # Show quiz using unified system
         from core.quiz_system import create_quiz
@@ -412,7 +413,7 @@ def main():
     st.divider()
     
     # 8. Navigation or next steps
-    st.header("✅ Verificación del Nivel")
+    st.header(replace_emojis("✅ Verificación del Nivel"))
     
     # Only allow marking as complete if quiz is passed
     if not quiz_passed:
@@ -431,7 +432,7 @@ def main():
         if save_level_progress(user_id, 'nivel4', True):
             st.session_state['nivel4_completed'] = True
         else:
-            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            st.markdown(replace_emojis("❌ Error al guardar el progreso. Intenta de nuevo."), unsafe_allow_html=True)
             return
         
         # Show final achievement
@@ -440,9 +441,9 @@ def main():
         # Show final progression summary
         create_progression_summary(progress)
         
-        st.success("🎉 ¡Felicidades! Has completado todos los niveles del curso. ¡Eres un experto en análisis de datos!")
+        st.markdown(replace_emojis("🎉 ¡Felicidades! Has completado todos los niveles del curso. ¡Eres un experto en análisis de datos!"), unsafe_allow_html=True)
         
-        st.markdown("### 📝 Antes de continuar, nos gustaría conocer tu opinión sobre este nivel y la experiencia general.")
+        st.markdown(replace_emojis("### 📝 Antes de continuar, nos gustaría conocer tu opinión sobre este nivel y la experiencia general."), unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns(3)
         with col1:

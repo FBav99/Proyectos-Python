@@ -9,6 +9,7 @@ from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
 from utils.ui import auth_ui
+from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
@@ -18,7 +19,7 @@ configure_streamlit_error_handling()
 # Page config
 st.set_page_config(
     page_title="Nivel 0: Introducción - Conceptos de Datos",
-    page_icon="🌟",
+    page_icon=get_icon("🌟", 20),
     layout="wide"
 )
 
@@ -32,7 +33,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -40,13 +41,13 @@ def main():
     # Get current user
     user = current_user
     if not user or 'id' not in user:
-        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
     # 1. Title (level name and description)
-    st.title("🌟 Nivel 0: Introducción")
+    st.title(replace_emojis("🌟 Nivel 0: Introducción"))
     st.subheader("Conceptos Fundamentales de Datos")
     
     # 2. Progress Bar (showing progress across levels)
@@ -66,7 +67,7 @@ def main():
     create_level_preview('nivel0')
     
     # 5. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.")
     
     # Add narrative context
@@ -77,7 +78,7 @@ def main():
     )
     
     # 6. Steps Section (clear, actionable instructions)
-    st.header("📋 Conceptos Fundamentales de Datos")
+    st.header(replace_emojis("📋 Conceptos Fundamentales de Datos"))
     
     # Step 1
     create_step_card(
@@ -85,13 +86,13 @@ def main():
         title="¿Qué son los datos?",
         description="<strong>¿Qué son los datos?</strong> Los datos son información que se puede medir, contar o describir. Son como las piezas de un rompecabezas que, cuando las organizas, te cuentan una historia.",
         sections={
-            "📊 Ejemplos de datos en la vida real:": [
+            replace_emojis("📊 Ejemplos de datos en la vida real:"): [
                 "<strong>En una tienda:</strong> Cuántos productos vendiste, cuánto dinero ganaste",
                 "<strong>En un restaurante:</strong> Qué platos pidieron más, cuánto tiempo tardan en servir",
                 "<strong>En tu teléfono:</strong> Cuántos pasos caminaste, cuántas horas dormiste",
                 "<strong>En el clima:</strong> La temperatura, si llovió, qué tan fuerte sopló el viento"
             ],
-            "💡 ¿Por qué son importantes?": [
+            replace_emojis("💡 ¿Por qué son importantes?"): [
                 "Te ayudan a tomar mejores decisiones",
                 "Te muestran patrones que no ves a simple vista",
                 "Te permiten medir si algo está funcionando bien o mal",
@@ -106,22 +107,22 @@ def main():
         title="Tipos de datos que existen",
         description="<strong>¿Qué tipos hay?</strong> Los datos vienen en diferentes formas. Conocer estos tipos te ayuda a entender mejor tu información y saber qué puedes hacer con ella.",
         sections={
-            "🔢 Datos numéricos:": [
+            replace_emojis("🔢 Datos numéricos:"): [
                 "<strong>Números enteros:</strong> 1, 2, 3, 100 (cantidades, edades)",
                 "<strong>Números decimales:</strong> 1.5, 3.14, 99.99 (precios, medidas)",
                 "<strong>Porcentajes:</strong> 25%, 50%, 100% (descuentos, tasas de éxito)"
             ],
-            "🔤 Datos de texto:": [
+            replace_emojis("🔤 Datos de texto:"): [
                 "<strong>Nombres:</strong> Juan, María, Empresa ABC",
                 "<strong>Categorías:</strong> Rojo, Azul, Verde / Pequeño, Mediano, Grande",
                 "<strong>Descripciones:</strong> 'Producto de alta calidad'"
             ],
-            "📅 Datos de fecha y hora:": [
+            replace_emojis("📅 Datos de fecha y hora:"): [
                 "<strong>Fechas:</strong> 15/03/2024, 2024-03-15",
                 "<strong>Horas:</strong> 14:30, 2:30 PM",
                 "<strong>Períodos:</strong> Enero 2024, Q1 2024"
             ],
-            "✅ Datos de sí/no:": [
+            replace_emojis("✅ Datos de sí/no:"): [
                 "<strong>Verdadero/Falso:</strong> ¿Está activo? ¿Compró el producto?",
                 "<strong>Sí/No:</strong> ¿Tiene seguro? ¿Es cliente VIP?"
             ],
@@ -140,22 +141,22 @@ def main():
         title="¿Qué puedes hacer con los datos?",
         description="<strong>¿Para qué sirven?</strong> Los datos te permiten hacer muchas cosas útiles. Aquí te mostramos las principales formas de usar la información.",
         sections={
-            "📈 Descubrir tendencias:": [
+            replace_emojis("📈 Descubrir tendencias:"): [
                 "<strong>¿Qué está pasando?</strong> Ver si las ventas suben o bajan",
                 "<strong>¿Cuándo pasa?</strong> Identificar en qué momentos del año hay más actividad",
                 "<strong>¿Por qué pasa?</strong> Entender las causas de los cambios"
             ],
-            "🔍 Hacer comparaciones:": [
+            replace_emojis("🔍 Hacer comparaciones:"): [
                 "<strong>Comparar períodos:</strong> Este mes vs el mes pasado",
                 "<strong>Comparar categorías:</strong> Producto A vs Producto B",
                 "<strong>Comparar regiones:</strong> Norte vs Sur vs Este vs Oeste"
             ],
-            "🎯 Encontrar patrones:": [
+            replace_emojis("🎯 Encontrar patrones:"): [
                 "<strong>Patrones de tiempo:</strong> Los lunes siempre hay más ventas",
                 "<strong>Patrones de comportamiento:</strong> Los clientes jóvenes compran más online",
                 "<strong>Patrones estacionales:</strong> En diciembre siempre suben las ventas"
             ],
-            "📊 Tomar decisiones:": [
+            replace_emojis("📊 Tomar decisiones:"): [
                 "<strong>Decidir qué hacer:</strong> ¿Abro una nueva sucursal?",
                 "<strong>Decidir cuándo hacerlo:</strong> ¿Cuál es el mejor momento?",
                 "<strong>Decidir cómo hacerlo:</strong> ¿Qué estrategia funciona mejor?"
@@ -169,19 +170,19 @@ def main():
         title="¿Cómo se ven los datos organizados?",
         description="<strong>¿Cómo se organizan?</strong> Los datos se organizan en tablas, como una hoja de Excel, donde cada fila es un registro y cada columna es un tipo de información.",
         sections={
-            "📋 Estructura de una tabla:": [
+            replace_emojis("📋 Estructura de una tabla:"): [
                 "<strong>Filas:</strong> Cada fila representa un registro (una venta, un cliente, un producto)",
                 "<strong>Columnas:</strong> Cada columna representa un tipo de información (fecha, precio, cantidad)",
                 "<strong>Encabezados:</strong> La primera fila tiene los nombres de las columnas"
             ],
-            "📊 Ejemplo de datos de ventas:": [
+            replace_emojis("📊 Ejemplo de datos de ventas:"): [
                 "| Fecha | Producto | Cantidad | Precio | Cliente |",
                 "|-------|----------|----------|--------|---------|",
                 "| 15/03 | Laptop   | 1        | $800   | Juan    |",
                 "| 15/03 | Mouse    | 2        | $25    | María   |",
                 "| 16/03 | Teclado  | 1        | $50    | Pedro   |"
             ],
-            "💡 ¿Qué puedes ver en esta tabla?": [
+            replace_emojis("💡 ¿Qué puedes ver en esta tabla?"): [
                 "Cuántas ventas hubo cada día",
                 "Qué productos se vendieron más",
                 "Cuánto dinero se ganó en total",
@@ -196,7 +197,7 @@ def main():
         title="¿Qué es el análisis de datos?",
         description="<strong>¿Qué significa analizar?</strong> Analizar datos significa examinar la información para encontrar respuestas, patrones y insights que te ayuden a tomar mejores decisiones.",
         sections={
-            "🔍 Proceso de análisis:": [
+            replace_emojis("🔍 Proceso de análisis:"): [
                 "<strong>1. Preguntar:</strong> ¿Qué quiero saber? ¿Qué problema quiero resolver?",
                 "<strong>2. Recopilar:</strong> Obtener los datos necesarios",
                 "<strong>3. Limpiar:</strong> Asegurarse de que los datos estén correctos",
@@ -204,13 +205,13 @@ def main():
                 "<strong>5. Analizar:</strong> Buscar patrones y respuestas",
                 "<strong>6. Comunicar:</strong> Contar lo que encontraste"
             ],
-            "🎯 Tipos de preguntas que puedes responder:": [
+            replace_emojis("🎯 Tipos de preguntas que puedes responder:"): [
                 "<strong>¿Qué pasó?</strong> Las ventas bajaron 10% este mes",
                 "<strong>¿Por qué pasó?</strong> Porque llovió mucho y la gente no salió",
                 "<strong>¿Qué va a pasar?</strong> Si sigue lloviendo, las ventas seguirán bajando",
                 "<strong>¿Qué debería hacer?</strong> Crear una campaña online para compensar"
             ],
-            "💡 Beneficios del análisis:": [
+            replace_emojis("💡 Beneficios del análisis:"): [
                 "Te ayuda a tomar decisiones basadas en hechos, no en suposiciones",
                 "Te permite encontrar oportunidades que otros no ven",
                 "Te ayuda a evitar problemas antes de que pasen",
@@ -220,67 +221,67 @@ def main():
     )
     
     # 5. Optional media (images, diagrams, icons)
-    st.header("🎥 Demostración Visual")
+    st.header(replace_emojis("🎥 Demostración Visual"))
     try:
         display_level_gif("nivel0", "conceptos_datos")
     except:
-        st.info("📹 GIF de demostración no disponible. Los conceptos incluyen: 1) Qué son los datos, 2) Tipos de datos, 3) Cómo organizarlos, 4) Qué puedes hacer con ellos.")
+        st.info(replace_emojis("📹 GIF de demostración no disponible. Los conceptos incluyen: 1) Qué son los datos, 2) Tipos de datos, 3) Cómo organizarlos, 4) Qué puedes hacer con ellos."))
     
     # Example section
-    st.header("🎯 Ejemplo Práctico")
+    st.header(replace_emojis("🎯 Ejemplo Práctico"))
     
     create_info_box(
         "info-box",
-        "📊 Vamos a ver un ejemplo con datos de TechStore",
+        replace_emojis("📊 Vamos a ver un ejemplo con datos de TechStore"),
         "<p>Te mostraré cómo se ven los datos de TechStore en la vida real y qué información puedes obtener de ellos. Estos mismos datos los usarás en todos los niveles del curso, pero en diferentes estados de calidad.</p>"
     )
     
     # Show data progression
     create_info_box(
         "success-box",
-        "🔄 Progresión de Datos en el Curso",
+        replace_emojis("🔄 Progresión de Datos en el Curso"),
         "<p><strong>Nivel 0:</strong> Datos organizados para aprender conceptos<br/><strong>Nivel 1:</strong> Datos con problemas para aprender preparación<br/><strong>Nivel 2-4:</strong> Datos limpios para análisis avanzados</p>"
     )
     
     df = create_sample_data('clean')  # Use clean data for Level 0
-    st.subheader("📁 Datos de ejemplo (Ventas de TechStore)")
+    st.subheader(replace_emojis("📁 Datos de ejemplo (Ventas de TechStore)"))
     
     col1, col2 = st.columns([2, 1])
     with col1:
         st.dataframe(df.head(10), use_container_width=True)
         st.caption("Primeras 10 filas de datos")
     with col2:
-        st.markdown("**📊 Información básica:**")
+        st.markdown(replace_emojis("**📊 Información básica:**"), unsafe_allow_html=True)
         st.metric("Total de registros", len(df))
         st.metric("Columnas", len(df.columns))
         st.metric("Período", f"{df['Fecha'].min().strftime('%d/%m/%Y')} - {df['Fecha'].max().strftime('%d/%m/%Y')}")
     
-    st.subheader("🔍 ¿Qué tipos de datos vemos aquí?")
+    st.subheader(replace_emojis("🔍 ¿Qué tipos de datos vemos aquí?"))
     col1, col2 = st.columns([1, 1])
     with col1:
-        st.markdown("**📋 Tipos de datos en esta tabla:**")
+        st.markdown(replace_emojis("**📋 Tipos de datos en esta tabla:**"), unsafe_allow_html=True)
         
         create_info_box(
             "info-box",
-            "📊 Tipos de datos identificados",
-            "<p><strong>📅 Fecha:</strong> Datos de fecha y hora</p><p><strong>🔤 Producto:</strong> Datos de texto (nombres)</p><p><strong>🔤 Categoría:</strong> Datos de texto (categorías)</p><p><strong>🔢 Cantidad:</strong> Datos numéricos (números enteros)</p><p><strong>💰 Ventas:</strong> Datos numéricos (números decimales)</p><p><strong>🔤 Región:</strong> Datos de texto (ubicaciones)</p><p><strong>⭐ Calificación:</strong> Datos numéricos (escala 1-5)</p>"
+            replace_emojis("📊 Tipos de datos identificados"),
+            replace_emojis("<p><strong>📅 Fecha:</strong> Datos de fecha y hora</p><p><strong>🔤 Producto:</strong> Datos de texto (nombres)</p><p><strong>🔤 Categoría:</strong> Datos de texto (categorías)</p><p><strong>🔢 Cantidad:</strong> Datos numéricos (números enteros)</p><p><strong>💰 Ventas:</strong> Datos numéricos (números decimales)</p><p><strong>🔤 Región:</strong> Datos de texto (ubicaciones)</p><p><strong>⭐ Calificación:</strong> Datos numéricos (escala 1-5)</p>")
         )
     
     with col2:
-        st.markdown("**💡 ¿Qué puedes hacer con estos datos?**")
+        st.markdown(replace_emojis("**💡 ¿Qué puedes hacer con estos datos?**"), unsafe_allow_html=True)
         
         create_info_box(
             "success-box",
-            "🚀 Posibilidades de análisis",
-            "<h4>📈 Descubrir tendencias:</h4><p>• Ver si las ventas suben o bajan con el tiempo</p><p>• Identificar qué días hay más ventas</p><h4>🔍 Hacer comparaciones:</h4><p>• Comparar ventas entre regiones</p><p>• Ver qué categorías venden más</p><h4>🎯 Encontrar patrones:</h4><p>• Productos con mejores calificaciones</p><p>• Relación entre cantidad y ventas</p>"
+            replace_emojis("🚀 Posibilidades de análisis"),
+            replace_emojis("<h4>📈 Descubrir tendencias:</h4><p>• Ver si las ventas suben o bajan con el tiempo</p><p>• Identificar qué días hay más ventas</p><h4>🔍 Hacer comparaciones:</h4><p>• Comparar ventas entre regiones</p><p>• Ver qué categorías venden más</p><h4>🎯 Encontrar patrones:</h4><p>• Productos con mejores calificaciones</p><p>• Relación entre cantidad y ventas</p>")
         )
     
     # Add dirty vs clean data comparison
-    st.subheader("🔄 Comparación: Datos Limpios vs Datos con Problemas")
+    st.subheader(replace_emojis("🔄 Comparación: Datos Limpios vs Datos con Problemas"))
     
     create_info_box(
         "info-box",
-        "📚 ¿Por qué es importante ver ambos tipos?",
+        replace_emojis("📚 ¿Por qué es importante ver ambos tipos?"),
         "<p>En la vida real, los datos no siempre vienen perfectos. Es importante entender qué problemas pueden tener los datos y cómo afectan el análisis.</p>"
     )
     
@@ -294,14 +295,14 @@ def main():
         st.markdown("**✨ Datos Limpios (Como los que viste arriba):**")
         st.dataframe(df_clean.head(6), use_container_width=True)
         
-        st.markdown("**✅ Características de datos limpios:**")
+        st.markdown(replace_emojis("**✅ Características de datos limpios:**"), unsafe_allow_html=True)
         clean_features = [
-            "✅ Todos los datos están completos",
+            replace_emojis("✅ Todos los datos están completos"),
             "✅ Nombres consistentes (Electronica, no 'ELECTRONICA')",
-            "✅ Calificaciones válidas (1-5)",
-            "✅ Fechas en formato correcto",
-            "✅ Sin filas duplicadas",
-            "✅ Valores realistas"
+            replace_emojis("✅ Calificaciones válidas (1-5)"),
+            replace_emojis("✅ Fechas en formato correcto"),
+            replace_emojis("✅ Sin filas duplicadas"),
+            replace_emojis("✅ Valores realistas")
         ]
         for feature in clean_features:
             st.markdown(f"- {feature}")
@@ -310,20 +311,20 @@ def main():
         st.markdown("**⚠️ Datos con Problemas (Como vienen en la vida real):**")
         st.dataframe(df_dirty.head(6), use_container_width=True)
         
-        st.markdown("**❌ Problemas comunes en datos reales:**")
+        st.markdown(replace_emojis("**❌ Problemas comunes en datos reales:**"), unsafe_allow_html=True)
         dirty_features = [
-            "❌ Datos faltantes (celdas vacías)",
-            "❌ Nombres inconsistentes (Electronica vs ELECTRONICA)",
-            "❌ Calificaciones inválidas (6, 0, -1)",
-            "❌ Fechas en diferentes formatos",
-            "❌ Filas duplicadas",
-            "❌ Valores atípicos o imposibles"
+            replace_emojis("❌ Datos faltantes (celdas vacías)"),
+            replace_emojis("❌ Nombres inconsistentes (Electronica vs ELECTRONICA)"),
+            replace_emojis("❌ Calificaciones inválidas (6, 0, -1)"),
+            replace_emojis("❌ Fechas en diferentes formatos"),
+            replace_emojis("❌ Filas duplicadas"),
+            replace_emojis("❌ Valores atípicos o imposibles")
         ]
         for feature in dirty_features:
             st.markdown(f"- {feature}")
     
     # Show the impact
-    st.markdown("**📈 ¿Por qué importa esta diferencia?**")
+    st.markdown(replace_emojis("**📈 ¿Por qué importa esta diferencia?**"), unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -346,12 +347,12 @@ def main():
     
     create_info_box(
         "success-box",
-        "✅ ¿Qué aprendiste sobre la calidad de datos?",
+        replace_emojis("✅ ¿Qué aprendiste sobre la calidad de datos?"),
         "<ul><li><strong>Los datos limpios son más fáciles de analizar</strong> - Todo está organizado y consistente</li><li><strong>Los datos con problemas son comunes</strong> - En la vida real, raramente vienen perfectos</li><li><strong>La calidad afecta los resultados</strong> - Datos malos = análisis malos</li><li><strong>Es importante verificar los datos</strong> - Siempre revisa antes de analizar</li></ul>"
     )
     
     # Tips section
-    st.header("💡 Consejos Importantes")
+    st.header(replace_emojis("💡 Consejos Importantes"))
     
     create_info_box(
         "warning-box",
@@ -361,25 +362,25 @@ def main():
     
     create_info_box(
         "success-box",
-        "✅ Buenas prácticas",
+        replace_emojis("✅ Buenas prácticas"),
         "<ul><li><strong>Haz preguntas claras:</strong> Antes de analizar, define qué quieres saber</li><li><strong>Verifica la calidad:</strong> Siempre revisa si los datos tienen problemas como los que viste arriba</li><li><strong>Entiende el contexto:</strong> Conoce de dónde vienen los datos y qué representan</li><li><strong>Empieza simple:</strong> Comienza con preguntas básicas antes de las complejas</li><li><strong>Busca patrones:</strong> Los datos te cuentan historias, aprende a escucharlas</li></ul>"
     )
     
     # Practice activity
-    st.header("🎯 Actividad Práctica")
+    st.header(replace_emojis("🎯 Actividad Práctica"))
     
     create_info_box(
         "card",
-        "📝 Ejercicio para practicar",
+        replace_emojis("📝 Ejercicio para practicar"),
         "<ol><li><strong>Observa los datos de ejemplo:</strong> Mira las tablas de ventas de arriba (limpios y con problemas)</li><li><strong>Identifica los tipos de datos:</strong> ¿Qué columnas son números? ¿Cuáles son texto?</li><li><strong>Compara la calidad:</strong> ¿Qué diferencias notas entre los datos limpios y los problemáticos?</li><li><strong>Haz preguntas:</strong> ¿Qué quieres saber sobre estos datos?</li><li><strong>Busca patrones:</strong> ¿Ves algo interesante en los números?</li><li><strong>Piensa en aplicaciones:</strong> ¿Cómo podrías usar esta información?</li></ol>"
     )
     
     # Interactive example
-    st.header("🎮 Ejemplo Interactivo")
+    st.header(replace_emojis("🎮 Ejemplo Interactivo"))
     
     create_info_box(
         "info-box",
-        "🚀 Explora los datos por ti mismo",
+        replace_emojis("🚀 Explora los datos por ti mismo"),
         "<p>Usa los controles de abajo para ver diferentes aspectos de los datos limpios y entender mejor cómo funcionan. Nota cómo es fácil trabajar con datos organizados.</p>"
     )
     
@@ -387,20 +388,20 @@ def main():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**🔍 Ver datos por categoría:**")
+        st.markdown(replace_emojis("**🔍 Ver datos por categoría:**"), unsafe_allow_html=True)
         categoria_seleccionada = st.selectbox(
             "Selecciona una categoría",
             ['Todas'] + list(df['Categoria'].unique())
         )
     
     with col2:
-        st.markdown("**📊 Ver estadísticas básicas:**")
+        st.markdown(replace_emojis("**📊 Ver estadísticas básicas:**"), unsafe_allow_html=True)
         mostrar_estadisticas = st.checkbox("Mostrar estadísticas", value=True)
     
     # Apply filters and show results
     if categoria_seleccionada != 'Todas':
         df_filtrado = df[df['Categoria'] == categoria_seleccionada]
-        st.markdown(f"**📋 Datos filtrados por categoría: {categoria_seleccionada}**")
+        st.markdown(f"**{get_icon('📋', 20)} Datos filtrados por categoría: {categoria_seleccionada}**", unsafe_allow_html=True)
         st.dataframe(df_filtrado, use_container_width=True)
         
         if mostrar_estadisticas:
@@ -412,7 +413,7 @@ def main():
             with col3:
                 st.metric("Registros", len(df_filtrado))
     else:
-        st.markdown("**📋 Todos los datos:**")
+        st.markdown(replace_emojis("**📋 Todos los datos:**"), unsafe_allow_html=True)
         st.dataframe(df, use_container_width=True)
         
         if mostrar_estadisticas:
@@ -427,13 +428,13 @@ def main():
     # 6. Quiz Section - Must complete quiz before marking level as complete
     st.header("🧠 Quiz del Nivel")
     st.markdown("### Pon a prueba tus conocimientos")
-    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
+    st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
     # Check if user passed the quiz
     quiz_passed = st.session_state.get(f'quiz_nivel0_passed', False)
     
     if quiz_passed:
-        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+        st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     else:
         # Show quiz
         from core.quiz_system import create_quiz
@@ -449,7 +450,7 @@ def main():
     st.divider()
     
     # 7. Navigation or next steps
-    st.header("✅ Verificación del Nivel")
+    st.header(replace_emojis("✅ Verificación del Nivel"))
     
     # Only allow marking as complete if quiz is passed
     if not quiz_passed:
@@ -468,7 +469,7 @@ def main():
         if save_level_progress(user_id, 'nivel0', True):
             st.session_state['nivel0_completed'] = True
         else:
-            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            st.markdown(replace_emojis("❌ Error al guardar el progreso. Intenta de nuevo."), unsafe_allow_html=True)
             return
         
         # Show achievement
@@ -476,11 +477,11 @@ def main():
         
         create_info_box(
             "success-box",
-            "🎉 ¡Felicidades! Has completado el Nivel 0",
+            replace_emojis("🎉 ¡Felicidades! Has completado el Nivel 0"),
             "<p>Ahora entiendes los conceptos básicos de los datos. Estás listo para continuar con el siguiente nivel donde aprenderás a preparar y cargar datos.</p>"
         )
         
-        st.subheader("🚀 ¿Qué sigue?")
+        st.subheader(replace_emojis("🚀 ¿Qué sigue?"))
         st.markdown("Antes de continuar, nos gustaría conocer tu opinión sobre este nivel.")
         
         # Show next level preview
@@ -493,7 +494,7 @@ def main():
     # Additional resources
     create_info_box(
         "info-box",
-        "📚 ¿Quieres saber más?",
+        replace_emojis("📚 ¿Quieres saber más?"),
         "<p>Este nivel está basado en fundamentos de ciencia de datos y mejores prácticas de la industria. Los conceptos que aprendiste aquí son la base para todo análisis de datos.</p>"
     )
 

@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Progression tracking and achievement system for learning levels
 """
@@ -6,7 +7,7 @@ def get_level_achievements():
     """Get achievement information for each level"""
     return {
         'nivel0': {
-            'title': '🌟 Conceptos de Datos',
+            'title': replace_emojis('🌟 Conceptos de Datos'),
             'achievement': 'Fundamentos de Datos',
             'description': 'Has aprendido qué son los datos, sus tipos y cómo se organizan',
             'skills_gained': [
@@ -17,7 +18,7 @@ def get_level_achievements():
             'next_level_preview': 'En el Nivel 1 aprenderás a preparar y cargar datos correctamente'
         },
         'nivel1': {
-            'title': '📚 Preparación de Datos',
+            'title': replace_emojis('📚 Preparación de Datos'),
             'achievement': 'Especialista en Carga de Datos',
             'description': 'Dominas la preparación y carga de archivos de datos',
             'skills_gained': [
@@ -29,7 +30,7 @@ def get_level_achievements():
             'next_level_preview': 'En el Nivel 2 aprenderás a filtrar y organizar información específica'
         },
         'nivel2': {
-            'title': '🔍 Filtros y Organización',
+            'title': replace_emojis('🔍 Filtros y Organización'),
             'achievement': 'Experto en Filtros',
             'description': 'Sabes usar filtros para encontrar exactamente la información que necesitas',
             'skills_gained': [
@@ -41,7 +42,7 @@ def get_level_achievements():
             'next_level_preview': 'En el Nivel 3 aprenderás a calcular métricas y KPIs importantes'
         },
         'nivel3': {
-            'title': '📊 Métricas y KPIs',
+            'title': replace_emojis('📊 Métricas y KPIs'),
             'achievement': 'Analista de Métricas',
             'description': 'Puedes calcular, interpretar y usar métricas para tomar decisiones',
             'skills_gained': [
@@ -53,7 +54,7 @@ def get_level_achievements():
             'next_level_preview': 'En el Nivel 4 aprenderás a crear visualizaciones avanzadas y dashboards'
         },
         'nivel4': {
-            'title': '🚀 Análisis Avanzado',
+            'title': replace_emojis('🚀 Análisis Avanzado'),
             'achievement': 'Experto en Análisis de Datos',
             'description': 'Eres capaz de crear análisis complejos y dashboards profesionales',
             'skills_gained': [
@@ -102,20 +103,20 @@ def get_next_milestone(user_progress):
     
     if current_level == 'completed':
         return {
-            'title': '🎉 ¡Curso Completado!',
+            'title': replace_emojis('🎉 ¡Curso Completado!'),
             'description': 'Has dominado todos los conceptos de análisis de datos',
             'action': 'Crear tu propio dashboard profesional'
         }
     
     if current_level in achievements:
         return {
-            'title': f'🎯 Siguiente: {achievements[current_level]["title"]}',
+            'title': f'{get_icon("🎯", 20)} Siguiente: {achievements[current_level]["title"]}',
             'description': achievements[current_level]['next_level_preview'],
             'action': f'Completar el {current_level.replace("nivel", "Nivel ")}'
         }
     
     return {
-        'title': '🚀 Comienza tu viaje',
+        'title': replace_emojis('🚀 Comienza tu viaje'),
         'description': 'Aprende los fundamentos del análisis de datos',
         'action': 'Comenzar con el Nivel 0'
     }

@@ -9,6 +9,7 @@ from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
 from utils.learning.level_data import get_data_progression_info
 from utils.ui import auth_ui
+from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
@@ -18,7 +19,7 @@ configure_streamlit_error_handling()
 # Page config
 st.set_page_config(
     page_title="Nivel 1: Básico - Preparación de Datos",
-    page_icon="📚",
+    page_icon=get_icon("📚", 20),
     layout="wide"
 )
 
@@ -34,7 +35,7 @@ def main():
     
     # Check if user is authenticated
     if not current_user:
-        st.error("🔐 Por favor inicia sesión para acceder a este nivel.")
+        st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
@@ -42,13 +43,13 @@ def main():
     # Get current user
     user = current_user
     if not user or 'id' not in user:
-        st.error("❌ Error: No se pudo obtener la información del usuario.")
+        st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
     # 1. Title (level name and description)
-    st.title("📚 Nivel 1: Básico")
+    st.title(replace_emojis("📚 Nivel 1: Básico"))
     st.subheader("Preparación y Carga de Datos")
     
     # 2. Progress Bar (showing progress across levels)
@@ -79,7 +80,7 @@ def main():
     create_level_preview('nivel1')
     
     # 6. Introduction Section (what the user will learn)
-    st.header("🎯 ¿Qué aprenderás en este nivel?")
+    st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("Ahora que ya entiendes **qué son los datos** y **cómo se organizan** (como aprendiste en el Nivel 0), en este nivel aprenderás los pasos prácticos para preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico para trabajar con datos reales.")
     
     # Add connection to previous level
@@ -90,7 +91,7 @@ def main():
     )
     
     # 7. Steps Section (clear, actionable instructions)
-    st.header("📋 Pasos para Preparar y Cargar Datos")
+    st.header(replace_emojis("📋 Pasos para Preparar y Cargar Datos"))
     
     # Step 1
     create_step_card(
@@ -98,12 +99,12 @@ def main():
         title="Elegir el formato correcto para tus datos",
         description="<strong>¿Por qué es importante el formato?</strong> El formato correcto asegura que tus datos se carguen sin errores y sean fáciles de trabajar.",
         sections={
-            "📁 Formatos recomendados:": [
+            replace_emojis("📁 Formatos recomendados:"): [
                 "<strong>CSV (.csv)</strong> - Para datos simples, se abre en cualquier programa",
                 "<strong>Excel (.xlsx)</strong> - Para datos con formato, colores y múltiples hojas",
                 "<strong>JSON (.json)</strong> - Para datos estructurados complejos"
             ],
-            "🔧 Cómo elegir el formato:": [
+            replace_emojis("🔧 Cómo elegir el formato:"): [
                 "<strong>Usa CSV si:</strong> Tienes datos simples en tabla, quieres compatibilidad máxima",
                 "<strong>Usa Excel si:</strong> Tienes formato, colores, o múltiples hojas de datos",
                 "<strong>Usa JSON si:</strong> Tienes datos anidados o estructuras complejas"
@@ -122,19 +123,19 @@ def main():
         title="Preparar la estructura de datos correctamente",
         description="<strong>¿Por qué es importante la estructura?</strong> Una estructura bien organizada hace que el análisis sea más fácil y preciso.",
         sections={
-            "📋 Reglas para organizar datos:": [
+            replace_emojis("📋 Reglas para organizar datos:"): [
                 "<strong>Una fila = un registro:</strong> Cada fila debe representar una sola cosa (una venta, un cliente, un producto)",
                 "<strong>Una columna = un tipo de información:</strong> Cada columna debe tener el mismo tipo de dato",
                 "<strong>Encabezados claros:</strong> Usa nombres descriptivos para las columnas",
                 "<strong>Sin filas vacías:</strong> Evita filas completamente vacías en el medio de los datos"
             ],
-            "✅ Ejemplo de estructura correcta:": [
+            replace_emojis("✅ Ejemplo de estructura correcta:"): [
                 "| Fecha | Producto | Cantidad | Precio |",
                 "|-------|----------|----------|--------|",
                 "| 15/03 | Laptop   | 1        | 800    |",
                 "| 15/03 | Mouse    | 2        | 25     |"
             ],
-            "❌ Ejemplo de estructura incorrecta:": [
+            replace_emojis("❌ Ejemplo de estructura incorrecta:"): [
                 "| Fecha | Producto | Cantidad | Precio |",
                 "|-------|----------|----------|--------|",
                 "| 15/03 | Laptop   | 1        | 800    |",
@@ -150,13 +151,13 @@ def main():
         title="Cargar el archivo en la herramienta",
         description="<strong>¿Cómo cargar datos?</strong> Una vez que tienes tu archivo preparado, necesitas subirlo a la herramienta de análisis.",
         sections={
-            "🔧 Proceso de carga paso a paso:": [
+            replace_emojis("🔧 Proceso de carga paso a paso:"): [
                 "<strong>1. Localiza el botón de carga:</strong> Busca 'Cargar archivo', 'Subir datos' o 'Importar'",
                 "<strong>2. Selecciona tu archivo:</strong> Navega hasta donde guardaste tu archivo",
                 "<strong>3. Confirma la carga:</strong> Haz clic en 'Abrir' o 'Subir'",
                 "<strong>4. Espera la confirmación:</strong> La herramienta te dirá si la carga fue exitosa"
             ],
-            "📁 Tipos de carga disponibles:": [
+            replace_emojis("📁 Tipos de carga disponibles:"): [
                 "<strong>Arrastrar y soltar:</strong> Arrastra el archivo directamente a la zona de carga",
                 "<strong>Explorador de archivos:</strong> Haz clic en 'Examinar' y selecciona el archivo",
                 "<strong>URL o enlace:</strong> Si tienes un enlace a los datos en internet"
@@ -181,13 +182,13 @@ def main():
                 "<strong>¿No hay datos extraños?</strong> Busca símbolos raros, errores de tipeo, o valores imposibles",
                 "<strong>¿El conteo es correcto?</strong> Confirma que el número de filas y columnas sea el esperado"
             ],
-            "🔍 Qué buscar específicamente:": [
+            replace_emojis("🔍 Qué buscar específicamente:"): [
                 "<strong>Datos faltantes:</strong> Celdas vacías donde no debería haberlas",
                 "<strong>Formato incorrecto:</strong> Números que se ven como texto, fechas mal formateadas",
                 "<strong>Datos duplicados:</strong> Filas que aparecen más de una vez",
                 "<strong>Valores atípicos:</strong> Números que parecen demasiado grandes o pequeños"
             ],
-            "✅ Señales de que todo está bien:": [
+            replace_emojis("✅ Señales de que todo está bien:"): [
                 "Los números se ven como números (alineados a la derecha)",
                 "Las fechas tienen un formato consistente",
                 "No hay celdas con errores (#N/A, #ERROR, etc.)",
@@ -202,19 +203,19 @@ def main():
         title="Entender la estructura de tus datos cargados",
         description="<strong>¿Por qué es importante?</strong> Conocer la estructura te ayuda a entender qué puedes hacer con los datos y cómo organizarlos para el análisis.",
         sections={
-            "📊 Información básica a revisar:": [
+            replace_emojis("📊 Información básica a revisar:"): [
                 "<strong>Número de filas:</strong> Cuántos registros tienes en total",
                 "<strong>Número de columnas:</strong> Qué tipos de información tienes disponibles",
                 "<strong>Tipos de datos:</strong> Qué columnas son números, texto, fechas, etc.",
                 "<strong>Valores únicos:</strong> Cuántas categorías diferentes tienes en cada columna"
             ],
-            "🔍 Cómo interpretar la información:": [
+            replace_emojis("🔍 Cómo interpretar la información:"): [
                 "<strong>Filas:</strong> Cada fila representa un evento, transacción, o registro individual",
                 "<strong>Columnas:</strong> Cada columna representa una característica o medida",
                 "<strong>Tipos de datos:</strong> Te dicen qué operaciones puedes hacer (sumar números, contar categorías)",
                 "<strong>Valores únicos:</strong> Te muestran la diversidad de tus datos"
             ],
-            "💡 Preguntas útiles para hacerte:": [
+            replace_emojis("💡 Preguntas útiles para hacerte:"): [
                 "¿Tengo suficientes datos para hacer análisis confiables?",
                 "¿Qué columnas contienen la información más importante?",
                 "¿Hay columnas que no necesito para mi análisis?",
@@ -224,18 +225,18 @@ def main():
     )
     
     # 5. Optional media (images, diagrams, icons)
-    st.header("🎥 Demostración Visual")
+    st.header(replace_emojis("🎥 Demostración Visual"))
     try:
         display_level_gif("nivel1", "preparacion_csv")
     except:
         st.info("📹 GIF de demostración no disponible. El proceso incluye: 1) Seleccionar archivo, 2) Hacer clic en 'Cargar', 3) Verificar la carga exitosa.")
     
     # Example section
-    st.header("🎯 Ejemplo Práctico")
+    st.header(replace_emojis("🎯 Ejemplo Práctico"))
     
     create_info_box(
         "info-box",
-        "📊 Vamos a practicar la preparación y carga de datos",
+        replace_emojis("📊 Vamos a practicar la preparación y carga de datos"),
         "<p>Te mostraré cómo preparar datos correctamente y qué verificar después de cargarlos.</p>"
     )
     
@@ -243,40 +244,40 @@ def main():
     create_data_quality_insight('nivel1', 'dirty')
     
     df = create_sample_data('dirty')  # Use dirty data for Level 1
-    st.subheader("📁 Datos de ejemplo (Ventas de TechStore - Datos sin procesar)")
+    st.subheader(replace_emojis("📁 Datos de ejemplo (Ventas de TechStore - Datos sin procesar)"))
     
     col1, col2 = st.columns([2, 1])
     with col1:
         st.dataframe(df.head(10), use_container_width=True)
         st.caption("Primeras 10 filas de datos")
     with col2:
-        st.markdown("**📊 Información básica:**")
+        st.markdown(replace_emojis("**📊 Información básica:**"), unsafe_allow_html=True)
         st.metric("Total de registros", len(df))
         st.metric("Columnas", len(df.columns))
         st.metric("Período", f"{df['Fecha'].min().strftime('%d/%m/%Y')} - {df['Fecha'].max().strftime('%d/%m/%Y')}")
     
-    st.subheader("🔍 Estructura de los datos")
+    st.subheader(replace_emojis("🔍 Estructura de los datos"))
     col1, col2 = st.columns([1, 1])
     with col1:
-        st.markdown("**📋 Columnas disponibles:**")
+        st.markdown(replace_emojis("**📋 Columnas disponibles:**"), unsafe_allow_html=True)
         for col in df.columns:
             st.markdown(f"- **{col}**: {df[col].dtype}")
     with col2:
-        st.markdown("**📚 ¿Qué significa cada tipo de dato?**")
+        st.markdown(replace_emojis("**📚 ¿Qué significa cada tipo de dato?**"), unsafe_allow_html=True)
         
         with st.container():
-            st.markdown("**🔤 object:** Texto, nombres, categorías")
-            st.markdown("**🔢 int64:** Números enteros")
-            st.markdown("**📊 float64:** Números decimales")
-            st.markdown("**📅 datetime64:** Fechas y horas")
-            st.markdown("**✅ bool:** Verdadero o Falso")
+            st.markdown(replace_emojis("**🔤 object:** Texto, nombres, categorías"), unsafe_allow_html=True)
+            st.markdown(replace_emojis("**🔢 int64:** Números enteros"), unsafe_allow_html=True)
+            st.markdown(replace_emojis("**📊 float64:** Números decimales"), unsafe_allow_html=True)
+            st.markdown(replace_emojis("**📅 datetime64:** Fechas y horas"), unsafe_allow_html=True)
+            st.markdown(replace_emojis("**✅ bool:** Verdadero o Falso"), unsafe_allow_html=True)
     
     # Show dirty vs clean data comparison
-    st.subheader("🔄 Comparación: Datos Sin Procesar vs Datos Limpios")
+    st.subheader(replace_emojis("🔄 Comparación: Datos Sin Procesar vs Datos Limpios"))
     
     create_info_box(
         "info-box",
-        "📚 ¿Por qué es importante ver ambos tipos?",
+        replace_emojis("📚 ¿Por qué es importante ver ambos tipos?"),
         "<p>En el <strong>Nivel 0</strong> viste datos organizados y limpios. En la vida real, los datos raramente vienen así. En este nivel aprenderás a identificar y solucionar estos problemas para que los datos estén listos para el análisis.</p>"
     )
     
@@ -289,20 +290,20 @@ def main():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**📊 Datos Sin Procesar (Actual):**")
+        st.markdown(replace_emojis("**📊 Datos Sin Procesar (Actual):**"))
         st.dataframe(df.head(8), use_container_width=True)
         
         # Show data quality issues
-        st.markdown("**🔍 Problemas identificados:**")
+        st.markdown(replace_emojis("**🔍 Problemas identificados:**"), unsafe_allow_html=True)
         issues = []
         if df['Categoria'].isnull().any():
-            issues.append("❌ Valores faltantes en Categoría")
+            issues.append(replace_emojis("❌ Valores faltantes en Categoría"))
         if df.duplicated().any():
-            issues.append("❌ Filas duplicadas")
+            issues.append(replace_emojis("❌ Filas duplicadas"))
         if df['Calificacion'].max() > 5 or df['Calificacion'].min() < 1:
-            issues.append("❌ Calificaciones fuera del rango 1-5")
+            issues.append(replace_emojis("❌ Calificaciones fuera del rango 1-5"))
         if df['Ventas'].max() > df['Ventas'].quantile(0.95) * 5:
-            issues.append("❌ Valores atípicos en Ventas")
+            issues.append(replace_emojis("❌ Valores atípicos en Ventas"))
         
         for issue in issues:
             st.markdown(f"- {issue}")
@@ -313,20 +314,20 @@ def main():
         st.dataframe(df_clean.head(8), use_container_width=True)
         
         # Show improvements
-        st.markdown("**✅ Mejoras aplicadas:**")
+        st.markdown(replace_emojis("**✅ Mejoras aplicadas:**"), unsafe_allow_html=True)
         improvements = [
-            "✅ Valores faltantes eliminados",
-            "✅ Duplicados removidos", 
-            "✅ Calificaciones normalizadas (1-5)",
-            "✅ Valores atípicos corregidos",
-            "✅ Formatos consistentes"
+            replace_emojis("✅ Valores faltantes eliminados"),
+            replace_emojis("✅ Duplicados removidos"), 
+            replace_emojis("✅ Calificaciones normalizadas (1-5)"),
+            replace_emojis("✅ Valores atípicos corregidos"),
+            replace_emojis("✅ Formatos consistentes")
         ]
         
         for improvement in improvements:
             st.markdown(f"- {improvement}")
     
     # Show the impact
-    st.markdown("**📈 Impacto de la limpieza:**")
+    st.markdown(replace_emojis("**📈 Impacto de la limpieza:**"), unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -342,7 +343,7 @@ def main():
         st.metric("Calidad mejorada", "95%", "20%")
     
     # Tips section
-    st.header("💡 Consejos Importantes")
+    st.header(replace_emojis("💡 Consejos Importantes"))
     
     with st.container():
         st.markdown("### ⚠️ Errores comunes al preparar datos:")
@@ -353,7 +354,7 @@ def main():
         st.markdown("- **Archivos corruptos:** Intentar cargar archivos dañados o incompletos")
     
     with st.container():
-        st.markdown("### ✅ Buenas prácticas para preparar datos:")
+        st.markdown(replace_emojis("### ✅ Buenas prácticas para preparar datos:"), unsafe_allow_html=True)
         st.markdown("- **Planifica antes de empezar:** Decide qué formato usar según tus necesidades")
         st.markdown("- **Organiza la estructura:** Una fila = un registro, una columna = un tipo de información")
         st.markdown("- **Usa nombres descriptivos:** Las columnas deben tener nombres claros y específicos")
@@ -361,9 +362,9 @@ def main():
         st.markdown("- **Mantén copias de seguridad:** Guarda una copia de tus datos originales")
     
     # Practice activity
-    st.header("🎯 Actividad Práctica")
+    st.header(replace_emojis("🎯 Actividad Práctica"))
     with st.container():
-        st.markdown("### 📝 Ejercicio para practicar la preparación de datos:")
+        st.markdown(replace_emojis("### 📝 Ejercicio para practicar la preparación de datos:"), unsafe_allow_html=True)
         st.markdown("1. **Elige un formato:** Decide si usar CSV o Excel para tu archivo")
         st.markdown("2. **Diseña la estructura:** Planifica qué columnas necesitas (ej: Fecha, Producto, Cantidad, Precio)")
         st.markdown("3. **Crea el archivo:** Abre Excel o un editor de texto y crea tu tabla")
@@ -372,9 +373,9 @@ def main():
         st.markdown("6. **Guarda correctamente:** Guarda en el formato que elegiste (.csv o .xlsx)")
     
     # Data upload and testing section
-    st.header("📤 Prueba lo que Aprendiste")
+    st.header(replace_emojis("📤 Prueba lo que Aprendiste"))
     with st.container():
-        st.markdown("### 🚀 Sube tu propio archivo de datos")
+        st.markdown(replace_emojis("### 🚀 Sube tu propio archivo de datos"), unsafe_allow_html=True)
         st.markdown("Ahora puedes poner en práctica lo que aprendiste. Sube un archivo CSV o Excel para ver cómo se cargan y analizan los datos.")
     
     # File uploader
@@ -393,17 +394,17 @@ def main():
                 df_uploaded = pd.read_excel(uploaded_file)
             
             # Display success message
-            st.success(f"✅ Archivo cargado exitosamente: {uploaded_file.name}")
+            st.markdown(f"{get_icon("✅", 20)} Archivo cargado exitosamente: {uploaded_file.name}", unsafe_allow_html=True)
             
             # Display data overview
-            st.subheader("📊 Vista General de tus Datos")
+            st.subheader(replace_emojis("📊 Vista General de tus Datos"))
             
             col1, col2 = st.columns([2, 1])
             with col1:
                 st.dataframe(df_uploaded.head(10), use_container_width=True)
                 st.caption(f"Primeras 10 filas de {len(df_uploaded)} registros totales")
             with col2:
-                st.markdown("**📊 Información básica:**")
+                st.markdown(replace_emojis("**📊 Información básica:**"), unsafe_allow_html=True)
                 st.metric("Total de registros", len(df_uploaded))
                 st.metric("Columnas", len(df_uploaded.columns))
                 
@@ -419,58 +420,58 @@ def main():
                     st.metric("Columnas de fecha", len(date_cols))
             
             # Data structure analysis
-            st.subheader("🔍 Estructura de tus Datos")
+            st.subheader(replace_emojis("🔍 Estructura de tus Datos"))
             col1, col2 = st.columns([1, 1])
             
             with col1:
-                st.markdown("**📋 Columnas disponibles:**")
+                st.markdown(replace_emojis("**📋 Columnas disponibles:**"), unsafe_allow_html=True)
                 for col in df_uploaded.columns:
                     dtype_str = str(df_uploaded[col].dtype)
                     if 'int' in dtype_str:
-                        dtype_icon = "🔢"
+                        dtype_icon = replace_emojis("🔢")
                     elif 'float' in dtype_str:
-                        dtype_icon = "📊"
+                        dtype_icon = replace_emojis("📊")
                     elif 'datetime' in dtype_str:
-                        dtype_icon = "📅"
+                        dtype_icon = replace_emojis("📅")
                     elif 'bool' in dtype_str:
-                        dtype_icon = "✅"
+                        dtype_icon = replace_emojis("✅")
                     else:
-                        dtype_icon = "🔤"
+                        dtype_icon = replace_emojis("🔤")
                     
                     st.markdown(f"- {dtype_icon} **{col}**: {dtype_str}")
             
             with col2:
-                st.markdown("**📚 Análisis de calidad:**")
+                st.markdown(replace_emojis("**📚 Análisis de calidad:**"), unsafe_allow_html=True)
                 
                 # Check for missing values and duplicates using utility function
                 if analysis['total_missing'] == 0:
-                    st.markdown("✅ **Sin datos faltantes** - Excelente calidad")
+                    st.markdown(replace_emojis("✅ **Sin datos faltantes** - Excelente calidad"), unsafe_allow_html=True)
                 else:
                     st.markdown(f"⚠️ **Datos faltantes**: {analysis['total_missing']} valores ({analysis['missing_percentage']:.1f}%)")
                 
                 if analysis['duplicates'] == 0:
-                    st.markdown("✅ **Sin filas duplicadas** - Datos únicos")
+                    st.markdown(replace_emojis("✅ **Sin filas duplicadas** - Datos únicos"), unsafe_allow_html=True)
                 else:
                     st.markdown(f"⚠️ **Filas duplicadas**: {analysis['duplicates']} registros")
                 
                 # Data range info
                 if numeric_cols:
                     numeric_sample = df_uploaded[numeric_cols].iloc[0]
-                    st.markdown(f"🔢 **Columnas numéricas**: {', '.join(numeric_cols[:3])}{'...' if len(numeric_cols) > 3 else ''}")
+                    st.markdown(f"{get_icon("🔢", 20)} **Columnas numéricas**: {', '.join(numeric_cols[:3])}{'...' if len(numeric_cols) > 3 else ''}", unsafe_allow_html=True)
                 
                 if text_cols:
                     text_sample = df_uploaded[text_cols].iloc[0]
-                    st.markdown(f"🔤 **Columnas de texto**: {', '.join(text_cols[:3])}{'...' if len(text_cols) > 3 else ''}")
+                    st.markdown(f"{get_icon("🔤", 20)} **Columnas de texto**: {', '.join(text_cols[:3])}{'...' if len(text_cols) > 3 else ''}", unsafe_allow_html=True)
             
             # Data preview with more details
             st.subheader("👀 Vista Detallada de tus Datos")
             
             # Show sample data with more rows
-            st.markdown("**📋 Muestra de datos (primeras 15 filas):**")
+            st.markdown(replace_emojis("**📋 Muestra de datos (primeras 15 filas):**"))
             st.dataframe(df_uploaded.head(15), use_container_width=True)
             
             # Show data info
-            with st.expander("🔍 Información técnica del dataset"):
+            with st.expander(replace_emojis("🔍 Información técnica del dataset")):
                 st.write("**Tipos de datos:**")
                 st.write(df_uploaded.dtypes)
                 
@@ -481,21 +482,21 @@ def main():
                     st.info("No hay columnas numéricas para mostrar estadísticas")
                 
                 with st.container():
-                    st.markdown("#### 📊 Información General del Dataset")
+                    st.markdown(replace_emojis("#### 📊 Información General del Dataset"), unsafe_allow_html=True)
                 
                 # Create a nice grid layout for the info
                 col1, col2 = st.columns(2)
                 
                 with col1:
                     with st.container():
-                        st.markdown("#### 🔢 Detalles Técnicos")
+                        st.markdown(replace_emojis("#### 🔢 Detalles Técnicos"), unsafe_allow_html=True)
                         st.markdown(f"**Memoria utilizada:** {df_uploaded.memory_usage(deep=True).sum() / 1024:.2f} KB")
                         st.markdown(f"**Rango de índice:** {df_uploaded.index[0]} a {df_uploaded.index[-1]}")
                         st.markdown(f"**Tipos de datos:** {len(df_uploaded.dtypes.unique())} diferentes")
                 
                 with col2:
                     with st.container():
-                        st.markdown("#### 📋 Resumen de Columnas")
+                        st.markdown(replace_emojis("#### 📋 Resumen de Columnas"), unsafe_allow_html=True)
                         st.markdown(f"**Total de columnas:** {len(df_uploaded.columns)}")
                         st.markdown(f"**Columnas numéricas:** {len(numeric_cols)}")
                         st.markdown(f"**Columnas de texto:** {len(text_cols)}")
@@ -504,7 +505,7 @@ def main():
                 
                 # Show detailed column information in a nice format
                 with st.container():
-                    st.markdown("#### 📚 Detalle por Columna")
+                    st.markdown(replace_emojis("#### 📚 Detalle por Columna"), unsafe_allow_html=True)
                 
                 # Create a table-like display for column details
                 col_details = []
@@ -514,15 +515,15 @@ def main():
                     missing_count = df_uploaded[col].isnull().sum()
                     
                     if 'int' in dtype_str:
-                        dtype_icon = "🔢"
+                        dtype_icon = replace_emojis("🔢")
                     elif 'float' in dtype_str:
-                        dtype_icon = "📊"
+                        dtype_icon = replace_emojis("📊")
                     elif 'datetime' in dtype_str:
-                        dtype_icon = "📅"
+                        dtype_icon = replace_emojis("📅")
                     elif 'bool' in dtype_str:
-                        dtype_icon = "✅"
+                        dtype_icon = replace_emojis("✅")
                     else:
-                        dtype_icon = "🔤"
+                        dtype_icon = replace_emojis("🔤")
                     
                     col_details.append({
                         'columna': col,
@@ -533,31 +534,31 @@ def main():
                 
                 # Display as a nice dataframe
                 col_details_df = pd.DataFrame(col_details)
-                col_details_df.columns = ['📋 Columna', '🔤 Tipo', '✅ No Nulos', '⚠️ Faltantes']
+                col_details_df.columns = [replace_emojis('📋 Columna'), '🔤 Tipo', '✅ No Nulos', '⚠️ Faltantes']
                 st.dataframe(col_details_df, use_container_width=True, hide_index=True)
             
             # Congratulations message
             with st.container():
-                st.markdown("### 🎉 ¡Excelente trabajo!")
+                st.markdown(replace_emojis("### 🎉 ¡Excelente trabajo!"), unsafe_allow_html=True)
                 st.markdown("Has cargado y analizado exitosamente tu propio archivo de datos. Esto demuestra que has dominado los conceptos básicos del Nivel 1.")
             
         except Exception as e:
-            st.error(f"❌ Error al cargar el archivo: {str(e)}")
-            st.info("💡 Asegúrate de que tu archivo esté en el formato correcto y no esté corrupto.")
+            st.markdown(f"{get_icon("❌", 20)} Error al cargar el archivo: {str(e)}", unsafe_allow_html=True)
+            st.markdown(replace_emojis("💡 Asegúrate de que tu archivo esté en el formato correcto y no esté corrupto."), unsafe_allow_html=True)
     
     else:
-        st.info("📁 Sube un archivo CSV o Excel para ver el análisis en acción.")
+        st.markdown(replace_emojis("📁 Sube un archivo CSV o Excel para ver el análisis en acción."), unsafe_allow_html=True)
     
     # 6. Quiz Section - Must complete quiz before marking level as complete
     st.header("🧠 Quiz del Nivel")
     st.markdown("### Pon a prueba tus conocimientos")
-    st.info("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado.")
+    st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
     # Check if user passed the quiz
     quiz_passed = st.session_state.get(f'quiz_nivel1_passed', False)
     
     if quiz_passed:
-        st.success("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado.")
+        st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     else:
         # Show quiz
         from core.quiz_system import create_quiz
@@ -573,7 +574,7 @@ def main():
     st.divider()
     
     # 7. Navigation or next steps
-    st.header("✅ Verificación del Nivel")
+    st.header(replace_emojis("✅ Verificación del Nivel"))
     
     # Only allow marking as complete if quiz is passed
     if not quiz_passed:
@@ -592,7 +593,7 @@ def main():
         if save_level_progress(user_id, 'nivel1', True):
             st.session_state['nivel1_completed'] = True
         else:
-            st.error("❌ Error al guardar el progreso. Intenta de nuevo.")
+            st.markdown(replace_emojis("❌ Error al guardar el progreso. Intenta de nuevo."), unsafe_allow_html=True)
             return
         
         # Show achievement
@@ -600,11 +601,11 @@ def main():
         
         create_info_box(
             "success-box",
-            "🎉 ¡Felicidades! Has completado el Nivel 1",
+            replace_emojis("🎉 ¡Felicidades! Has completado el Nivel 1"),
             "<p>Ahora sabes cómo preparar y cargar datos correctamente. Estás listo para continuar con el siguiente nivel.</p>"
         )
         
-        st.subheader("🚀 ¿Qué sigue?")
+        st.subheader(replace_emojis("🚀 ¿Qué sigue?"))
         st.markdown("Antes de continuar, nos gustaría conocer tu opinión sobre este nivel.")
         
         # Show next level preview
@@ -617,7 +618,7 @@ def main():
     # Additional resources
     create_info_box(
         "info-box",
-        "📚 ¿Quieres saber más?",
+        replace_emojis("📚 ¿Quieres saber más?"),
         "<p>Este nivel está basado en estándares de calidad de datos y mejores prácticas. Consulta la documentación para profundizar.</p>"
     )
 

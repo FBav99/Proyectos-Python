@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from pathlib import Path
 
+from utils.ui.icon_system import get_icon, replace_emojis
 def display_gif(gif_path, caption="", width=None, use_container_width=True):
     """
     Display a GIF in Streamlit with proper error handling
@@ -16,7 +17,7 @@ def display_gif(gif_path, caption="", width=None, use_container_width=True):
         # Check if file exists
         if not os.path.exists(gif_path):
             st.warning(f"⚠️ GIF no encontrado: {gif_path}")
-            st.info("📹 Si estas viendo esto, significa que el GIF no esta disponible.")
+            st.markdown(replace_emojis("📹 Si estas viendo esto, significa que el GIF no esta disponible."), unsafe_allow_html=True)
             return False
         
         # Display the GIF
@@ -28,7 +29,7 @@ def display_gif(gif_path, caption="", width=None, use_container_width=True):
         return True
         
     except Exception as e:
-        st.error(f"❌ Error al cargar el GIF: {str(e)}")
+        st.markdown(f"{get_icon("❌", 20)} Error al cargar el GIF: {str(e)}", unsafe_allow_html=True)
         return False
 
 def get_gif_path(nivel, gif_name):
@@ -101,7 +102,7 @@ def create_gif_placeholder(nivel, gif_name, description=""):
             </p>
         </div>
         """, unsafe_allow_html=True)
-        st.info("📹 Placeholder para GIF de demostración")
+        st.markdown(replace_emojis("📹 Placeholder para GIF de demostración"), unsafe_allow_html=True)
         st.caption("El GIF real se mostrará cuando subas el archivo correspondiente")
 
 def display_gif_with_fallback(nivel, gif_name, description="", caption="", width=None):
@@ -123,6 +124,7 @@ def display_gif_with_fallback(nivel, gif_name, description="", caption="", width
         create_gif_placeholder(nivel, gif_name, description)
 
 # Predefined GIF configurations for each level
+# NOTA: Usamos emojis directos aquí, replace_emojis() se aplica cuando se usa
 GIF_CONFIGS = {
     "nivel1": {
         "preparacion_csv": {
@@ -185,7 +187,7 @@ def display_level_gif(nivel, gif_name, width=None):
             nivel, 
             gif_name, 
             config["description"], 
-            config["caption"], 
+            replace_emojis(config["caption"]), 
             width
         )
     else:

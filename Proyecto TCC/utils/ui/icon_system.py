@@ -54,7 +54,6 @@ class IconSystem:
             "📤": "upload.png",
             "🎨": "palette.png",
             "🧮": "calculator.png",
-            "📁": "folder.png",
             "🤝": "handshake.png",
             "🏆": "trophy.png"
         }
@@ -88,6 +87,8 @@ class IconSystem:
         """
         if self.icon_exists(emoji):
             icon_path = self.get_icon_path(emoji)
+            # Convert Windows backslashes to forward slashes for web URLs
+            icon_path = icon_path.replace('\\', '/') if icon_path else None
             alt = alt_text or emoji
             return f'<img src="{icon_path}" alt="{alt}" width="{size}" height="{size}" style="vertical-align: middle; margin-right: 4px;">'
         else:
@@ -113,3 +114,12 @@ def get_icon(emoji: str, size: int = 20, alt_text: str = None) -> str:
 def replace_emojis(text: str, size: int = 20) -> str:
     """Convenience function to replace emojis in text"""
     return icon_system.replace_emojis_in_text(text, size)
+
+def get_emoji_only(text: str) -> str:
+    """
+    Extract emojis from text without converting to HTML
+    Use this for component labels (st.button, st.text_input, etc.) that don't support HTML
+    """
+    # For now, just return the text as-is (emojis will display natively)
+    # This is a placeholder for future logic if needed
+    return text

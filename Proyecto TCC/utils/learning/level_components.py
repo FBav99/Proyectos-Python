@@ -2,6 +2,7 @@ import streamlit as st
 from core.progress_tracker import progress_tracker
 from .progression_tracker import get_level_achievements, get_progression_summary, get_achievement_badge, get_data_quality_insights
 
+from utils.ui.icon_system import get_icon, replace_emojis
 def create_step_card(step_number, title, description, sections=None):
     """Create a step card with proper HTML structure"""
     html_content = f"""
@@ -61,7 +62,7 @@ def create_achievement_display(level, user_progress):
         """
         
         for skill in achievement_info['skills_gained']:
-            html_content += f"<li>✅ {skill}</li>"
+            html_content += f"<li>{get_icon("✅", 20)} {skill}</li>"
         
         html_content += """
             </ul>
@@ -76,7 +77,7 @@ def create_progression_summary(user_progress):
     achievements = get_level_achievements()
     
     # Main title
-    st.markdown("### 📊 Tu Progreso de Aprendizaje")
+    st.markdown(replace_emojis("### 📊 Tu Progreso de Aprendizaje"), unsafe_allow_html=True)
     
     # Progress stats in columns
     col1, col2, col3 = st.columns(3)
@@ -89,7 +90,7 @@ def create_progression_summary(user_progress):
     
     # Achievements section
     if summary['completed_levels']:
-        st.markdown("#### 🏆 Logros Desbloqueados:")
+        st.markdown(replace_emojis("#### 🏆 Logros Desbloqueados:"), unsafe_allow_html=True)
         
         # Create achievement badges in columns
         achievement_cols = st.columns(min(len(summary['completed_levels']), 3))
@@ -103,9 +104,9 @@ def create_progression_summary(user_progress):
     
     # Next milestone
     next_milestone = summary['next_milestone']
-    st.markdown("#### 🎯 Siguiente Meta:")
-    st.markdown(f"**{next_milestone['title']}**")
-    st.markdown(next_milestone['description'])
+    st.markdown(replace_emojis("#### 🎯 Siguiente Meta:"), unsafe_allow_html=True)
+    st.markdown(f"**{next_milestone['title']}**", unsafe_allow_html=True)
+    st.markdown(next_milestone['description'], unsafe_allow_html=True)
 
 def create_data_quality_insight(level, data_type):
     """Create data quality insight display"""
@@ -147,7 +148,7 @@ def create_level_preview(level):
     """
     
     for skill in achievement_info['skills_gained']:
-        html_content += f"<li>🎯 {skill}</li>"
+        html_content += f"<li>{get_icon("🎯", 20)} {skill}</li>"
     
     html_content += f"""
             </ul>

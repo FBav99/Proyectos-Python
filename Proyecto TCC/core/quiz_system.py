@@ -4,6 +4,7 @@ from datetime import datetime
 from core.auth_config import update_user_progress, check_achievement
 from core.database import db_manager
 
+from utils.ui.icon_system import get_icon, replace_emojis
 # Quiz questions for each level
 QUIZ_QUESTIONS = {
     'nivel0': [
@@ -283,10 +284,10 @@ def create_quiz(level, username):
         feedback = st.session_state.pop(f'{prefix}_last_feedback', None)
         if feedback:
             if feedback['is_correct']:
-                st.success("🎉 ¡Respuesta correcta!")
+                st.markdown(replace_emojis("🎉 ¡Respuesta correcta!"), unsafe_allow_html=True)
             else:
-                st.error(f"❌ Incorrecto. La respuesta correcta era: **{feedback['correct_answer']}**")
-            st.info(f"💡 **Explicación:** {feedback['explanation']}")
+                st.markdown(f"{get_icon('❌', 20)} Incorrecto. La respuesta correcta era: **{feedback['correct_answer']}**", unsafe_allow_html=True)
+            st.markdown(f"{get_icon('💡', 20)} **Explicación:** {feedback['explanation']}", unsafe_allow_html=True)
             st.markdown("---")
 
         if not st.session_state[f'{prefix}_completed']:
@@ -354,7 +355,7 @@ def show_quiz_results(level, username, questions, expander_key):
     percentage = (score / total_questions) * 100 if total_questions else 0
     passed = score >= 3
 
-    st.subheader("🎯 Resultados del Quiz")
+    st.subheader(replace_emojis("🎯 Resultados del Quiz"))
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -362,35 +363,35 @@ def show_quiz_results(level, username, questions, expander_key):
     with col2:
         st.metric("Porcentaje", f"{percentage:.1f}%")
     with col3:
-        status = "✅ Aprobado" if passed else "❌ No Aprobado"
+        status = replace_emojis("✅ Aprobado") if passed else "❌ No Aprobado"
         st.metric("Estado", status)
 
     st.progress(percentage / 100 if total_questions else 0)
 
     if passed:
-        st.success("🎉 ¡Felicitaciones! Has aprobado el quiz.")
+        st.markdown(replace_emojis("🎉 ¡Felicitaciones! Has aprobado el quiz."), unsafe_allow_html=True)
         st.session_state[f'{prefix}_passed'] = True
 
         if score == total_questions:
             new_achievements = check_achievement(username, 'quiz_perfect')
             if new_achievements:
                 st.balloons()
-                st.success("🏆 ¡Logro desbloqueado: Maestro del Quiz!")
+                st.markdown(replace_emojis("🏆 ¡Logro desbloqueado: Maestro del Quiz!"), unsafe_allow_html=True)
     else:
-        st.error("📚 Necesitas al menos 3 respuestas correctas para aprobar. ¡Sigue estudiando!")
+        st.markdown(replace_emojis("📚 Necesitas al menos 3 respuestas correctas para aprobar. ¡Sigue estudiando!"), unsafe_allow_html=True)
         st.session_state[f'{prefix}_passed'] = False
 
-    st.markdown("### 📋 Respuestas Detalladas")
+    st.markdown(replace_emojis("### 📋 Respuestas Detalladas"), unsafe_allow_html=True)
 
     for i, answer in enumerate(st.session_state[f'{prefix}_answers']):
         with st.expander(f"Pregunta {i + 1}: {answer['question']}"):
             if answer['is_correct']:
-                st.success(f"✅ Tu respuesta: {answer['selected']}")
+                st.markdown(f"{get_icon('✅', 20)} Tu respuesta: {answer['selected']}", unsafe_allow_html=True)
             else:
-                st.error(f"❌ Tu respuesta: {answer['selected']}")
-                st.info(f"✅ Respuesta correcta: {answer['correct']}")
+                st.markdown(f"{get_icon('❌', 20)} Tu respuesta: {answer['selected']}", unsafe_allow_html=True)
+                st.markdown(f"{get_icon('✅', 20)} Respuesta correcta: {answer['correct']}", unsafe_allow_html=True)
 
-            st.markdown(f"💡 **Explicación:** {answer['explanation']}")
+            st.markdown(f"{get_icon("💡", 20)} **Explicación:** {answer['explanation']}", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -416,7 +417,7 @@ def show_quiz_results(level, username, questions, expander_key):
         if level == 'nivel1' and not st.session_state.get('nivel1_completed', False):
             new_achievements = check_achievement(username, 'level_completion')
             if new_achievements:
-                st.success("🏆 ¡Logro desbloqueado: Primer Nivel Completado!")
+                st.markdown(replace_emojis("🏆 ¡Logro desbloqueado: Primer Nivel Completado!"), unsafe_allow_html=True)
 
 def save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers_list):
     """Save quiz attempt and answers to database"""
@@ -487,22 +488,22 @@ def show_achievements(username):
     progress = get_user_progress(username)
     achievements = progress.get('achievements', [])
     
-    st.markdown("## 🏆 Logros Desbloqueados")
+    st.markdown(replace_emojis("## 🏆 Logros Desbloqueados"), unsafe_allow_html=True)
     
     if not achievements:
-        st.info("🎯 ¡Completa niveles y quizzes para desbloquear logros!")
+        st.markdown(replace_emojis("🎯 ¡Completa niveles y quizzes para desbloquear logros!"), unsafe_allow_html=True)
         return
     
     achievement_info = {
         'first_level': {
-            'title': '🎓 Primer Paso',
+            'title': replace_emojis('🎓 Primer Paso'),
             'description': 'Completaste tu primer nivel de aprendizaje',
-            'icon': '🎓'
+            'icon': replace_emojis('🎓')
         },
         'all_levels': {
-            'title': '🏆 Maestro del Análisis',
+            'title': replace_emojis('🏆 Maestro del Análisis'),
             'description': 'Completaste todos los niveles del curso',
-            'icon': '🏆'
+            'icon': replace_emojis('🏆')
         },
         'quiz_master': {
             'title': '🧠 Maestro del Quiz',
@@ -510,9 +511,9 @@ def show_achievements(username):
             'icon': '🧠'
         },
         'data_analyst': {
-            'title': '📊 Analista de Datos',
+            'title': replace_emojis('📊 Analista de Datos'),
             'description': 'Creaste 5 análisis de datos',
-            'icon': '📊'
+            'icon': replace_emojis('📊')
         }
     }
     
@@ -527,7 +528,7 @@ def show_achievements(username):
             """, unsafe_allow_html=True)
     
     # Progress towards next achievements
-    st.markdown("### 🎯 Próximos Logros")
+    st.markdown(replace_emojis("### 🎯 Próximos Logros"), unsafe_allow_html=True)
     
     if 'first_level' not in achievements:
         st.info("🎓 Completa el Nivel 1 para desbloquear 'Primer Paso'")
@@ -538,4 +539,4 @@ def show_achievements(username):
     if 'data_analyst' not in achievements:
         analyses_count = progress.get('data_analyses_created', 0)
         remaining = 5 - analyses_count
-        st.info(f"📊 Crea {remaining} análisis más para desbloquear 'Analista de Datos'")
+        st.markdown(f"{get_icon('📊', 20)} Crea {remaining} análisis más para desbloquear 'Analista de Datos'", unsafe_allow_html=True)

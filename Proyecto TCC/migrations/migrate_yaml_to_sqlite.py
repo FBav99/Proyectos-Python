@@ -1,3 +1,4 @@
+from utils.ui.icon_system import get_icon, replace_emojis
 """
 Migration script to transfer data from YAML config to SQLite database
 This script helps migrate existing users from the old YAML-based system
@@ -116,7 +117,7 @@ def verify_migration():
             user_count = cursor.fetchone()['count']
             
             if user_count > 0:
-                logger.info(f"✅ Migration successful! {user_count} users in database")
+                logger.info(f"{get_icon("✅", 20)} Migration successful! {user_count} users in database")
                 return True
             else:
                 logger.warning("⚠️ No users found in database")
@@ -128,23 +129,23 @@ def verify_migration():
 
 def main():
     """Main migration function"""
-    logger.info("🚀 Starting YAML to SQLite migration...")
+    logger.info(replace_emojis("🚀 Starting YAML to SQLite migration..."))
     
     # Step 1: Create backup
-    logger.info("📋 Step 1: Creating backup...")
+    logger.info(replace_emojis("📋 Step 1: Creating backup..."))
     create_backup_yaml()
     
     # Step 2: Initialize database
     logger.info("🗄️ Step 2: Initializing database...")
     try:
         init_database()
-        logger.info("✅ Database initialized successfully")
+        logger.info(replace_emojis("✅ Database initialized successfully"))
     except Exception as e:
-        logger.error(f"❌ Database initialization failed: {e}")
+        logger.error(f"{get_icon("❌", 20)} Database initialization failed: {e}")
         return False
     
     # Step 3: Load YAML config
-    logger.info("📄 Step 3: Loading YAML configuration...")
+    logger.info(replace_emojis("📄 Step 3: Loading YAML configuration..."))
     config = load_yaml_config()
     if not config:
         logger.warning("⚠️ No YAML config found, creating empty database")
@@ -153,20 +154,20 @@ def main():
     # Step 4: Migrate users
     logger.info("👥 Step 4: Migrating users...")
     migrated_count = migrate_users_from_yaml(config)
-    logger.info(f"✅ Migrated {migrated_count} users")
+    logger.info(f"{get_icon("✅", 20)} Migrated {migrated_count} users")
     
     # Step 5: Verify migration
-    logger.info("🔍 Step 5: Verifying migration...")
+    logger.info(replace_emojis("🔍 Step 5: Verifying migration..."))
     success = verify_migration()
     
     if success:
-        logger.info("🎉 Migration completed successfully!")
-        logger.info("📝 Next steps:")
+        logger.info(replace_emojis("🎉 Migration completed successfully!"))
+        logger.info(replace_emojis("📝 Next steps:"))
         logger.info("   1. Test the new authentication system")
         logger.info("   2. Update your pages to use the new auth service")
         logger.info("   3. Remove the old YAML-based authentication")
     else:
-        logger.error("❌ Migration verification failed")
+        logger.error(replace_emojis("❌ Migration verification failed"))
     
     return success
 
