@@ -1,4 +1,3 @@
-from utils.ui.icon_system import get_icon, replace_emojis
 """
 Project Timeline Utility
 Parses git commits and groups them by weeks and action types for timeline visualization
@@ -221,4 +220,197 @@ def get_action_color(action_type: str) -> str:
         'OTHER': '#6c757d'
     }
     return colors.get(action_type, '#6c757d')
+
+
+def create_gantt_chart_data(grouped_commits: Dict[str, Dict[str, List[Dict[str, str]]]]) -> List[Dict]:
+    """
+    Create data for Gantt chart visualization
+    
+    Args:
+        grouped_commits: Grouped commits dictionary
+    
+    Returns:
+        List of dictionaries with Gantt chart data
+    """
+    gantt_data = []
+    
+    # Sort weeks chronologically
+    sorted_weeks = sorted(grouped_commits.keys())
+    
+    for week_start in sorted_weeks:
+        week_data = grouped_commits[week_start]
+        
+        # Get Monday (start) and Sunday (end) of the week
+        try:
+            monday = datetime.strptime(week_start, '%Y-%m-%d')
+            sunday = monday + timedelta(days=6)
+        except (ValueError, AttributeError):
+            continue
+        
+        # Create a bar for each action type in this week
+        for action_type, commits in week_data.items():
+            if not commits:
+                continue
+            
+            # Count commits for this action type in this week
+            commit_count = len(commits)
+            
+            # Create task label with icon and count
+            icon = get_action_icon(action_type)
+            task_label = f"{icon} {action_type} ({commit_count})"
+            
+            gantt_data.append({
+                'Task': task_label,
+                'Start': monday,
+                'Finish': sunday,
+                'Action': action_type,
+                'Commits': commit_count,
+                'Color': get_action_color(action_type)
+            })
+    
+    return gantt_data
+
+
+def create_gantt_chart_plotly(grouped_commits: Dict[str, Dict[str, List[Dict[str, str]]]]):
+    """
+    Create a Gantt chart using Plotly
+    
+    Args:
+        grouped_commits: Grouped commits dictionary
+    
+    Returns:
+        Plotly figure object
+    """
+    try:
+        import plotly.graph_objects as go
+    except ImportError:
+        return None
+    
+    # Get Gantt chart data
+    gantt_data = create_gantt_chart_data(grouped_commits)
+    
+    if not gantt_data:
+        return None
+    
+    # Create unique tasks by combining week and action type
+    tasks_dict = {}
+    
+    for item in gantt_data:
+        # Create unique task key: Action + Week
+        week_label = item['Start'].strftime('%Y-%m-%d')
+        task_key = f"{item['Action']}_{week_label}"
+        
+        if task_key not in tasks_dict:
+            # Create task label
+            icon = get_action_icon(item['Action'])
+            week_start_str = item['Start'].strftime('%d/%m')
+            week_end_str = item['Finish'].strftime('%d/%m')
+            task_label = f"{icon} {item['Action']} - {week_start_str} a {week_end_str}"
+            
+            tasks_dict[task_key] = {
+                'Task': task_label,
+                'Start': item['Start'],
+                'Finish': item['Finish'],
+                'Action': item['Action'],
+                'Commits': item['Commits'],
+                'Color': item['Color']
+            }
+        else:
+            # Merge commit counts
+            tasks_dict[task_key]['Commits'] += item['Commits']
+    
+    # Convert to list and sort by start date, then action type
+    tasks_list = list(tasks_dict.values())
+    tasks_list.sort(key=lambda x: (x['Start'], x['Action']))
+    
+    # Create figure with timeline-style bars
+    fig = go.Figure()
+    
+    # Add a trace for each action type to enable grouping in legend
+    action_types = sorted(set(task['Action'] for task in tasks_list))
+    
+    for action_type in action_types:
+        # Filter tasks for this action type
+        action_tasks = [t for t in tasks_list if t['Action'] == action_type]
+        
+        if not action_tasks:
+            continue
+        
+        # Create arrays for this action type
+        task_names = [t['Task'] for t in action_tasks]
+        starts = [t['Start'] for t in action_tasks]
+        finishes = [t['Finish'] for t in action_tasks]
+        commits = [t['Commits'] for t in action_tasks]
+        colors = [t['Color'] for t in action_tasks]
+        
+        # For Gantt charts, we'll use dates directly
+        # Calculate the difference (duration) as timedelta objects
+        # Plotly bar charts can handle datetime objects for base
+        
+        # Create individual traces for each task to properly handle dates
+        for i, task in enumerate(action_tasks):
+            start = task['Start']
+            finish = task['Finish']
+            duration_days = (finish - start).days + 1
+            
+            # Add a bar for each task
+            fig.add_trace(go.Bar(
+                name=get_action_icon(action_type) + ' ' + action_type if i == 0 else '',  # Only show in legend once
+                x=[duration_days],
+                y=[task['Task']],
+                base=[start],
+                orientation='h',
+                marker=dict(
+                    color=task['Color'],
+                    line=dict(color='white', width=1)
+                ),
+                text=[f"{task['Commits']} commits"],
+                textposition='inside',
+                textfont=dict(color='white', size=9),
+                hovertemplate='<b>%{y}</b><br>' +
+                             f'Inicio: {start.strftime("%d/%m/%Y")}<br>' +
+                             f'Fin: {finish.strftime("%d/%m/%Y")}<br>' +
+                             f'Commits: {task["Commits"]}<br>' +
+                             '<extra></extra>',
+                showlegend=(i == 0)  # Only show in legend for first task of this type
+            ))
+    
+    # Update layout for Gantt chart
+    fig.update_layout(
+        title=dict(
+            text='📊 Gráfico de Gantt - Progreso del Proyecto',
+            x=0.5,
+            font=dict(size=18)
+        ),
+        xaxis=dict(
+            title='Fecha',
+            type='date',
+            showgrid=True,
+            gridcolor='lightgray',
+            side='top'
+        ),
+        yaxis=dict(
+            title='Actividades por Semana',
+            showgrid=True,
+            gridcolor='lightgray',
+            autorange='reversed',
+            tickfont=dict(size=10)
+        ),
+        height=max(600, len(tasks_list) * 50),
+        template='plotly_white',
+        hovermode='closest',
+        margin=dict(l=250, r=50, t=80, b=50),
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        barmode='group',
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.02,
+            xanchor='right',
+            x=1
+        )
+    )
+    
+    return fig
 

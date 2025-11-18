@@ -19,7 +19,8 @@ from utils.system.project_timeline import (
     get_timeline_summary,
     get_action_icon,
     get_action_color,
-    format_week_label
+    format_week_label,
+    create_gantt_chart_plotly
 )
 from utils.ui import auth_ui
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
@@ -92,6 +93,18 @@ def main():
                     <p style="margin: 0.5rem 0 0 0; font-size: 1.5rem; font-weight: bold;">{count}</p>
                 </div>
                 """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Gantt chart visualization
+    st.subheader(replace_emojis("📊 Gráfico de Gantt - Progreso del Proyecto"))
+    
+    gantt_fig = create_gantt_chart_plotly(grouped_commits)
+    if gantt_fig:
+        st.plotly_chart(gantt_fig, use_container_width=True)
+        st.caption(replace_emojis("💡 El gráfico muestra las actividades agrupadas por semana y tipo de acción. Cada barra representa una semana de desarrollo."))
+    else:
+        st.warning("⚠️ No se pudo generar el gráfico de Gantt. Asegúrate de que Plotly esté instalado.")
     
     st.markdown("---")
     
