@@ -1,8 +1,6 @@
 from utils.ui.icon_system import get_icon, replace_emojis
-"""
-Level-specific Survey - After Each Level
-Rating questions (1-5 scale) and suggestions box
-"""
+# Level-specific Survey - After Each Level
+# Rating questions (1-5 scale) and suggestions box
 
 import streamlit as st
 from datetime import datetime

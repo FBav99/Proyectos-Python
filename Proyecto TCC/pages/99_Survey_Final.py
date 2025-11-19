@@ -1,8 +1,6 @@
 from utils.ui.icon_system import get_icon, replace_emojis
-"""
-Final Survey - After All Levels Completed
-General experience quiz and comment box
-"""
+# Final Survey - After All Levels Completed
+# General experience quiz and comment box
 
 import streamlit as st
 from datetime import datetime

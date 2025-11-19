@@ -1,8 +1,6 @@
 from utils.ui.icon_system import get_icon, replace_emojis
-"""
-Initial Survey - Before Starting Levels
-Asks about user's data analysis experience, Excel usage, etc.
-"""
+# Initial Survey - Before Starting Levels
+# Asks about user's data analysis experience, Excel usage, etc.
 
 import streamlit as st
 from datetime import datetime
