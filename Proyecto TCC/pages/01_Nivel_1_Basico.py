@@ -548,20 +548,23 @@ def main():
     
     # Check if user passed the quiz
     quiz_passed = st.session_state.get(f'quiz_nivel1_passed', False)
+    quiz_completed = st.session_state.get(f'quiz_nivel1_completed', False)
     
+    # Always show quiz and results if quiz is completed (whether passed or not)
+    # This ensures results are always visible after completing the quiz
+    from core.quiz_system import create_quiz
+    create_quiz('nivel1', user['username'])
+    
+    # Show passed message if quiz is passed
     if quiz_passed:
         st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
-    else:
-        # Show quiz
-        from core.quiz_system import create_quiz
-        create_quiz('nivel1', user['username'])
-        
-        # Check if quiz was just completed and passed
-        if st.session_state.get(f'quiz_nivel1_completed', False):
-            score = st.session_state.get(f'quiz_nivel1_score', 0)
-            if score >= 3:
-                st.session_state[f'quiz_nivel1_passed'] = True
-                st.rerun()
+    
+    # Check if quiz was just completed and passed (for first-time completion)
+    if quiz_completed and not quiz_passed:
+        score = st.session_state.get(f'quiz_nivel1_score', 0)
+        if score >= 3:
+            st.session_state[f'quiz_nivel1_passed'] = True
+            st.rerun()
     
     st.divider()
     

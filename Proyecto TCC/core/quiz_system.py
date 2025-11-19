@@ -246,13 +246,19 @@ def create_quiz(level, username):
     with st.expander(f"🧠 Quiz - {header_text}", expanded=expanded):
         st.markdown("### Pon a prueba tus conocimientos")
 
-        if f'{prefix}_started' not in st.session_state:
+        # Only initialize quiz state if quiz hasn't been started or completed yet
+        # This prevents resetting the state when returning to the page after completing the quiz
+        if f'{prefix}_started' not in st.session_state and f'{prefix}_completed' not in st.session_state:
             st.session_state[f'{prefix}_started'] = False
             st.session_state[f'{prefix}_current_question'] = 0
             st.session_state[f'{prefix}_score'] = 0
             st.session_state[f'{prefix}_answers'] = []
             st.session_state[f'{prefix}_completed'] = False
             st.session_state[f'{prefix}_question_order'] = []
+        
+        # Ensure answers are preserved if quiz is completed
+        if st.session_state.get(f'{prefix}_completed', False) and f'{prefix}_answers' not in st.session_state:
+            st.session_state[f'{prefix}_answers'] = []
 
         total_questions = len(questions)
 
