@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import io
 from datetime import datetime
-from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
 from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_data_quality_insight, create_achievement_display
@@ -223,13 +222,6 @@ def main():
             ]
         }
     )
-    
-    # 5. Optional media (images, diagrams, icons)
-    st.header(replace_emojis("🎥 Demostración Visual"))
-    try:
-        display_level_gif("nivel1", "preparacion_csv")
-    except:
-        st.info("📹 GIF de demostración no disponible. El proceso incluye: 1) Seleccionar archivo, 2) Hacer clic en 'Cargar', 3) Verificar la carga exitosa.")
     
     # Example section
     st.header(replace_emojis("🎯 Ejemplo Práctico"))

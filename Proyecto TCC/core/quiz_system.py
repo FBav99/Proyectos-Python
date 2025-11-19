@@ -198,6 +198,7 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
         f'{prefix}_question_order',
         f'{prefix}_last_feedback',
         f'{prefix}_skipped',
+        f'{prefix}_saved',
     ]
     for key in keys_to_clear:
         st.session_state.pop(key, None)
@@ -409,15 +410,18 @@ def show_quiz_results(level, username, questions, expander_key):
             if st.button(f"➡️ Ir al {next_label}", type="primary", use_container_width=True, key=f"{prefix}_next"):
                 st.switch_page(next_page)
 
-    save_quiz_attempt(level, username, score, total_questions, percentage, passed, st.session_state[f'{prefix}_answers'])
+    # Only save quiz attempt once when results are first shown
+    if not st.session_state.get(f'{prefix}_saved', False):
+        save_quiz_attempt(level, username, score, total_questions, percentage, passed, st.session_state[f'{prefix}_answers'])
+        st.session_state[f'{prefix}_saved'] = True
+        
+        if passed:
+            update_user_progress(username, quiz_scores={level: percentage})
 
-    if passed:
-        update_user_progress(username, quiz_scores={level: percentage})
-
-        if level == 'nivel1' and not st.session_state.get('nivel1_completed', False):
-            new_achievements = check_achievement(username, 'level_completion')
-            if new_achievements:
-                st.markdown(replace_emojis("🏆 ¡Logro desbloqueado: Primer Nivel Completado!"), unsafe_allow_html=True)
+            if level == 'nivel1' and not st.session_state.get('nivel1_completed', False):
+                new_achievements = check_achievement(username, 'level_completion')
+                if new_achievements:
+                    st.markdown(replace_emojis("🏆 ¡Logro desbloqueado: Primer Nivel Completado!"), unsafe_allow_html=True)
 
 def save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers_list):
     """Save quiz attempt and answers to database"""
