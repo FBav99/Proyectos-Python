@@ -47,11 +47,7 @@ def main():
             st.switch_page("Inicio.py")
         return
     
-    # 1. Title (level name and description)
-    st.title(replace_emojis("📊 Nivel 3: Métricas"))
-    st.subheader("KPIs y Análisis de Rendimiento")
-    
-    # 2. Progress Bar (showing progress across levels)
+    # 1. Progress Bar (showing progress across levels)
     total_progress, completed_count, progress = get_level_progress(user['id'])
     
     st.markdown('<div class="progress-container">', unsafe_allow_html=True)

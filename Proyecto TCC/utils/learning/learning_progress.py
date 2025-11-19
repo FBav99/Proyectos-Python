@@ -136,7 +136,8 @@ def show_learning_section(total_progress, completed_count, progress):
                 classes.append("next")
             icon = get_icon("✅", 20) if completed else get_icon("⏳", 20)
             state_text = "Completado" if completed else ("Siguiente paso" if level_key == next_pending_level else "Pendiente")
-            status_cards_html += f'<div class="{" ".join(classes)}"><span class="level-icon">{icon}</span><span class="level-label">{level_title}</span><span class="level-subtitle">{level_subtitle}</span><span class="level-state">{state_text}</span></div>'
+            start_here_text = '<span style="font-size: 0.75rem; color: rgba(249, 115, 22, 0.9); display: block; margin-top: 0.3rem;">⭐ Comienza aquí</span>' if (not completed and level_key == next_pending_level) else ''
+            status_cards_html += f'<div class="{" ".join(classes)}"><span class="level-icon">{icon}</span><span class="level-label">{level_title}</span><span class="level-subtitle">{level_subtitle}</span><span class="level-state">{state_text}</span>{start_here_text}</div>'
         status_cards_html += '</div>'
         st.markdown(status_cards_html, unsafe_allow_html=True)
     
@@ -251,8 +252,6 @@ def show_learning_section(total_progress, completed_count, progress):
             button_type = "primary" if progress.get(level_key, False) else "secondary"
             if st.button(label, type=button_type, use_container_width=True, key=f"learn_{level_key}"):
                 st.switch_page(target_page)
-            if level_key == next_pending_level and not progress.get(level_key, False):
-                st.caption("⭐ Comienza aquí")
     
     st.markdown("")
     if st.button("❓ Ayuda y Recursos", use_container_width=True, key="learn_ayuda"):
