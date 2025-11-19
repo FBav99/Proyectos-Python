@@ -106,7 +106,6 @@ class IconStandardizer:
         # Tiempo
         'calendario': '📅',
         'reloj': '🕐',
-        'timeline': '📅',
         'historial': '📜',
         
         # Otros
@@ -371,7 +370,6 @@ ICON_OBJETIVO = replace_emojis("🎯")
 
 # Tiempo
 ICON_CALENDARIO = replace_emojis("📅")
-ICON_TIMELINE = replace_emojis("📅")
 
 # Otros
 ICON_IDEA = replace_emojis("💡")
@@ -431,7 +429,6 @@ def get_standard_icon(icon_name: str, size: int = 20) -> str:
         'estrella': ICON_ESTRELLA,
         'objetivo': ICON_OBJETIVO,
         'calendario': ICON_CALENDARIO,
-        'timeline': ICON_TIMELINE,
         'idea': ICON_IDEA,
         'pregunta': ICON_PREGUNTA,
     }

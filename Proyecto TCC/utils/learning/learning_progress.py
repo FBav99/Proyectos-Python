@@ -127,7 +127,7 @@ def show_learning_section(total_progress, completed_count, progress):
         ]
         next_pending_level = next((level for level, _, _ in level_definitions if not progress.get(level, False)), None)
 
-        status_cards_html = ['<div class="level-status-grid">']
+        status_cards_html = '<div class="level-status-grid">'
         for level_key, level_title, level_subtitle in level_definitions:
             completed = progress.get(level_key, False)
             classes = ["level-status-card"]
@@ -136,18 +136,9 @@ def show_learning_section(total_progress, completed_count, progress):
                 classes.append("next")
             icon = get_icon("✅", 20) if completed else get_icon("⏳", 20)
             state_text = "Completado" if completed else ("Siguiente paso" if level_key == next_pending_level else "Pendiente")
-            status_cards_html.append(
-                f"""
-                <div class="{' '.join(classes)}">
-                    <span class="level-icon">{icon}</span>
-                    <span class="level-label">{level_title}</span>
-                    <span class="level-subtitle">{level_subtitle}</span>
-                    <span class="level-state">{state_text}</span>
-                </div>
-                """
-            )
-        status_cards_html.append("</div>")
-        st.markdown("".join(status_cards_html), unsafe_allow_html=True)
+            status_cards_html += f'<div class="{" ".join(classes)}"><span class="level-icon">{icon}</span><span class="level-label">{level_title}</span><span class="level-subtitle">{level_subtitle}</span><span class="level-state">{state_text}</span></div>'
+        status_cards_html += '</div>'
+        st.markdown(status_cards_html, unsafe_allow_html=True)
     
     # Add progress reset button in learning section
     st.markdown("---")
