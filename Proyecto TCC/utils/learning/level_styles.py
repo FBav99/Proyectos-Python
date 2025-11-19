@@ -1,5 +1,11 @@
+import streamlit as st
+
+@st.cache_data(show_spinner=False)
 def load_level_styles():
-    """Load the CSS styling for level pages"""
+    """Load the CSS styling for level pages
+    
+    Cached since CSS styles are static and don't change during runtime.
+    """
     return """
     <style>
     /* ===== Global Styles ===== */

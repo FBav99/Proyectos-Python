@@ -1,5 +1,6 @@
 import json
 import logging
+import streamlit as st
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -70,6 +71,10 @@ def upsert_dashboard(
                 (dashboard_name, dashboard_config, is_public, now, now, dashboard_id, user_id),
             )
             conn.commit()
+            
+            # Invalidate cache to ensure fresh data on next call
+            list_user_dashboards.clear()
+            
             return dashboard_id
 
         logger.debug("Creating new dashboard for user %s", user_id)
@@ -88,6 +93,10 @@ def upsert_dashboard(
             )
             record = cursor.fetchone()
             conn.commit()
+            
+            # Invalidate cache to ensure fresh data on next call
+            list_user_dashboards.clear()
+            
             return record["id"] if record else dashboard_id or 0
 
         cursor = conn.execute(
@@ -101,11 +110,20 @@ def upsert_dashboard(
             (user_id, dashboard_name, dashboard_config, is_public, now, now, now),
         )
         conn.commit()
+        
+        # Invalidate cache to ensure fresh data on next call
+        list_user_dashboards.clear()
+        
         return int(cursor.lastrowid)
 
 
+@st.cache_data(show_spinner=False, ttl=30)
 def list_user_dashboards(user_id: int) -> List[Dict[str, Any]]:
-    """Retrieve all dashboards for a user ordered by last update."""
+    """Retrieve all dashboards for a user ordered by last update.
+    
+    Cached for 30 seconds to reduce database queries while allowing
+    real-time updates when dashboards are created/modified.
+    """
     if not user_id:
         return []
 
@@ -157,4 +175,7 @@ def delete_dashboard(dashboard_id: int, user_id: int) -> None:
             (dashboard_id, user_id),
         )
         conn.commit()
+    
+    # Invalidate cache to ensure fresh data on next call
+    list_user_dashboards.clear()
 

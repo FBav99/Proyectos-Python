@@ -1,10 +1,16 @@
 from utils.ui.icon_system import get_icon, replace_emojis
+import streamlit as st
+
 """
 Progression tracking and achievement system for learning levels
 """
 
+@st.cache_data(show_spinner=False)
 def get_level_achievements():
-    """Get achievement information for each level"""
+    """Get achievement information for each level
+    
+    Cached since achievement definitions are static.
+    """
     return {
         'nivel0': {
             'title': replace_emojis('🌟 Conceptos de Datos'),
@@ -121,8 +127,12 @@ def get_next_milestone(user_progress):
         'action': 'Comenzar con el Nivel 0'
     }
 
+@st.cache_data(show_spinner=False)
 def get_achievement_badge(level):
-    """Get achievement badge information for a level"""
+    """Get achievement badge information for a level
+    
+    Cached since badge definitions are static.
+    """
     achievements = get_level_achievements()
     
     if level not in achievements:
@@ -142,8 +152,12 @@ def get_achievement_badge(level):
         'icon': achievements[level]['title'].split()[0]  # Get the emoji
     }
 
+@st.cache_data(show_spinner=False)
 def get_data_quality_insights(level, data_type):
-    """Get insights about data quality for each level"""
+    """Get insights about data quality for each level
+    
+    Cached since insight definitions are static.
+    """
     insights = {
         'nivel0': {
             'clean': {

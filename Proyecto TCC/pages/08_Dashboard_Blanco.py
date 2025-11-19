@@ -614,8 +614,12 @@ def build_operations_template(df):
     return components
 
 
+@st.cache_data(show_spinner=False)
 def get_dashboard_templates(df):
-    """Retorna la configuración de plantillas disponibles."""
+    """Retorna la configuración de plantillas disponibles.
+    
+    Cached since template definitions are static.
+    """
     return [
         {
             "key": "executive_overview",

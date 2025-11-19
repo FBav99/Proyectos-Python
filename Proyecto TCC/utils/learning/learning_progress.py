@@ -2,8 +2,13 @@ import streamlit as st
 from core.progress_tracker import progress_tracker
 from utils.ui.icon_system import get_icon, replace_emojis
 
+@st.cache_data(show_spinner=False, ttl=60)
 def get_level_progress(user_id):
-    """Get current progress across all levels from database"""
+    """Get current progress across all levels from database
+    
+    Cached for 60 seconds to reduce database queries while allowing
+    real-time updates when progress changes.
+    """
     try:
         progress = progress_tracker.get_user_progress(user_id)
         level_progress = {
@@ -375,6 +380,9 @@ def save_level_progress(user_id, level_name, completed=True):
         elif level_name == 'nivel4':
             progress_tracker.update_user_progress(user_id, nivel4_completed=completed)
         
+        # Invalidate cache to ensure fresh data on next call
+        get_level_progress.clear()
+        
         # Also update session state for immediate UI feedback
         st.session_state[f'{level_name}_completed'] = completed
         return True
@@ -393,6 +401,9 @@ def reset_all_progress(user_id):
             nivel3_completed=False,
             nivel4_completed=False
         )
+        
+        # Invalidate cache to ensure fresh data on next call
+        get_level_progress.clear()
         
         # Clear session state
         for level in ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']:
