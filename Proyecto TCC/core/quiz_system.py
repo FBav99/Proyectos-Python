@@ -230,10 +230,17 @@ def create_quiz(level, username):
     if st.session_state.get(skipped_key):
         st.info("Has pospuesto este quiz. Puedes retomarlo cuando quieras. Recuerda que necesitas aprobarlo para completar el nivel.")
 
+    # Always keep expander open if quiz is completed or started
     if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
         st.session_state[expander_key] = True
 
-    expanded = st.session_state.get(expander_key, True)
+    # If quiz is completed, force expander to stay open
+    if st.session_state.get(f'{prefix}_completed', False):
+        expanded = True
+        st.session_state[expander_key] = True
+    else:
+        expanded = st.session_state.get(expander_key, True)
+    
     header_text = LEVEL_HEADERS.get(level, f"Nivel {level[-1]}")
 
     with st.expander(f"🧠 Quiz - {header_text}", expanded=expanded):
@@ -280,7 +287,9 @@ def create_quiz(level, username):
         if not st.session_state.get(f'{prefix}_question_order'):
             st.session_state[f'{prefix}_question_order'] = random.sample(range(total_questions), total_questions)
 
-        st.session_state[expander_key] = True
+        # Always keep expander open during quiz or when completed
+        if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
+            st.session_state[expander_key] = True
 
         feedback = st.session_state.pop(f'{prefix}_last_feedback', None)
         if feedback:
@@ -297,6 +306,7 @@ def create_quiz(level, username):
 
             if current_index >= len(order):
                 st.session_state[f'{prefix}_completed'] = True
+                st.session_state[expander_key] = True  # Ensure expander stays open
                 st.rerun()
 
             question = questions[order[current_index]]
@@ -335,6 +345,7 @@ def create_quiz(level, username):
                     st.session_state[f'{prefix}_current_question'] += 1
                     if st.session_state[f'{prefix}_current_question'] >= len(order):
                         st.session_state[f'{prefix}_completed'] = True
+                        st.session_state[expander_key] = True  # Ensure expander stays open
                     st.rerun()
 
             with col_restart:
@@ -349,9 +360,15 @@ def show_quiz_results(level, username, questions, expander_key):
     """Show quiz results and achievements."""
 
     prefix = f'quiz_{level}'
-    st.session_state[expander_key] = True
+    st.session_state[expander_key] = True  # Force expander to stay open
 
-    score = st.session_state[f'{prefix}_score']
+    # Verify that quiz data exists
+    if f'{prefix}_score' not in st.session_state or f'{prefix}_answers' not in st.session_state:
+        st.error("Error: Los datos del quiz no están disponibles. Por favor, intenta el quiz nuevamente.")
+        return
+
+    score = st.session_state.get(f'{prefix}_score', 0)
+    answers = st.session_state.get(f'{prefix}_answers', [])
     total_questions = len(questions)
     percentage = (score / total_questions) * 100 if total_questions else 0
     passed = score >= 3
@@ -384,7 +401,11 @@ def show_quiz_results(level, username, questions, expander_key):
 
     st.markdown(replace_emojis("### 📋 Respuestas Detalladas"), unsafe_allow_html=True)
 
-    for i, answer in enumerate(st.session_state[f'{prefix}_answers']):
+    if not answers:
+        st.warning("No hay respuestas disponibles para mostrar.")
+        return
+
+    for i, answer in enumerate(answers):
         with st.expander(f"Pregunta {i + 1}: {answer['question']}"):
             if answer['is_correct']:
                 st.markdown(f"{get_icon('✅', 20)} Tu respuesta: {answer['selected']}", unsafe_allow_html=True)
@@ -412,7 +433,7 @@ def show_quiz_results(level, username, questions, expander_key):
 
     # Only save quiz attempt once when results are first shown
     if not st.session_state.get(f'{prefix}_saved', False):
-        save_quiz_attempt(level, username, score, total_questions, percentage, passed, st.session_state[f'{prefix}_answers'])
+        save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers)
         st.session_state[f'{prefix}_saved'] = True
         
         if passed:
