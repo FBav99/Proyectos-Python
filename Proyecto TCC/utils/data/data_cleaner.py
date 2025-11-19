@@ -179,7 +179,14 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
         with col1:
             st.markdown(replace_emojis("#### 🎯 Presets de Limpieza"), unsafe_allow_html=True)
             
-            if st.button("🧹 Limpieza Básica", use_container_width=True, type="primary"):
+            st.markdown("**🧹 Limpieza Básica**")
+            st.caption("Aplica: limpieza de espacios, normalización de capitalización, eliminación de duplicados y llenado de valores faltantes")
+            if st.button(
+                "🧹 Limpieza Básica", 
+                use_container_width=True, 
+                type="primary",
+                key="basic_cleaning_btn"
+            ):
                 with st.spinner("Aplicando limpieza básica..."):
                     cleaning_options = {
                         'whitespace': True,
@@ -195,7 +202,13 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                     st.markdown(replace_emojis("✅ Limpieza básica completada!"), unsafe_allow_html=True)
                     st.rerun()
             
-            if st.button("🔧 Limpieza Completa", use_container_width=True):
+            st.markdown("**🔧 Limpieza Completa**")
+            st.caption("Aplica todas las opciones de limpieza: espacios, capitalización, caracteres especiales, acentos, duplicados, faltantes, teléfonos y emails")
+            if st.button(
+                "🔧 Limpieza Completa", 
+                use_container_width=True,
+                key="full_cleaning_btn"
+            ):
                     cleaning_options = {
                         'whitespace': True,
                         'case_normalization': True,
@@ -221,15 +234,51 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
             
             # Collapsible advanced options
             with st.expander(replace_emojis("🔧 Configuración Avanzada")):
-                auto_whitespace = st.checkbox("🧹 Limpiar espacios", value=True)
-                auto_case = st.checkbox(replace_emojis("📝 Normalizar capitalización"), value=True)
-                auto_duplicates = st.checkbox(replace_emojis("🔄 Remover duplicados"), value=True)
-                auto_missing = st.checkbox(replace_emojis("❌ Llenar faltantes"), value=True)
-                auto_special_chars = st.checkbox(replace_emojis("🔤 Remover caracteres especiales"), value=False)
-                auto_accents = st.checkbox("🌍 Normalizar acentos", value=False)
-                auto_phones = st.checkbox("📞 Estandarizar teléfonos", value=False)
-                auto_emails = st.checkbox("📧 Estandarizar emails", value=False)
-                auto_dates = st.checkbox(replace_emojis("📅 Estandarizar fechas"), value=False)
+                auto_whitespace = st.checkbox(
+                    "🧹 Limpiar espacios", 
+                    value=True,
+                    help="Elimina espacios en blanco al inicio y final de cada celda en columnas de texto"
+                )
+                auto_case = st.checkbox(
+                    replace_emojis("📝 Normalizar capitalización"), 
+                    value=True,
+                    help="Estandariza mayúsculas y minúsculas en texto (minúsculas, MAYÚSCULAS, Título, etc.)"
+                )
+                auto_duplicates = st.checkbox(
+                    replace_emojis("🔄 Remover duplicados"), 
+                    value=True,
+                    help="Elimina filas duplicadas que tengan exactamente los mismos valores en todas las columnas"
+                )
+                auto_missing = st.checkbox(
+                    replace_emojis("❌ Llenar faltantes"), 
+                    value=True,
+                    help="Rellena valores faltantes automáticamente: media/mediana para números, moda para texto"
+                )
+                auto_special_chars = st.checkbox(
+                    replace_emojis("🔤 Remover caracteres especiales"), 
+                    value=False,
+                    help="Elimina caracteres especiales (!@#$%^&*, etc.) de columnas de texto, manteniendo solo letras, números y espacios básicos"
+                )
+                auto_accents = st.checkbox(
+                    "🌍 Normalizar acentos", 
+                    value=False,
+                    help="Convierte caracteres acentuados a su versión sin acento (á→a, é→e, ñ→n, etc.)"
+                )
+                auto_phones = st.checkbox(
+                    "📞 Estandarizar teléfonos", 
+                    value=False,
+                    help="Formatea números de teléfono a un formato estándar (puedes elegir formato internacional, nacional, etc.)"
+                )
+                auto_emails = st.checkbox(
+                    "📧 Estandarizar emails", 
+                    value=False,
+                    help="Limpia y valida direcciones de correo electrónico, convirtiendo a minúsculas y removiendo espacios"
+                )
+                auto_dates = st.checkbox(
+                    replace_emojis("📅 Estandarizar fechas"), 
+                    value=False,
+                    help="Convierte diferentes formatos de fecha a un formato estándar consistente (puedes elegir el formato deseado)"
+                )
                 
                 # Advanced options
                 if auto_case:

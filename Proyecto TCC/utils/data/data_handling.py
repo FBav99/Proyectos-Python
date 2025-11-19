@@ -91,7 +91,11 @@ def show_examples_section():
                 """, unsafe_allow_html=True)
                 
                 if st.button(f"📥 Usar {name}", key=f"sample_{name}", use_container_width=True):
-                    st.session_state.sample_data = info['data']
+                    dataset_df = info['data']
+                    # Set as sample_data for dashboard compatibility
+                    st.session_state.sample_data = dataset_df
+                    # Also set as uploaded_data for data cleaning page compatibility
+                    st.session_state.uploaded_data = dataset_df
                     st.session_state.data_quality_completed = True
                     st.session_state.show_dashboard = True
                     st.success(f"¡Dataset {name} cargado exitosamente!")
