@@ -151,33 +151,54 @@ def show_learning_section(total_progress, completed_count, progress):
                 
                 # Determine card styling
                 if completed:
-                    card_style = "background: linear-gradient(135deg, rgba(46, 204, 113, 0.22), rgba(34, 197, 94, 0.12)); border: 1px solid rgba(34, 197, 94, 0.45); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 8px 18px rgba(34, 197, 94, 0.18);"
+                    card_style = "background: linear-gradient(135deg, rgba(46, 204, 113, 0.22), rgba(34, 197, 94, 0.12)); border: 1px solid rgba(34, 197, 94, 0.45); border-radius: 14px 14px 0 0; padding: 1.25rem 1rem; text-align: center; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15); min-height: 180px; display: flex; flex-direction: column; justify-content: space-between;"
                 elif is_next:
-                    card_style = "background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(249, 115, 22, 0.06)); border: 1px solid rgba(249, 115, 22, 0.6); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 8px 18px rgba(249, 115, 22, 0.18); opacity: 0.85;"
+                    card_style = "background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(249, 115, 22, 0.06)); border: 1px solid rgba(249, 115, 22, 0.6); border-radius: 14px 14px 0 0; padding: 1.25rem 1rem; text-align: center; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15); min-height: 180px; display: flex; flex-direction: column; justify-content: space-between;"
                 else:
-                    card_style = "background: rgba(148, 163, 184, 0.12); border: 1px solid rgba(148, 163, 184, 0.32); border-radius: 14px; padding: 1rem; text-align: center; opacity: 0.45;"
+                    card_style = "background: rgba(148, 163, 184, 0.12); border: 1px solid rgba(148, 163, 184, 0.32); border-radius: 14px 14px 0 0; padding: 1.25rem 1rem; text-align: center; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; opacity: 0.45;"
                 
                 icon = get_icon("✅", 20) if completed else get_icon("⏳", 20)
                 state_text = "Completado" if completed else ("Siguiente paso" if is_next else "Pendiente")
                 
-                st.markdown(f'<div style="{card_style}">', unsafe_allow_html=True)
-                st.markdown(f'<span style="font-size: 1.3rem; display: block; margin-bottom: 0.35rem;">{icon}</span>', unsafe_allow_html=True)
-                st.markdown(f'<span style="font-weight: 600; color: #1f2937; display: block; margin-bottom: 0.2rem;">{level_title}</span>', unsafe_allow_html=True)
-                st.markdown(f'<span style="font-size: 0.85rem; color: rgba(71, 85, 105, 0.9); display: block; margin-bottom: 0.35rem;">{level_subtitle}</span>', unsafe_allow_html=True)
-                st.markdown(f'<span style="font-size: 0.8rem; color: rgba(71, 85, 105, 0.85); display: block; margin-bottom: 0.5rem;">{state_text}</span>', unsafe_allow_html=True)
+                # Build card content HTML
+                card_content = f'<div style="{card_style}"><div style="flex: 1;">'
+                card_content += f'<div style="font-size: 1.3rem; display: block; margin-bottom: 0.5rem;">{icon}</div>'
+                card_content += f'<div style="font-weight: 600; color: #1f2937; display: block; margin-bottom: 0.3rem; font-size: 1rem;">{level_title}</div>'
+                card_content += f'<div style="font-size: 0.85rem; color: rgba(71, 85, 105, 0.9); display: block; margin-bottom: 0.4rem;">{level_subtitle}</div>'
+                card_content += f'<div style="font-size: 0.8rem; color: rgba(71, 85, 105, 0.85); display: block; margin-bottom: 0.5rem;">{state_text}</div>'
                 
                 if is_next_and_nivel0:
-                    st.markdown('<span style="font-size: 0.75rem; color: rgba(249, 115, 22, 0.9); display: block; margin-bottom: 0.5rem;">⭐ Comienza aquí</span>', unsafe_allow_html=True)
+                    card_content += '<div style="font-size: 0.75rem; color: rgba(249, 115, 22, 0.9); display: block; margin-bottom: 0.5rem; font-weight: 500;">⭐ Comienza aquí</div>'
                 
-                # Add button only if level is enabled
+                card_content += '</div>'
+                
+                # Add button or blocked text inside card
                 if enabled:
                     button_label = "Ver Nivel" if not completed else "Revisar"
+                    card_content += '<div style="margin-top: auto; padding-top: 0.75rem;"></div>'
+                else:
+                    card_content += '<div style="margin-top: auto; padding-top: 0.75rem; text-align: center; font-size: 0.75rem; color: rgba(148, 163, 184, 0.8);">Bloqueado</div>'
+                
+                card_content += '</div>'
+                
+                st.markdown(card_content, unsafe_allow_html=True)
+                
+                # Add button using Streamlit (positioned below card but visually connected)
+                if enabled:
+                    button_label = "Ver Nivel" if not completed else "Revisar"
+                    # Style button container to match card
+                    button_style = ""
+                    if completed:
+                        button_style = "background: linear-gradient(135deg, rgba(46, 204, 113, 0.3), rgba(34, 197, 94, 0.2)); border: 1px solid rgba(34, 197, 94, 0.45); border-radius: 0 0 14px 14px; padding: 0.5rem; margin-top: -1px;"
+                    elif is_next:
+                        button_style = "background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(249, 115, 22, 0.15)); border: 1px solid rgba(249, 115, 22, 0.6); border-radius: 0 0 14px 14px; padding: 0.5rem; margin-top: -1px;"
+                    else:
+                        button_style = "background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.32); border-radius: 0 0 14px 14px; padding: 0.5rem; margin-top: -1px;"
+                    
+                    st.markdown(f'<div style="{button_style}">', unsafe_allow_html=True)
                     if st.button(button_label, key=f"card_btn_{level_key}", use_container_width=True):
                         st.switch_page(target_page)
-                else:
-                    st.markdown('<span style="font-size: 0.75rem; color: rgba(148, 163, 184, 0.8); display: block;">Bloqueado</span>', unsafe_allow_html=True)
-                
-                st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
     
     # Add progress reset button in learning section
     st.markdown("---")
