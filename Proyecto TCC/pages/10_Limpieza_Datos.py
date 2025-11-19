@@ -49,6 +49,14 @@ def main():
                 # Show confirmation dialog
                 st.session_state.show_upload_new = True
                 st.rerun()
+            
+            # Show current file/dataset name
+            if 'current_data_name' in st.session_state and st.session_state.current_data_name:
+                data_type = st.session_state.get('current_data_type', 'uploaded_file')
+                if data_type == "sample_dataset":
+                    st.caption(f"{get_icon('📊', 16)} Dataset: {st.session_state.current_data_name}")
+                else:
+                    st.caption(f"{get_icon('📁', 16)} Archivo: {st.session_state.current_data_name}")
         
         # Confirmation dialog for uploading new file
         if st.session_state.get('show_upload_new', False):
@@ -60,6 +68,10 @@ def main():
                     st.session_state.uploaded_data = None
                     if 'global_replacements' in st.session_state:
                         del st.session_state.global_replacements
+                    if 'current_data_name' in st.session_state:
+                        del st.session_state.current_data_name
+                    if 'current_data_type' in st.session_state:
+                        del st.session_state.current_data_type
                     st.session_state.show_upload_new = False
                     st.rerun()
             with col2:

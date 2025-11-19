@@ -42,18 +42,24 @@ def show_upload_section():
             with col1:
                 if st.button("🧹 Analizar Calidad de Datos", type="primary", use_container_width=True):
                     st.session_state.uploaded_data = df
+                    st.session_state.current_data_name = uploaded_file.name
+                    st.session_state.current_data_type = "uploaded_file"
                     st.session_state.show_data_quality = True
                     st.rerun()
             
             with col2:
                 if st.button("🧽 Limpieza Automática", use_container_width=True):
                     st.session_state.uploaded_data = df
+                    st.session_state.current_data_name = uploaded_file.name
+                    st.session_state.current_data_type = "uploaded_file"
                     st.session_state.show_data_cleaning = True
                     st.rerun()
             
             with col3:
                 if st.button("🚀 Ir Directo al Dashboard", use_container_width=True):
                     st.session_state.cleaned_data = df
+                    st.session_state.current_data_name = uploaded_file.name
+                    st.session_state.current_data_type = "uploaded_file"
                     st.session_state.data_quality_completed = True
                     st.session_state.show_dashboard = True
                     st.rerun()
@@ -96,6 +102,9 @@ def show_examples_section():
                     st.session_state.sample_data = dataset_df
                     # Also set as uploaded_data for data cleaning page compatibility
                     st.session_state.uploaded_data = dataset_df
+                    # Store dataset name and type
+                    st.session_state.current_data_name = name
+                    st.session_state.current_data_type = "sample_dataset"
                     st.session_state.data_quality_completed = True
                     st.session_state.show_dashboard = True
                     st.success(f"¡Dataset {name} cargado exitosamente!")
