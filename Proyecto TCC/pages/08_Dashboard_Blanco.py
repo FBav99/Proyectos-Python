@@ -346,7 +346,7 @@ def render_inline_builder_controls(df):
         col = cols[idx % len(cols)]
         with col:
             if st.button(
-                component["title"],
+                component["label"],
                 key=f"quick_component_{idx}",
                 help=component["description"],
                 use_container_width=True,
@@ -614,11 +614,12 @@ def build_operations_template(df):
     return components
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource
 def get_dashboard_templates(df):
     """Retorna la configuración de plantillas disponibles.
     
-    Cached since template definitions are static.
+    Uses cache_resource because the return value contains functions (builders)
+    which are not pickle-serializable for cache_data.
     """
     return [
         {
