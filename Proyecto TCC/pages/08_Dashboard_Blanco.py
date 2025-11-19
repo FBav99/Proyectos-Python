@@ -798,7 +798,7 @@ def main():
         toggle_label = "Ocultar plantillas" if st.session_state.dashboard_template_gallery_expanded else "Mostrar plantillas"
         col_toggle, col_status = st.columns([1, 3])
         with col_toggle:
-            if st.button("toggle_label, key="):
+            if st.button(toggle_label, key="toggle_templates"):
                 st.session_state.dashboard_template_gallery_expanded = not st.session_state.dashboard_template_gallery_expanded
                 st.rerun()
         with col_status:
