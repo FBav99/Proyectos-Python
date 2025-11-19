@@ -119,27 +119,65 @@ def show_learning_section(total_progress, completed_count, progress):
             st.session_state['_level_status_styles_injected'] = True
 
         level_definitions = [
-            ('nivel0', 'Nivel 0', 'Introducción'),
-            ('nivel1', 'Nivel 1', 'Básico'),
-            ('nivel2', 'Nivel 2', 'Filtros'),
-            ('nivel3', 'Nivel 3', 'Métricas'),
-            ('nivel4', 'Nivel 4', 'Avanzado'),
+            ('nivel0', 'Nivel 0', 'Introducción', 'pages/00_Nivel_0_Introduccion.py'),
+            ('nivel1', 'Nivel 1', 'Básico', 'pages/01_Nivel_1_Basico.py'),
+            ('nivel2', 'Nivel 2', 'Filtros', 'pages/02_Nivel_2_Filtros.py'),
+            ('nivel3', 'Nivel 3', 'Métricas', 'pages/03_Nivel_3_Metricas.py'),
+            ('nivel4', 'Nivel 4', 'Avanzado', 'pages/04_Nivel_4_Avanzado.py'),
         ]
-        next_pending_level = next((level for level, _, _ in level_definitions if not progress.get(level, False)), None)
-
-        status_cards_html = '<div class="level-status-grid">'
-        for level_key, level_title, level_subtitle in level_definitions:
-            completed = progress.get(level_key, False)
-            classes = ["level-status-card"]
-            classes.append("completed" if completed else "pending")
-            if not completed and level_key == next_pending_level:
-                classes.append("next")
-            icon = get_icon("✅", 20) if completed else get_icon("⏳", 20)
-            state_text = "Completado" if completed else ("Siguiente paso" if level_key == next_pending_level else "Pendiente")
-            start_here_text = '<span style="font-size: 0.75rem; color: rgba(249, 115, 22, 0.9); display: block; margin-top: 0.3rem;">⭐ Comienza aquí</span>' if (not completed and level_key == next_pending_level) else ''
-            status_cards_html += f'<div class="{" ".join(classes)}"><span class="level-icon">{icon}</span><span class="level-label">{level_title}</span><span class="level-subtitle">{level_subtitle}</span><span class="level-state">{state_text}</span>{start_here_text}</div>'
-        status_cards_html += '</div>'
-        st.markdown(status_cards_html, unsafe_allow_html=True)
+        next_pending_level = next((level for level, _, _, _ in level_definitions if not progress.get(level, False)), None)
+        
+        # Determine which levels are enabled (previous level completed or nivel0)
+        def is_level_enabled(level_key):
+            if level_key == 'nivel0':
+                return True
+            prev_level_map = {
+                'nivel1': 'nivel0',
+                'nivel2': 'nivel1',
+                'nivel3': 'nivel2',
+                'nivel4': 'nivel3'
+            }
+            prev_level = prev_level_map.get(level_key)
+            return prev_level and progress.get(prev_level, False)
+        
+        # Create cards using Streamlit columns
+        level_cols = st.columns(5)
+        for col, (level_key, level_title, level_subtitle, target_page) in zip(level_cols, level_definitions):
+            with col:
+                completed = progress.get(level_key, False)
+                enabled = is_level_enabled(level_key)
+                is_next = (not completed and level_key == next_pending_level)
+                is_next_and_nivel0 = (is_next and level_key == 'nivel0')
+                
+                # Determine card styling
+                if completed:
+                    card_style = "background: linear-gradient(135deg, rgba(46, 204, 113, 0.22), rgba(34, 197, 94, 0.12)); border: 1px solid rgba(34, 197, 94, 0.45); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 8px 18px rgba(34, 197, 94, 0.18);"
+                elif is_next:
+                    card_style = "background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(249, 115, 22, 0.06)); border: 1px solid rgba(249, 115, 22, 0.6); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 8px 18px rgba(249, 115, 22, 0.18); opacity: 0.85;"
+                else:
+                    card_style = "background: rgba(148, 163, 184, 0.12); border: 1px solid rgba(148, 163, 184, 0.32); border-radius: 14px; padding: 1rem; text-align: center; opacity: 0.45;"
+                
+                icon = get_icon("✅", 20) if completed else get_icon("⏳", 20)
+                state_text = "Completado" if completed else ("Siguiente paso" if is_next else "Pendiente")
+                
+                st.markdown(f'<div style="{card_style}">', unsafe_allow_html=True)
+                st.markdown(f'<span style="font-size: 1.3rem; display: block; margin-bottom: 0.35rem;">{icon}</span>', unsafe_allow_html=True)
+                st.markdown(f'<span style="font-weight: 600; color: #1f2937; display: block; margin-bottom: 0.2rem;">{level_title}</span>', unsafe_allow_html=True)
+                st.markdown(f'<span style="font-size: 0.85rem; color: rgba(71, 85, 105, 0.9); display: block; margin-bottom: 0.35rem;">{level_subtitle}</span>', unsafe_allow_html=True)
+                st.markdown(f'<span style="font-size: 0.8rem; color: rgba(71, 85, 105, 0.85); display: block; margin-bottom: 0.5rem;">{state_text}</span>', unsafe_allow_html=True)
+                
+                if is_next_and_nivel0:
+                    st.markdown('<span style="font-size: 0.75rem; color: rgba(249, 115, 22, 0.9); display: block; margin-bottom: 0.5rem;">⭐ Comienza aquí</span>', unsafe_allow_html=True)
+                
+                # Add button only if level is enabled
+                if enabled:
+                    button_label = "Ver Nivel" if not completed else "Revisar"
+                    if st.button(button_label, key=f"card_btn_{level_key}", use_container_width=True):
+                        st.switch_page(target_page)
+                else:
+                    st.markdown('<span style="font-size: 0.75rem; color: rgba(148, 163, 184, 0.8); display: block;">Bloqueado</span>', unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
     
     # Add progress reset button in learning section
     st.markdown("---")
