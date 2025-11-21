@@ -380,10 +380,14 @@ def main():
     if uploaded_file is not None:
         try:
             # Load the uploaded data
+            from utils.data.data_handling import load_excel_with_sheet_selection
+            
             if uploaded_file.name.endswith('.csv'):
                 df_uploaded = pd.read_csv(uploaded_file)
             else:
-                df_uploaded = pd.read_excel(uploaded_file)
+                df_uploaded = load_excel_with_sheet_selection(uploaded_file, key_prefix="nivel1_basico")
+                if df_uploaded is None:
+                    return
             
             # Display success message
             st.markdown(f"{get_icon("✅", 20)} Archivo cargado exitosamente: {uploaded_file.name}", unsafe_allow_html=True)

@@ -101,9 +101,12 @@ DASHBOARD_CUSTOM_CSS = """
 
 def load_uploaded_dataframe(uploaded_file):
     """Carga un archivo subido por el usuario y devuelve un DataFrame."""
+    from utils.data.data_handling import load_excel_with_sheet_selection
+    
     if uploaded_file.name.endswith('.csv'):
         return pd.read_csv(uploaded_file)
-    return pd.read_excel(uploaded_file)
+    df = load_excel_with_sheet_selection(uploaded_file, key_prefix="dashboard_blank")
+    return df if df is not None else pd.DataFrame()
 
 
 def analyze_dataset_columns(df):

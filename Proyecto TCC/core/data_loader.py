@@ -3,6 +3,7 @@ import numpy as np
 import streamlit as st
 
 from utils.ui.icon_system import get_icon, replace_emojis
+from utils.data.data_handling import load_excel_with_sheet_selection
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_sample_data():
     """Generar conjunto de datos de muestra para demostración"""
@@ -34,7 +35,9 @@ def load_uploaded_file(uploaded_file):
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file)
         else:
-            df = pd.read_excel(uploaded_file)
+            df = load_excel_with_sheet_selection(uploaded_file, key_prefix="sidebar_loader")
+            if df is None:
+                return None
         
         # Intentar convertir columnas de fecha
         for col in df.columns:

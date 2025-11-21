@@ -4,6 +4,54 @@ from data.sample_datasets import get_sample_datasets
 from .data_cleaner import create_data_cleaning_interface
 
 from utils.ui.icon_system import get_icon, replace_emojis
+
+def get_excel_sheet_names(uploaded_file):
+    """Obtener lista de nombres de hojas de un archivo Excel"""
+    try:
+        excel_file = pd.ExcelFile(uploaded_file)
+        return excel_file.sheet_names
+    except Exception as e:
+        st.error(f"Error al leer el archivo Excel: {str(e)}")
+        return []
+
+def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
+    """
+    Cargar archivo Excel con soporte para selección de hoja cuando hay múltiples hojas.
+    
+    Args:
+        uploaded_file: Archivo subido por el usuario
+        key_prefix: Prefijo para la clave única del selector de hoja
+    
+    Returns:
+        DataFrame con los datos de la hoja seleccionada
+    """
+    try:
+        # Obtener lista de hojas
+        sheet_names = get_excel_sheet_names(uploaded_file)
+        
+        if not sheet_names:
+            st.error("No se pudieron leer las hojas del archivo Excel.")
+            return None
+        
+        # Si hay múltiples hojas, mostrar selector
+        if len(sheet_names) > 1:
+            st.info(f"📑 Este archivo Excel contiene {len(sheet_names)} hojas. Selecciona la hoja que deseas cargar:")
+            selected_sheet = st.selectbox(
+                "Selecciona la hoja:",
+                sheet_names,
+                key=f"{key_prefix}_{uploaded_file.name}",
+                help="Por defecto se carga la primera hoja, pero puedes seleccionar cualquier otra."
+            )
+            df = pd.read_excel(uploaded_file, sheet_name=selected_sheet)
+            st.success(f"✅ Hoja '{selected_sheet}' cargada exitosamente")
+        else:
+            # Solo una hoja, cargar directamente
+            df = pd.read_excel(uploaded_file, sheet_name=sheet_names[0])
+        
+        return df
+    except Exception as e:
+        st.error(f"Error al cargar el archivo Excel: {str(e)}")
+        return None
 def show_upload_section():
     """Show the file upload section"""
     st.markdown("---")
@@ -28,7 +76,9 @@ def show_upload_section():
             if uploaded_file.name.endswith('.csv'):
                 df = pd.read_csv(uploaded_file)
             else:
-                df = pd.read_excel(uploaded_file)
+                df = load_excel_with_sheet_selection(uploaded_file, key_prefix="upload_section")
+                if df is None:
+                    return
             
             st.markdown(f"{get_icon("✅", 20)} Archivo cargado exitosamente: {uploaded_file.name}", unsafe_allow_html=True)
             st.markdown(f"{get_icon("📊", 20)} {len(df)} filas, {len(df.columns)} columnas", unsafe_allow_html=True)
