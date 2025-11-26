@@ -20,7 +20,7 @@ def generate_state():
     return secrets.token_urlsafe(32)
 
 def generate_pkce():
-    """Generate PKCE code verifier and challenge"""
+    """(Deprecated in this app) Kept for compatibility, but PKCE is not used now."""
     code_verifier = secrets.token_urlsafe(32)
     code_challenge = base64.urlsafe_b64encode(
         hashlib.sha256(code_verifier.encode()).digest()
@@ -172,24 +172,20 @@ def handle_google_oauth():
             st.info("Configura las credenciales de Google en `.streamlit/secrets.toml`")
             return
         
-        # Generate OAuth parameters
+        # Generate OAuth parameters (without PKCE to avoid dependency on session state)
         state = generate_state()
-        code_verifier, code_challenge = generate_pkce()
         
-        # Store in session state
+        # Store in session state only the state and provider
         st.session_state.oauth_state = state
-        st.session_state.oauth_code_verifier = code_verifier
         st.session_state.oauth_provider = "google"
         
-        # Build authorization URL
+        # Build authorization URL (no code_challenge)
         auth_params = {
             'client_id': client_id,
             'redirect_uri': redirect_uri,
             'response_type': 'code',
             'scope': 'openid email profile',
-            'state': state,
-            'code_challenge': code_challenge,
-            'code_challenge_method': 'S256'
+            'state': state
         }
         
         auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(auth_params)}"
@@ -206,8 +202,11 @@ def handle_google_oauth():
         </div>
         """, unsafe_allow_html=True)
         
-        # Alternative: Create a clickable link
-        st.markdown(f"[🔗 **Hacer clic aquí para abrir Google OAuth**]({auth_url})")
+        # Alternative: Create a clickable link (open in the same tab to preserve session)
+        st.markdown(
+            f'<a href="{auth_url}" target="_self" style="display:inline-block;padding:0.5em 1em;color:white;background-color:#4285F4;border-radius:5px;text-decoration:none;font-family:sans-serif;font-weight:bold;">🔗 Hacer clic aquí para abrir Google OAuth (misma pestaña)</a>',
+            unsafe_allow_html=True,
+        )
         
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Google OAuth: {str(e)}", unsafe_allow_html=True)
@@ -232,24 +231,20 @@ def handle_microsoft_oauth():
             st.info("Configura las credenciales de Microsoft en `.streamlit/secrets.toml`")
             return
         
-        # Generate OAuth parameters
+        # Generate OAuth parameters (without PKCE)
         state = generate_state()
-        code_verifier, code_challenge = generate_pkce()
         
-        # Store in session state
+        # Store in session state only the state and provider
         st.session_state.oauth_state = state
-        st.session_state.oauth_code_verifier = code_verifier
         st.session_state.oauth_provider = "microsoft"
         
-        # Build authorization URL
+        # Build authorization URL (no code_challenge)
         auth_params = {
             'client_id': client_id,
             'redirect_uri': redirect_uri,
             'response_type': 'code',
             'scope': 'openid email profile',
-            'state': state,
-            'code_challenge': code_challenge,
-            'code_challenge_method': 'S256'
+            'state': state
         }
         
         auth_url = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?{urlencode(auth_params)}"
@@ -266,8 +261,11 @@ def handle_microsoft_oauth():
         </div>
         """, unsafe_allow_html=True)
         
-        # Alternative: Create a clickable link
-        st.markdown(f"[🔗 **Hacer clic aquí para abrir Microsoft OAuth**]({auth_url})")
+        # Alternative: Create a clickable link (open in the same tab to preserve session)
+        st.markdown(
+            f'<a href="{auth_url}" target="_self" style="display:inline-block;padding:0.5em 1em;color:white;background-color:#ea4335;border-radius:5px;text-decoration:none;font-family:sans-serif;font-weight:bold;">🔗 Hacer clic aquí para abrir Microsoft OAuth (misma pestaña)</a>',
+            unsafe_allow_html=True,
+        )
         
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Microsoft OAuth: {str(e)}", unsafe_allow_html=True)
@@ -345,7 +343,6 @@ def handle_google_callback(code):
         client_id = google_config.get("client_id")
         client_secret = google_config.get("client_secret")
         redirect_uri = google_config.get("redirect_uri", "http://localhost:8501/oauth_callback")
-        code_verifier = st.session_state.get('oauth_code_verifier')
         
         # Exchange code for token
         token_url = "https://oauth2.googleapis.com/token"
@@ -354,8 +351,7 @@ def handle_google_callback(code):
             'client_secret': client_secret,
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': redirect_uri,
-            'code_verifier': code_verifier
+            'redirect_uri': redirect_uri
         }
         
         response = requests.post(token_url, data=token_data)
@@ -376,7 +372,12 @@ def handle_google_callback(code):
                 st.markdown(replace_emojis("❌ Error al crear usuario OAuth"), unsafe_allow_html=True)
                 return False
         else:
+            # Mostrar detalles del error devuelto por Google para diagnóstico
+            error = token_info.get("error", "desconocido")
+            error_desc = token_info.get("error_description", "")
             st.markdown(replace_emojis("❌ Error al obtener token de acceso"), unsafe_allow_html=True)
+            if error or error_desc:
+                st.markdown(f"**Detalle del error:** `{error}` - {error_desc}")
             return False
             
     except Exception as e:
@@ -395,7 +396,6 @@ def handle_microsoft_callback(code):
         client_id = microsoft_config.get("client_id")
         client_secret = microsoft_config.get("client_secret")
         redirect_uri = microsoft_config.get("redirect_uri", "http://localhost:8501/oauth_callback")
-        code_verifier = st.session_state.get('oauth_code_verifier')
         
         # Exchange code for token
         token_url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
@@ -404,8 +404,7 @@ def handle_microsoft_callback(code):
             'client_secret': client_secret,
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': redirect_uri,
-            'code_verifier': code_verifier
+            'redirect_uri': redirect_uri
         }
         
         response = requests.post(token_url, data=token_data)
@@ -426,7 +425,12 @@ def handle_microsoft_callback(code):
                 st.markdown(replace_emojis("❌ Error al crear usuario OAuth"), unsafe_allow_html=True)
                 return False
         else:
+            # Mostrar detalles del error devuelto por Microsoft para diagnóstico
+            error = token_info.get("error", "desconocido")
+            error_desc = token_info.get("error_description", "")
             st.markdown(replace_emojis("❌ Error al obtener token de acceso"), unsafe_allow_html=True)
+            if error or error_desc:
+                st.markdown(f"**Detalle del error:** `{error}` - {error_desc}")
             return False
             
     except Exception as e:
