@@ -291,6 +291,26 @@ def handle_oauth_callback():
         
         provider = st.session_state.get('oauth_provider')
         
+        # If provider was lost due to a new Streamlit session, try to infer it
+        if not provider:
+            try:
+                google_config = st.secrets.get("google_oauth", {})
+            except Exception:
+                google_config = {}
+            try:
+                microsoft_config = st.secrets.get("microsoft_oauth", {})
+            except Exception:
+                microsoft_config = {}
+            
+            google_configured = bool(google_config.get("client_id"))
+            microsoft_configured = bool(microsoft_config.get("client_id"))
+            
+            # Heuristic: if only one provider is configured, assume that one
+            if google_configured and not microsoft_configured:
+                provider = "google"
+            elif microsoft_configured and not google_configured:
+                provider = "microsoft"
+        
         if provider == "google":
             success = handle_google_callback(code)
         elif provider == "microsoft":
