@@ -202,11 +202,8 @@ def handle_google_oauth():
         </div>
         """, unsafe_allow_html=True)
         
-        # Alternative: Create a clickable link (open in the same tab to preserve session)
-        st.markdown(
-            f'<a href="{auth_url}" target="_self" style="display:inline-block;padding:0.5em 1em;color:white;background-color:#4285F4;border-radius:5px;text-decoration:none;font-family:sans-serif;font-weight:bold;">🔗 Hacer clic aquí para abrir Google OAuth (misma pestaña)</a>',
-            unsafe_allow_html=True,
-        )
+        # Alternative: Create a clickable link (Streamlit abre normalmente en nueva pestaña)
+        st.markdown(f"[🔗 **Hacer clic aquí para abrir Google OAuth**]({auth_url})")
         
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Google OAuth: {str(e)}", unsafe_allow_html=True)
@@ -261,11 +258,8 @@ def handle_microsoft_oauth():
         </div>
         """, unsafe_allow_html=True)
         
-        # Alternative: Create a clickable link (open in the same tab to preserve session)
-        st.markdown(
-            f'<a href="{auth_url}" target="_self" style="display:inline-block;padding:0.5em 1em;color:white;background-color:#ea4335;border-radius:5px;text-decoration:none;font-family:sans-serif;font-weight:bold;">🔗 Hacer clic aquí para abrir Microsoft OAuth (misma pestaña)</a>',
-            unsafe_allow_html=True,
-        )
+        # Alternative: Create a clickable link (Streamlit abre normalmente en nueva pestaña)
+        st.markdown(f"[🔗 **Hacer clic aquí para abrir Microsoft OAuth**]({auth_url})")
         
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Microsoft OAuth: {str(e)}", unsafe_allow_html=True)

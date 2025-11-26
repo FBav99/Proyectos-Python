@@ -169,7 +169,9 @@ def main():
         # Limpiar selected_template al mostrar página principal para evitar loops de redirección
         clear_selected_template()
         
-        show_user_profile_section(current_user['username'], total_progress, completed_count, current_user['id'])
+        # Para usuarios de base de datos usamos su ID real; para OAuth no hay ID en la BD
+        user_id_for_profile = current_user.get('id') if 'oauth_provider' not in current_user else None
+        show_user_profile_section(current_user['username'], total_progress, completed_count, user_id_for_profile)
 
 if __name__ == "__main__":
     main() 
