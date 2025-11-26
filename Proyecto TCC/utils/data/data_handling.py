@@ -8,10 +8,29 @@ from utils.ui.icon_system import get_icon, replace_emojis
 def get_excel_sheet_names(uploaded_file):
     """Obtener lista de nombres de hojas de un archivo Excel"""
     try:
-        excel_file = pd.ExcelFile(uploaded_file)
+        # Determinar el motor según la extensión del archivo
+        file_extension = uploaded_file.name.lower().split('.')[-1] if uploaded_file.name else ''
+        
+        if file_extension == 'xlsx':
+            engine = 'openpyxl'
+        elif file_extension == 'xls':
+            # Para archivos .xls antiguos, intentar con xlrd
+            # Nota: xlrd 2.0+ no soporta .xls, solo .xlsx
+            engine = 'xlrd'
+        else:
+            engine = None  # Dejar que pandas lo detecte automáticamente
+        
+        excel_file = pd.ExcelFile(uploaded_file, engine=engine)
         return excel_file.sheet_names
     except Exception as e:
-        st.error(f"Error al leer el archivo Excel: {str(e)}")
+        error_msg = str(e)
+        # Verificar si es un error relacionado con .xls y xlrd
+        if '.xls' in uploaded_file.name.lower() and 'xlrd' in error_msg.lower():
+            st.error(f"Error al leer el archivo Excel: {error_msg}")
+            st.warning("⚠️ **Nota importante:** Los archivos .xls (formato antiguo de Excel) tienen soporte limitado. "
+                      "Se recomienda convertir el archivo a formato .xlsx para mejor compatibilidad.")
+        else:
+            st.error(f"Error al leer el archivo Excel: {error_msg}")
         return []
 
 def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
@@ -33,6 +52,16 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
             st.error("No se pudieron leer las hojas del archivo Excel.")
             return None
         
+        # Determinar el motor según la extensión del archivo
+        file_extension = uploaded_file.name.lower().split('.')[-1] if uploaded_file.name else ''
+        
+        if file_extension == 'xlsx':
+            engine = 'openpyxl'
+        elif file_extension == 'xls':
+            engine = 'xlrd'
+        else:
+            engine = None  # Dejar que pandas lo detecte automáticamente
+        
         # Si hay múltiples hojas, mostrar selector
         if len(sheet_names) > 1:
             st.info(f"📑 Este archivo Excel contiene {len(sheet_names)} hojas. Selecciona la hoja que deseas cargar:")
@@ -42,15 +71,23 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
                 key=f"{key_prefix}_{uploaded_file.name}",
                 help="Por defecto se carga la primera hoja, pero puedes seleccionar cualquier otra."
             )
-            df = pd.read_excel(uploaded_file, sheet_name=selected_sheet)
+            df = pd.read_excel(uploaded_file, sheet_name=selected_sheet, engine=engine)
             st.success(f"✅ Hoja '{selected_sheet}' cargada exitosamente")
         else:
             # Solo una hoja, cargar directamente
-            df = pd.read_excel(uploaded_file, sheet_name=sheet_names[0])
+            df = pd.read_excel(uploaded_file, sheet_name=sheet_names[0], engine=engine)
         
         return df
     except Exception as e:
-        st.error(f"Error al cargar el archivo Excel: {str(e)}")
+        error_msg = str(e)
+        # Verificar si es un error relacionado con .xls y xlrd
+        if '.xls' in uploaded_file.name.lower() and ('xlrd' in error_msg.lower() or 'xls' in error_msg.lower()):
+            st.error(f"Error al cargar el archivo Excel: {error_msg}")
+            st.warning("⚠️ **Nota importante:** Los archivos .xls (formato antiguo de Excel) tienen soporte limitado. "
+                      "Se recomienda convertir el archivo a formato .xlsx para mejor compatibilidad. "
+                      "Puedes abrir el archivo en Excel y guardarlo como .xlsx.")
+        else:
+            st.error(f"Error al cargar el archivo Excel: {error_msg}")
         return None
 def show_upload_section():
     """Show the file upload section"""
