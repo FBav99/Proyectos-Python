@@ -63,11 +63,16 @@ def main():
     # OAuth Configuration
     st.markdown(replace_emojis("### 🔐 Opciones de Inicio de Sesión"), unsafe_allow_html=True)
     
-    # Check if OAuth is configured
+    # Check if OAuth is configured (support both bool and string values in secrets)
     try:
-        oauth_configured = st.secrets.get("oauth_configured", False)
+        raw_flag = st.secrets.get("oauth_configured", False)
     except Exception:
-        oauth_configured = False
+        raw_flag = False
+    
+    if isinstance(raw_flag, bool):
+        oauth_configured = raw_flag
+    else:
+        oauth_configured = str(raw_flag).strip().lower() in ("1", "true", "yes", "on")
     
     if not oauth_configured:
         st.warning("⚠️ OAuth no está configurado aún. Usa el login local por ahora.")
