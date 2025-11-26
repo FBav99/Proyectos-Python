@@ -100,9 +100,8 @@ def main():
                 handle_google_oauth()
         
         with col2:
-            st.markdown("### 🔴 Microsoft OAuth")
-            if st.button("🔴 Iniciar sesión con Microsoft", use_container_width=True, type="primary"):
-                handle_microsoft_oauth()
+            st.markdown("### 🔴 Microsoft OAuth (Próximamente)")
+            st.button("🔴 Microsoft (no disponible aún)", use_container_width=True, disabled=True)
         
         # Also show local login as option
         st.markdown("---")
@@ -190,20 +189,13 @@ def handle_google_oauth():
         
         auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(auth_params)}"
         
-        # Show the URL for manual navigation instead of auto-redirect
-        st.markdown(replace_emojis("🔄 Para continuar con Google OAuth:"), unsafe_allow_html=True)
-        st.markdown(f"""
-        <div style="background: #f0f2f6; padding: 1rem; border-radius: 8px; border-left: 4px solid #4285f4;">
-            <p><strong>1.</strong> Copia y pega este enlace en tu navegador:</p>
-            <p style="word-break: break-all; font-family: monospace; background: white; padding: 0.5rem; border-radius: 4px;">
-                {auth_url}
-            </p>
-            <p><strong>2.</strong> Después de autorizar, serás redirigido de vuelta a esta aplicación.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Alternative: Create a clickable link (Streamlit abre normalmente en nueva pestaña)
-        st.markdown(f"[🔗 **Hacer clic aquí para abrir Google OAuth**]({auth_url})")
+        # Mensaje simple y amigable sin mostrar la URL completa
+        st.markdown(replace_emojis("🔄 Para continuar con Google OAuth, haz clic en el siguiente botón:"), unsafe_allow_html=True)
+        # Enlace como botón (se abre normalmente en nueva pestaña)
+        st.markdown(
+            f'<a href="{auth_url}" target="_blank" style="display:inline-block;padding:0.6em 1.4em;color:white;background-color:#4285F4;border-radius:999px;text-decoration:none;font-family:sans-serif;font-weight:600;">🔗 Continuar con Google</a>',
+            unsafe_allow_html=True,
+        )
         
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Google OAuth: {str(e)}", unsafe_allow_html=True)
@@ -246,20 +238,8 @@ def handle_microsoft_oauth():
         
         auth_url = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?{urlencode(auth_params)}"
         
-        # Show the URL for manual navigation instead of auto-redirect
-        st.markdown(replace_emojis("🔄 Para continuar con Microsoft OAuth:"), unsafe_allow_html=True)
-        st.markdown(f"""
-        <div style="background: #f0f2f6; padding: 1rem; border-radius: 8px; border-left: 4px solid #ea4335;">
-            <p><strong>1.</strong> Copia y pega este enlace en tu navegador:</p>
-            <p style="word-break: break-all; font-family: monospace; background: white; padding: 0.5rem; border-radius: 4px;">
-                {auth_url}
-            </p>
-            <p><strong>2.</strong> Después de autorizar, serás redirigido de vuelta a esta aplicación.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Alternative: Create a clickable link (Streamlit abre normalmente en nueva pestaña)
-        st.markdown(f"[🔗 **Hacer clic aquí para abrir Microsoft OAuth**]({auth_url})")
+        # Por ahora no mostramos botón activo para Microsoft (solo mensaje informativo)
+        st.markdown(replace_emojis("ℹ️ Integración con Microsoft OAuth disponible próximamente."), unsafe_allow_html=True)
         
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Microsoft OAuth: {str(e)}", unsafe_allow_html=True)
