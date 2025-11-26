@@ -3,7 +3,7 @@ import streamlit as st
 from utils.ui.icon_system import get_icon, replace_emojis
 def show_header(name):
     """Show the main header with welcome message"""
-    st.markdown(f'<h1 class="main-header">{get_icon("📊", 20)} Panel de Análisis de Datos</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">Inicio</h1>', unsafe_allow_html=True)
     st.markdown(f'<p style="text-align: center; color: #666; font-size: 1.2rem;">Bienvenido, <strong>{name}</strong>! 👋</p>', unsafe_allow_html=True)
 
 def show_quick_start_section():
