@@ -9,6 +9,7 @@ from core.database import db_manager
 logger = logging.getLogger(__name__)
 
 
+# Utilidad - Convertir Fila a Diccionario
 def _row_to_dict(row: Any) -> Dict[str, Any]:
     """Convert SQLite Row or psycopg2 row to plain dict."""
     if row is None:
@@ -21,6 +22,7 @@ def _row_to_dict(row: Any) -> Dict[str, Any]:
         return row
 
 
+# Base de Datos - Crear o Actualizar Dashboard
 def upsert_dashboard(
     user_id: int,
     dashboard_name: str,
@@ -117,6 +119,7 @@ def upsert_dashboard(
         return int(cursor.lastrowid)
 
 
+# Consulta - Listar Dashboards del Usuario
 @st.cache_data(show_spinner=False, ttl=30)
 def list_user_dashboards(user_id: int) -> List[Dict[str, Any]]:
     """Retrieve all dashboards for a user ordered by last update.
@@ -164,6 +167,7 @@ def list_user_dashboards(user_id: int) -> List[Dict[str, Any]]:
     return dashboards
 
 
+# Base de Datos - Eliminar Dashboard
 def delete_dashboard(dashboard_id: int, user_id: int) -> None:
     """Delete a dashboard that belongs to the provided user."""
     if not dashboard_id or not user_id:

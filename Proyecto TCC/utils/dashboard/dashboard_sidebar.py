@@ -20,6 +20,7 @@ try:
 except ImportError:
     Image = ImageDraw = ImageFont = None
 
+# Consulta - Obtener DataFrame Activo
 def _get_active_dataframe():
     """Return the DataFrame currently used in the dashboard context."""
     for key in ("cleaned_data", "uploaded_data", "sample_data"):
@@ -28,6 +29,7 @@ def _get_active_dataframe():
             return df
     return None
 
+# UI - Crear Sidebar de Dashboard
 def create_dashboard_sidebar(df, show_component_controls=True):
     """Create the dashboard sidebar with all controls"""
     with st.sidebar:
@@ -221,6 +223,7 @@ def create_dashboard_sidebar(df, show_component_controls=True):
             if st.button("❓ Ayuda", use_container_width=True):
                 st.switch_page("pages/00_Ayuda.py")
 
+# Base de Datos - Guardar Dashboard
 def save_dashboard():
     """Save dashboard configuration"""
     try:
@@ -259,6 +262,7 @@ def save_dashboard():
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error al guardar dashboard: {e}", unsafe_allow_html=True)
 
+# Exportacion - Exportar Dashboard
 def export_dashboard(format_type):
     """Export dashboard"""
     if not st.session_state.dashboard_components:
@@ -331,6 +335,7 @@ def export_dashboard(format_type):
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error al exportar dashboard: {e}", unsafe_allow_html=True)
 
+# UI - Mostrar Informacion del Dashboard
 def show_dashboard_info(df, *, show_divider=True, container_class=None):
     """Show dashboard information and statistics"""
     if show_divider:
@@ -363,6 +368,7 @@ def show_dashboard_info(df, *, show_divider=True, container_class=None):
         st.markdown("</div>", unsafe_allow_html=True)
 
 
+# Utilidad - Formatear Timestamp
 def _format_timestamp(value):
     if not value:
         return "sin fecha"
@@ -372,6 +378,7 @@ def _format_timestamp(value):
         return str(value)
 
 
+# Utilidad - Construir Resumen de Componentes
 def _build_component_summary(components, width=90):
     lines = []
     for idx, component in enumerate(components, 1):
@@ -392,6 +399,7 @@ def _build_component_summary(components, width=90):
     return lines or ["Sin componentes disponibles."]
 
 
+# Layout - Preparar Filas de Layout
 def _prepare_layout_rows(components):
     """Return components grouped and ordered by layout row."""
     layout_rows = {}
@@ -414,6 +422,7 @@ def _prepare_layout_rows(components):
     return [(row_key, sorted(items, key=lambda item: item['order'])) for row_key, items in sorted(layout_rows.items())]
 
 
+# Calculo - Calcular Valor de Metrica
 def _calculate_metric_value(config, df, component_title):
     metric_type = config.get('metric_type', 'count')
     column = config.get('column')
@@ -461,6 +470,7 @@ def _calculate_metric_value(config, df, component_title):
     return label, formatted_value
 
 
+# Renderizado - Crear Base de Tarjeta
 def _create_card_base(width, body_height, fonts, title):
     padding = 28
     header_height = 54
@@ -480,12 +490,14 @@ def _create_card_base(width, body_height, fonts, title):
     return card, draw, body_top, padding
 
 
+# Renderizado - Renderizar Tarjeta de Placeholder
 def _render_placeholder_card(width, body_height, fonts, title, message):
     card, draw, body_top, padding = _create_card_base(width, body_height, fonts, title)
     draw.text((padding, body_top), message, font=fonts['body'], fill="#dc2626")
     return card
 
 
+# Renderizado - Renderizar Tarjeta de Metrica
 def _render_metric_card(component, df, width, fonts):
     config = component.get('config', {})
     title = component.get('title') or replace_emojis("📈 Métrica")
@@ -501,6 +513,7 @@ def _render_metric_card(component, df, width, fonts):
     return card
 
 
+# Visualizacion - Construir Figura de Plotly
 def _build_plotly_figure(component_type, config, df):
     if component_type == replace_emojis("📊 Gráfico de Líneas"):
         x_col = config.get('x_column')
@@ -587,6 +600,7 @@ def _build_plotly_figure(component_type, config, df):
     return fig
 
 
+# Renderizado - Renderizar Tarjeta de Grafico
 def _render_chart_card(component, df, width, fonts):
     chart_height = 350
     title = component.get('title') or component.get('type')
@@ -612,6 +626,7 @@ def _render_chart_card(component, df, width, fonts):
     return card
 
 
+# Renderizado - Renderizar Tarjeta de Tabla
 def _render_table_card(component, df, width, fonts):
     config = component.get('config', {})
     columns = config.get('columns') or df.columns.tolist()
@@ -665,6 +680,7 @@ def _render_table_card(component, df, width, fonts):
     return card
 
 
+# Renderizado - Renderizar Tarjeta de Componente
 def _render_component_card(component, df, width, fonts):
     component_type = component.get('type')
     try:
@@ -692,6 +708,7 @@ def _render_component_card(component, df, width, fonts):
     return _render_placeholder_card(width, 140, fonts, component.get('title') or component_type, "Este tipo de componente no se puede exportar todavía.")
 
 
+# Exportacion - Generar Imagen de Dashboard
 def _generate_dashboard_image(dashboard_name, components, df):
     if Image is None or ImageDraw is None or ImageFont is None:
         raise ImportError("Pillow no está instalado. Instala con `pip install pillow` para exportar como imagen.")
@@ -772,6 +789,7 @@ def _generate_dashboard_image(dashboard_name, components, df):
     return image_buffer, image.size
 
 
+# Exportacion - Generar PDF de Dashboard
 def _generate_dashboard_pdf(dashboard_name, summary_lines, image_buffer):
     try:
         from reportlab.lib.pagesizes import letter

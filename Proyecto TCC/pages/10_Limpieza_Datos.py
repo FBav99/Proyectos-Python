@@ -10,6 +10,7 @@ from core.streamlit_error_handler import safe_main, configure_streamlit_error_ha
 # Configure error handling
 configure_streamlit_error_handling()
 
+# Principal - Limpieza de Datos
 @safe_main
 def main():
     """Página de limpieza automática de datos"""

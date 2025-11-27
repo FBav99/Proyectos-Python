@@ -5,6 +5,7 @@ from .data_cleaner import create_data_cleaning_interface
 
 from utils.ui.icon_system import get_icon, replace_emojis
 
+# Archivo - Obtener Nombres de Hojas Excel
 def get_excel_sheet_names(uploaded_file):
     """Obtener lista de nombres de hojas de un archivo Excel"""
     try:
@@ -33,6 +34,7 @@ def get_excel_sheet_names(uploaded_file):
             st.error(f"Error al leer el archivo Excel: {error_msg}")
         return []
 
+# Archivo - Cargar Excel con Seleccion de Hoja
 def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
     """
     Cargar archivo Excel con soporte para selección de hoja cuando hay múltiples hojas.
@@ -89,6 +91,7 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
         else:
             st.error(f"Error al cargar el archivo Excel: {error_msg}")
         return None
+# UI - Mostrar Seccion de Carga de Archivos
 def show_upload_section():
     """Show the file upload section"""
     st.markdown("---")
@@ -162,6 +165,7 @@ def show_upload_section():
             del st.session_state.selected_template
         st.rerun()
 
+# UI - Mostrar Seccion de Datasets de Ejemplo
 def show_examples_section():
     """Show the sample datasets section"""
     st.markdown("---")
@@ -205,6 +209,7 @@ def show_examples_section():
             del st.session_state.selected_template
         st.rerun()
 
+# Consulta - Obtener Datos Actuales
 def get_current_data():
     """Get the current data from session state"""
     if 'cleaned_data' in st.session_state:

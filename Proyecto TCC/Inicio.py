@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 configure_streamlit_error_handling()
 
 
+# Cache - Precalentar Recursos
 def warm_initial_caches():
     """Preload heavy resources once per session to avoid cloud cold-start delays."""
     if st.session_state.get("_warm_start_complete"):
@@ -49,6 +50,7 @@ def warm_initial_caches():
 # MAIN FUNCTION
 # ============================================================================
 
+# Principal - Punto de Entrada
 @safe_main
 def main():
     """Función principal de la aplicación - Punto de entrada principal"""

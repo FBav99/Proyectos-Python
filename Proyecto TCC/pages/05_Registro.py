@@ -19,11 +19,13 @@ except Exception as e:
     st.error(f"Error initializing database: {e}")
     st.stop()
 
+# Validacion - Formato de Email
 def validate_email(email):
     """Validate email format"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
+# Validacion - Fortaleza de Contraseña
 def validate_password(password):
     """Validate password strength"""
     if len(password) < 8:
@@ -40,6 +42,7 @@ def validate_password(password):
     
     return True, "Contraseña válida"
 
+# Principal - Registro de Usuarios
 @safe_main
 def main():
     """Página de registro de usuarios"""

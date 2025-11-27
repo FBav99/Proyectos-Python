@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from utils.ui import display_error
 
 from utils.ui.icon_system import get_icon, replace_emojis
+# UI - Mostrar Metrica
 def display_metric(config, df):
     """Display a metric component"""
     metric_type = config.get('metric_type', 'count')
@@ -52,6 +53,7 @@ def display_metric(config, df):
     except Exception as e:
         display_error(e, "Calculando métrica")
 
+# UI - Mostrar Grafico de Lineas
 def display_line_chart(config, df):
     """Display a line chart"""
     x_col = config.get('x_column')
@@ -72,6 +74,7 @@ def display_line_chart(config, df):
     except Exception as e:
         display_error(e, "Creando gráfico de líneas")
 
+# UI - Mostrar Grafico de Barras
 def display_bar_chart(config, df):
     """Display a bar chart"""
     x_col = config.get('x_column')
@@ -92,6 +95,7 @@ def display_bar_chart(config, df):
     except Exception as e:
         display_error(e, "Creando gráfico de barras")
 
+# UI - Mostrar Grafico Circular
 def display_pie_chart(config, df):
     """Display a pie chart"""
     values_col = config.get('values_column')
@@ -110,6 +114,7 @@ def display_pie_chart(config, df):
     except Exception as e:
         display_error(e, "Creando gráfico circular")
 
+# UI - Mostrar Grafico de Area
 def display_area_chart(config, df):
     """Display an area chart"""
     x_col = config.get('x_column')
@@ -130,6 +135,7 @@ def display_area_chart(config, df):
     except Exception as e:
         display_error(e, "Creando gráfico de área")
 
+# UI - Mostrar Grafico de Dispersión
 def display_scatter_plot(config, df):
     """Display a scatter plot"""
     x_col = config.get('x_column')
@@ -150,6 +156,7 @@ def display_scatter_plot(config, df):
     except Exception as e:
         display_error(e, "Creando gráfico de dispersión")
 
+# UI - Mostrar Histograma
 def display_histogram(config, df):
     """Display a histogram"""
     column = config.get('column')
@@ -165,6 +172,7 @@ def display_histogram(config, df):
     except Exception as e:
         display_error(e, "Creando histograma")
 
+# UI - Mostrar Box Plot
 def display_box_plot(config, df):
     """Display a box plot"""
     x_col = config.get('x_column')
@@ -180,6 +188,7 @@ def display_box_plot(config, df):
     except Exception as e:
         display_error(e, "Creando box plot")
 
+# UI - Mostrar Grafico de Violin
 def display_violin_plot(config, df):
     """Display a violin plot"""
     x_col = config.get('x_column')
@@ -195,6 +204,7 @@ def display_violin_plot(config, df):
     except Exception as e:
         display_error(e, "Creando gráfico de violín")
 
+# UI - Mostrar Matriz de Correlacion
 def display_correlation_matrix(config, df):
     """Display correlation matrix"""
     columns = config.get('columns', [])
@@ -215,6 +225,7 @@ def display_correlation_matrix(config, df):
     except Exception as e:
         display_error(e, "Creando matriz de correlación")
 
+# UI - Mostrar Tabla de Datos
 def display_data_table(config, df):
     """Display a data table"""
     columns = config.get('columns', df.columns.tolist())
@@ -234,6 +245,7 @@ def display_data_table(config, df):
     except Exception as e:
         display_error(e, "Mostrando tabla de datos")
 
+# Renderizado - Renderizar Componente
 def render_component(component, df):
     """Render a dashboard component based on its type"""
     component_type = component['type']
@@ -296,6 +308,7 @@ def render_component(component, df):
             st.rerun()
 
 
+# Renderizado - Renderizar Dashboard Completo
 def render_dashboard(df):
     """Render the complete dashboard"""
     components = st.session_state.get('dashboard_components', [])

@@ -1,11 +1,13 @@
 import streamlit as st
 
 from utils.ui.icon_system import get_icon, replace_emojis
+# UI - Mostrar Encabezado Principal
 def show_header(name):
     """Show the main header with welcome message"""
     st.markdown('<h1 class="main-header">Inicio</h1>', unsafe_allow_html=True)
     st.markdown(f'<p style="text-align: center; color: #666; font-size: 1.2rem;">Bienvenido, <strong>{name}</strong>! 👋</p>', unsafe_allow_html=True)
 
+# UI - Mostrar Seccion de Inicio Rapido
 def show_quick_start_section():
     """Show the quick start section with main action buttons"""
     st.markdown(f"""
@@ -62,6 +64,7 @@ def show_quick_start_section():
                 st.session_state[action["state_key"]] = True
                 st.rerun()
 
+# Validacion - Verificar Mostrar Contenido Principal
 def should_show_main_content():
     """Check if we should show the main content (not in any specific section)"""
     return not any([
@@ -72,6 +75,7 @@ def should_show_main_content():
         st.session_state.get('show_dashboard', False)
     ])
 
+# Estado - Limpiar Plantilla Seleccionada
 def clear_selected_template():
     """Clear selected_template when showing main page to avoid redirect loops"""
     if 'selected_template' in st.session_state:

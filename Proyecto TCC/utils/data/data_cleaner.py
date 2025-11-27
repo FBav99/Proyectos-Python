@@ -21,6 +21,7 @@ class DataCleaner:
         self.validation = DataValidation(df)
         self.cleaning_history = []
     
+    # Historial - Agregar Operacion al Historial
     def add_to_history(self, operation: str, details: str):
         """Add operation to cleaning history"""
         self.cleaning_history.append({
@@ -29,6 +30,7 @@ class DataCleaner:
             'timestamp': pd.Timestamp.now()
         })
     
+    # Consulta - Obtener Resumen de Limpieza
     def get_cleaning_summary(self) -> Dict[str, Any]:
         """Get summary of cleaning operations performed"""
         return {
@@ -40,6 +42,7 @@ class DataCleaner:
             'columns_removed': self.original_df.shape[1] - self.cleaned_df.shape[1]
         }
     
+    # Limpieza - Aplicar Limpieza Automatica
     def apply_auto_cleaning(self, cleaning_options: Dict[str, bool] = None) -> pd.DataFrame:
         """
         Apply automatic cleaning based on predefined options
@@ -102,6 +105,7 @@ class DataCleaner:
         
         return self.cleaned_df
     
+    # Limpieza - Resetear a Datos Originales
     def reset_to_original(self) -> pd.DataFrame:
         """Reset to original data"""
         self.cleaned_df = self.original_df.copy()
@@ -110,20 +114,24 @@ class DataCleaner:
         self.cleaning_history = []
         return self.cleaned_df
     
+    # Consulta - Obtener Datos Limpiados
     def get_cleaned_data(self) -> pd.DataFrame:
         """Get cleaned data"""
         return self.cleaned_df.copy()
     
+    # Calidad - Obtener Reporte de Calidad
     def get_quality_report(self) -> Dict[str, Any]:
         """Get comprehensive data quality report"""
         return self.validation.validate_data_quality()
     
+    # Sugerencias - Obtener Sugerencias de Limpieza
     def get_cleaning_suggestions(self) -> List[Dict[str, Any]]:
         """Get suggestions for cleaning actions"""
         quality_report = self.get_quality_report()
         return self.validation.suggest_cleaning_actions(quality_report)
 
 
+# UI - Crear Interfaz de Limpieza de Datos
 def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
     """
     Create Streamlit interface for data cleaning

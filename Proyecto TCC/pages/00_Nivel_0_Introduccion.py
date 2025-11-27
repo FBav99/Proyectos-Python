@@ -26,19 +26,20 @@ st.set_page_config(
 # Load CSS styling for level pages
 st.markdown(load_level_styles(), unsafe_allow_html=True)
 
+# Principal - Nivel 0 Introduccion
 @safe_main
 def main():
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     current_user = init_sidebar()
     
-    # Check if user is authenticated
+    # Validacion - Verificar Autenticacion de Usuario
     if not current_user:
         st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
-    # Get current user
+    # Usuario - Obtener Usuario Actual
     user = current_user
     if not user or 'id' not in user:
         st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
@@ -70,7 +71,7 @@ def main():
     st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.")
     
-    # Add narrative context
+    # UI - Agregar Contexto Narrativo
     create_info_box(
         "info-box",
         "🏪 Bienvenido a TechStore",
@@ -227,7 +228,7 @@ def main():
     except:
         st.info(replace_emojis("📹 GIF de demostración no disponible. Los conceptos incluyen: 1) Qué son los datos, 2) Tipos de datos, 3) Cómo organizarlos, 4) Qué puedes hacer con ellos."))
     
-    # Example section
+    # UI - Mostrar Seccion de Ejemplo
     st.header(replace_emojis("🎯 Ejemplo Práctico"))
     
     create_info_box(
@@ -236,7 +237,7 @@ def main():
         "<p>Te mostraré cómo se ven los datos de TechStore en la vida real y qué información puedes obtener de ellos. Estos mismos datos los usarás en todos los niveles del curso, pero en diferentes estados de calidad.</p>"
     )
     
-    # Show data progression
+    # UI - Mostrar Progresion de Datos
     create_info_box(
         "success-box",
         replace_emojis("🔄 Progresión de Datos en el Curso"),
@@ -276,7 +277,7 @@ def main():
             replace_emojis("<h4>📈 Descubrir tendencias:</h4><p>• Ver si las ventas suben o bajan con el tiempo</p><p>• Identificar qué días hay más ventas</p><h4>🔍 Hacer comparaciones:</h4><p>• Comparar ventas entre regiones</p><p>• Ver qué categorías venden más</p><h4>🎯 Encontrar patrones:</h4><p>• Productos con mejores calificaciones</p><p>• Relación entre cantidad y ventas</p>")
         )
     
-    # Add dirty vs clean data comparison
+    # UI - Agregar Comparacion de Datos Sucios vs Limpios
     st.subheader(replace_emojis("🔄 Comparación: Datos Limpios vs Datos con Problemas"))
     
     create_info_box(
@@ -285,7 +286,7 @@ def main():
         "<p>En la vida real, los datos no siempre vienen perfectos. Es importante entender qué problemas pueden tener los datos y cómo afectan el análisis.</p>"
     )
     
-    # Get both dirty and clean data
+    # Datos - Obtener Datos Sucios y Limpios
     df_clean = create_sample_data('clean')
     df_dirty = create_sample_data('dirty')
     
@@ -323,7 +324,7 @@ def main():
         for feature in dirty_features:
             st.markdown(f"- {feature}")
     
-    # Show the impact
+    # UI - Mostrar Impacto de Limpieza
     st.markdown(replace_emojis("**📈 ¿Por qué importa esta diferencia?**"), unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
@@ -351,7 +352,7 @@ def main():
         "<ul><li><strong>Los datos limpios son más fáciles de analizar</strong> - Todo está organizado y consistente</li><li><strong>Los datos con problemas son comunes</strong> - En la vida real, raramente vienen perfectos</li><li><strong>La calidad afecta los resultados</strong> - Datos malos = análisis malos</li><li><strong>Es importante verificar los datos</strong> - Siempre revisa antes de analizar</li></ul>"
     )
     
-    # Tips section
+    # UI - Mostrar Seccion de Tips
     st.header(replace_emojis("💡 Consejos Importantes"))
     
     create_info_box(
@@ -366,7 +367,7 @@ def main():
         "<ul><li><strong>Haz preguntas claras:</strong> Antes de analizar, define qué quieres saber</li><li><strong>Verifica la calidad:</strong> Siempre revisa si los datos tienen problemas como los que viste arriba</li><li><strong>Entiende el contexto:</strong> Conoce de dónde vienen los datos y qué representan</li><li><strong>Empieza simple:</strong> Comienza con preguntas básicas antes de las complejas</li><li><strong>Busca patrones:</strong> Los datos te cuentan historias, aprende a escucharlas</li></ul>"
     )
     
-    # Practice activity
+    # UI - Mostrar Actividad de Practica
     st.header(replace_emojis("🎯 Actividad Práctica"))
     
     create_info_box(
@@ -375,7 +376,7 @@ def main():
         "<ol><li><strong>Observa los datos de ejemplo:</strong> Mira las tablas de ventas de arriba (limpios y con problemas)</li><li><strong>Identifica los tipos de datos:</strong> ¿Qué columnas son números? ¿Cuáles son texto?</li><li><strong>Compara la calidad:</strong> ¿Qué diferencias notas entre los datos limpios y los problemáticos?</li><li><strong>Haz preguntas:</strong> ¿Qué quieres saber sobre estos datos?</li><li><strong>Busca patrones:</strong> ¿Ves algo interesante en los números?</li><li><strong>Piensa en aplicaciones:</strong> ¿Cómo podrías usar esta información?</li></ol>"
     )
     
-    # Interactive example
+    # UI - Mostrar Ejemplo Interactivo
     st.header(replace_emojis("🎮 Ejemplo Interactivo"))
     
     create_info_box(
@@ -384,7 +385,7 @@ def main():
         "<p>Usa los controles de abajo para ver diferentes aspectos de los datos limpios y entender mejor cómo funcionan. Nota cómo es fácil trabajar con datos organizados.</p>"
     )
     
-    # Simple interactive controls
+    # UI - Mostrar Controles Interactivos Simples
     col1, col2 = st.columns(2)
     
     with col1:
@@ -398,7 +399,7 @@ def main():
         st.markdown(replace_emojis("**📊 Ver estadísticas básicas:**"), unsafe_allow_html=True)
         mostrar_estadisticas = st.checkbox("Mostrar estadísticas", value=True)
     
-    # Apply filters and show results
+    # Filtro - Aplicar Filtros y Mostrar Resultados
     if categoria_seleccionada != 'Todas':
         df_filtrado = df[df['Categoria'] == categoria_seleccionada]
         st.markdown(f"**{get_icon('📋', 20)} Datos filtrados por categoría: {categoria_seleccionada}**", unsafe_allow_html=True)
@@ -430,20 +431,20 @@ def main():
     st.markdown("### Pon a prueba tus conocimientos")
     st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
-    # Check if user passed the quiz
+    # Validacion - Verificar si Usuario Aprobo Quiz
     quiz_passed = st.session_state.get(f'quiz_nivel0_passed', False)
     quiz_completed = st.session_state.get(f'quiz_nivel0_completed', False)
     
-    # Always show quiz and results if quiz is completed (whether passed or not)
-    # This ensures results are always visible after completing the quiz
+    # UI - Mostrar Quiz y Resultados si esta Completado
+    # UI - Asegurar que Resultados sean Visibles Despues del Quiz
     from core.quiz_system import create_quiz
     create_quiz('nivel0', user['username'])
     
-    # Show passed message if quiz is passed
+    # UI - Mostrar Mensaje de Aprobacion si Quiz Aprobado
     if quiz_passed:
         st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     
-    # Check if quiz was just completed and passed (for first-time completion)
+    # Validacion - Verificar si Quiz Fue Completado y Aprobado Recientemente
     if quiz_completed and not quiz_passed:
         score = st.session_state.get(f'quiz_nivel0_score', 0)
         if score >= 3:
@@ -455,7 +456,7 @@ def main():
     # 7. Navigation or next steps
     st.header(replace_emojis("✅ Verificación del Nivel"))
     
-    # Only allow marking as complete if quiz is passed
+    # Validacion - Permitir Marcar Completado solo si Quiz Aprobado
     if not quiz_passed:
         st.warning("⚠️ Debes aprobar el quiz antes de poder marcar el nivel como completado.")
         nivel0_completed = False
@@ -494,7 +495,7 @@ def main():
             st.session_state.survey_level = 'nivel0'
             st.switch_page("pages/99_Survey_Nivel.py")
     
-    # Additional resources
+    # UI - Mostrar Recursos Adicionales
     create_info_box(
         "info-box",
         replace_emojis("📚 ¿Quieres saber más?"),

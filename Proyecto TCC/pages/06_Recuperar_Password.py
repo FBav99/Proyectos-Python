@@ -20,11 +20,13 @@ except Exception as e:
     # Error will be shown when page loads
     pass
 
+# Validacion - Formato de Email
 def validate_email(email):
     """Validate email format"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
+# Validacion - Fortaleza de Contraseña
 def validate_password(password):
     """Validate password strength"""
     if len(password) < 8:
@@ -41,6 +43,7 @@ def validate_password(password):
     
     return True, "Contraseña válida"
 
+# Principal - Recuperacion de Contraseña
 @safe_main
 def main():
     """Página de recuperación de contraseña con verificación de email y cambio de email"""

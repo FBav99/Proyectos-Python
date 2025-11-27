@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+# Calculo - Aplicar Operaciones Matematicas Basicas
 def apply_basic_calculation(df, calc_info):
     """Aplicar operaciones matemáticas básicas"""
     col1_calc, col2_calc, operation = calc_info['col1'], calc_info['col2'], calc_info['operation']
@@ -26,6 +27,7 @@ def apply_basic_calculation(df, calc_info):
         st.sidebar.error(f"Error en cálculo básico '{calc_name}': {str(e)}")
         return False
 
+# Calculo - Aplicar Calculos Basados en Tiempo
 def apply_time_calculation(df, calc_info):
     """Aplicar cálculos basados en tiempo"""
     target_col = calc_info['target_col']
@@ -71,6 +73,7 @@ def apply_time_calculation(df, calc_info):
         st.sidebar.error(f"Error en cálculo temporal '{calc_name}': {str(e)}")
         return False
 
+# Calculo - Aplicar Calculos de Agregacion
 def apply_aggregation_calculation(df, calc_info):
     """Aplicar cálculos de agregación"""
     target_col = calc_info['target_col']
@@ -102,6 +105,7 @@ def apply_aggregation_calculation(df, calc_info):
         st.sidebar.error(f"Error en cálculo de agregación '{calc_name}': {str(e)}")
         return False
 
+# Calculo - Aplicar Calculos Personalizados
 def apply_custom_calculations(df, custom_calculations):
     """Aplicar todos los cálculos personalizados"""
     filters_applied = {}

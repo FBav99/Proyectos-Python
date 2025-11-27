@@ -186,6 +186,7 @@ NEXT_LEVEL_DESTINATIONS = {
 }
 
 
+# Estado - Reiniciar Estado de Quiz
 def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
     """Clear quiz-related session state values."""
     prefix = f'quiz_{level}'
@@ -214,6 +215,7 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
         st.session_state[f'{prefix}_expanded'] = True
     else:
         st.session_state.pop(f'{prefix}_expanded', None)
+# Quiz - Crear y Mostrar Quiz
 def create_quiz(level, username):
     """Create and display a quiz for a specific level."""
 
@@ -362,6 +364,7 @@ def create_quiz(level, username):
             show_quiz_results(level, username, questions, expander_key)
 
 
+# Quiz - Mostrar Resultados de Quiz
 def show_quiz_results(level, username, questions, expander_key):
     """Show quiz results and achievements."""
 
@@ -450,6 +453,7 @@ def show_quiz_results(level, username, questions, expander_key):
                 if new_achievements:
                     st.markdown(replace_emojis("🏆 ¡Logro desbloqueado: Primer Nivel Completado!"), unsafe_allow_html=True)
 
+# Base de Datos - Guardar Intento de Quiz
 def save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers_list):
     """Save quiz attempt and answers to database"""
     try:
@@ -512,6 +516,7 @@ def save_quiz_attempt(level, username, score, total_questions, percentage, passe
         # Don't show error to user, just log it
         return False
 
+# UI - Mostrar Logros de Usuario
 def show_achievements(username):
     """Display user achievements"""
     from core.auth_config import get_user_progress

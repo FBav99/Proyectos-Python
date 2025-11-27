@@ -12,6 +12,7 @@ HIDDEN_NAVIGATION_PATTERNS = [
 ]
 
 
+# UI - Ocultar Entradas Restringidas del Sidebar
 def hide_restricted_sidebar_entries():
     """Inject CSS rules to hide restricted pages from the sidebar navigation."""
     if not HIDDEN_NAVIGATION_PATTERNS:
@@ -55,6 +56,7 @@ def hide_restricted_sidebar_entries():
     st.markdown(scripts, unsafe_allow_html=True)
 
 
+# UI - Mostrar Formulario de Login
 def show_login_form():
     """Display the login form for unauthenticated users"""
     st.markdown(f"""
@@ -97,6 +99,7 @@ def show_login_form():
         if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
             st.switch_page("pages/07_OAuth_Login.py")
 
+# UI - Mostrar Sidebar de Usuario
 def show_user_sidebar(current_user=None):
     """Display user information and logout button in sidebar - Always shows username prominently"""
     hide_restricted_sidebar_entries()
@@ -166,6 +169,7 @@ def show_user_sidebar(current_user=None):
                 st.switch_page("Inicio.py")
             return None
 
+# Consulta - Obtener Usuario Actual
 def get_current_user():
     """Get current authenticated user (handles both database and OAuth users)"""
     # First check for OAuth user in session state
@@ -175,12 +179,14 @@ def get_current_user():
     # Then check for database user
     return db_get_current_user()
 
+# Inicializacion - Inicializar Sidebar
 def init_sidebar():
     """Initialize sidebar with user info on all pages - Call this at the start of every page"""
     current_user = get_current_user()
     show_user_sidebar(current_user)
     return current_user
 
+# Autenticacion - Manejar Flujo de Autenticacion
 def handle_authentication():
     """Handle authentication flow and return user info if authenticated"""
     current_user = get_current_user()

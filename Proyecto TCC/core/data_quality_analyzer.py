@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from utils.ui.icon_system import get_icon, replace_emojis
+# Analisis - Analizar Calidad de Datos
 @st.cache_data(show_spinner=False, ttl=600)
 def analyze_data_quality(df):
     """Comprehensive data quality analysis"""
@@ -81,6 +82,7 @@ def analyze_data_quality(df):
     
     return analysis
 
+# Reporte - Crear Reporte de Calidad
 def create_quality_report(df, analysis):
     """Create comprehensive quality report"""
     
@@ -122,6 +124,7 @@ def create_quality_report(df, analysis):
     with tab5:
         show_date_analysis(analysis)
 
+# Calculo - Calcular Puntuacion de Calidad
 def calculate_quality_score(analysis):
     """Calculate overall data quality score"""
     score = 100
@@ -154,6 +157,7 @@ def calculate_quality_score(analysis):
     
     return max(0, score)
 
+# UI - Mostrar Analisis General
 def show_general_analysis(df, analysis):
     """Show general data analysis"""
     st.markdown(replace_emojis("### 📊 Información General"), unsafe_allow_html=True)
@@ -175,6 +179,7 @@ def show_general_analysis(df, analysis):
     })
     st.dataframe(column_info, use_container_width=True)
 
+# UI - Mostrar Analisis de Datos Faltantes
 def show_missing_data_analysis(analysis):
     """Show missing data analysis"""
     st.markdown(replace_emojis("### ❌ Análisis de Valores Faltantes"), unsafe_allow_html=True)
@@ -202,6 +207,7 @@ def show_missing_data_analysis(analysis):
     else:
         st.markdown(replace_emojis("🎉 ¡No hay valores faltantes en tu dataset!"), unsafe_allow_html=True)
 
+# UI - Mostrar Analisis de Columnas Numericas
 def show_numeric_analysis(analysis):
     """Show numeric columns analysis"""
     st.markdown(replace_emojis("### 🔢 Análisis de Columnas Numéricas"), unsafe_allow_html=True)
@@ -226,6 +232,7 @@ def show_numeric_analysis(analysis):
     else:
         st.info("ℹ️ No hay columnas numéricas en tu dataset")
 
+# UI - Mostrar Analisis de Columnas Categoricas
 def show_categorical_analysis(analysis):
     """Show categorical columns analysis"""
     st.markdown(replace_emojis("### 📝 Análisis de Columnas Categóricas"), unsafe_allow_html=True)
@@ -245,6 +252,7 @@ def show_categorical_analysis(analysis):
     else:
         st.info("ℹ️ No hay columnas categóricas en tu dataset")
 
+# UI - Mostrar Analisis de Columnas de Fecha
 def show_date_analysis(analysis):
     """Show date columns analysis"""
     st.markdown(replace_emojis("### 📅 Análisis de Columnas de Fecha"), unsafe_allow_html=True)
@@ -261,6 +269,7 @@ def show_date_analysis(analysis):
     else:
         st.info("ℹ️ No hay columnas de fecha en tu dataset")
 
+# UI - Crear Opciones de Limpieza
 def create_data_cleaning_options(df, analysis):
     """Create data cleaning options"""
     st.markdown("## 🧹 Opciones de Limpieza de Datos")
@@ -338,6 +347,7 @@ def create_data_cleaning_options(df, analysis):
     
     return cleaned_df
 
+# Principal - Pagina de Calidad de Datos
 def data_quality_page(df):
     """Main data quality analysis page"""
     st.markdown("# 🧹 Análisis y Limpieza de Datos")

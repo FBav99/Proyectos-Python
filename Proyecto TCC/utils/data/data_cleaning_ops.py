@@ -13,11 +13,13 @@ from typing import Dict, List, Any, Optional, Union
 class DataCleaningOperations:
     """Core data cleaning operations"""
     
+    # Inicializacion - Inicializar Operaciones de Limpieza
     def __init__(self, df: pd.DataFrame):
         self.original_df = df.copy()
         self.cleaned_df = df.copy()
         self.cleaning_history = []
     
+    # Historial - Agregar Operacion al Historial
     def add_to_history(self, operation: str, details: str):
         """Add operation to cleaning history"""
         self.cleaning_history.append({
@@ -26,6 +28,7 @@ class DataCleaningOperations:
             'timestamp': pd.Timestamp.now()
         })
     
+    # Consulta - Obtener Resumen de Limpieza
     def get_cleaning_summary(self) -> Dict[str, Any]:
         """Get summary of cleaning operations performed"""
         return {
@@ -37,6 +40,7 @@ class DataCleaningOperations:
             'columns_removed': self.original_df.shape[1] - self.cleaned_df.shape[1]
         }
     
+    # Limpieza - Limpiar Espacios en Blanco
     def clean_whitespace(self, columns: Optional[List[str]] = None, 
                         remove_leading_trailing: bool = True,
                         normalize_spaces: bool = True,
@@ -81,6 +85,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Limpieza - Normalizar Mayusculas y Minusculas
     def normalize_text_case(self, columns: Optional[List[str]] = None,
                            case_type: str = 'lower') -> pd.DataFrame:
         """
@@ -118,6 +123,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Limpieza - Remover Caracteres Especiales
     def remove_special_characters(self, columns: Optional[List[str]] = None,
                                 keep_alphanumeric: bool = True,
                                 keep_spaces: bool = True,
@@ -162,6 +168,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Limpieza - Normalizar Acentos
     def normalize_accents(self, columns: Optional[List[str]] = None,
                          remove_accents: bool = True) -> pd.DataFrame:
         """
@@ -202,6 +209,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Limpieza - Estandarizar Numeros de Telefono
     def standardize_phone_numbers(self, columns: Optional[List[str]] = None,
                                  format_type: str = 'international') -> pd.DataFrame:
         """
@@ -241,6 +249,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Utilidad - Estandarizar Telefono Interno
     def _standardize_phone(self, phone: str, format_type: str) -> str:
         """Helper function to standardize a phone number"""
         if pd.isna(phone) or phone == 'nan':
@@ -277,6 +286,7 @@ class DataCleaningOperations:
         else:  # simple
             return digits
     
+    # Limpieza - Estandarizar Emails
     def standardize_emails(self, columns: Optional[List[str]] = None) -> pd.DataFrame:
         """
         Standardize email addresses
@@ -313,6 +323,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Utilidad - Estandarizar Email Interno
     def _standardize_email(self, email: str) -> str:
         """Helper function to standardize an email"""
         if pd.isna(email) or email == 'nan':
@@ -325,6 +336,7 @@ class DataCleaningOperations:
         
         return email
     
+    # Limpieza - Estandarizar Fechas
     def standardize_dates(self, columns: Optional[List[str]] = None,
                          format_type: str = 'dd/mm/yyyy') -> pd.DataFrame:
         """
@@ -381,6 +393,7 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Validacion - Verificar si es Fecha
     def _is_date_like(self, value: str) -> bool:
         """Check if a string looks like a date"""
         if pd.isna(value) or value == 'nan':
@@ -402,6 +415,7 @@ class DataCleaningOperations:
         
         return False
     
+    # Limpieza - Reemplazar Valores
     def replace_values(self, replacements: Dict[str, str], 
                       columns: Optional[List[str]] = None) -> pd.DataFrame:
         """
@@ -433,12 +447,14 @@ class DataCleaningOperations:
         
         return self.cleaned_df
     
+    # Limpieza - Resetear a Datos Originales
     def reset_to_original(self) -> pd.DataFrame:
         """Reset to original data"""
         self.cleaned_df = self.original_df.copy()
         self.cleaning_history = []
         return self.cleaned_df
     
+    # Consulta - Obtener Datos Limpiados
     def get_cleaned_data(self) -> pd.DataFrame:
         """Get cleaned data"""
         return self.cleaned_df.copy()

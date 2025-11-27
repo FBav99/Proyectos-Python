@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 
+# Filtro - Aplicar Filtro de Fecha
 def apply_date_filter(df, original_df):
     """Aplicar filtro de fecha"""
     filters_applied = {}
@@ -19,6 +20,7 @@ def apply_date_filter(df, original_df):
     
     return df, filters_applied
 
+# Filtro - Aplicar Filtro de Categoria
 def apply_category_filter(df, original_df):
     """Aplicar filtro de categoría"""
     filters_applied = {}
@@ -35,6 +37,7 @@ def apply_category_filter(df, original_df):
     
     return df, filters_applied
 
+# Filtro - Aplicar Filtro de Region
 def apply_region_filter(df, original_df):
     """Aplicar filtro de región"""
     filters_applied = {}
@@ -51,6 +54,7 @@ def apply_region_filter(df, original_df):
     
     return df, filters_applied
 
+# Filtro - Aplicar Filtros Numericos
 def apply_numeric_filters(df, original_df):
     """Aplicar filtros numéricos"""
     filters_applied = {}
@@ -73,6 +77,7 @@ def apply_numeric_filters(df, original_df):
     
     return df, filters_applied
 
+# Filtro - Aplicar Todos los Filtros
 def apply_all_filters(df, original_df):
     """Aplicar todos los filtros"""
     filters_applied = {}

@@ -20,10 +20,12 @@ class ProgressTracker:
         self.levels = ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']
         self._cache: Dict[int, Dict[str, Any]] = {}
     
+    # Cache - Invalidar Cache de Progreso
     def _invalidate_cache(self, user_id: int):
         """Remove cached progress for a user."""
         self._cache.pop(user_id, None)
     
+    # Consulta - Obtener Progreso de Usuario
     def get_user_progress(self, user_id: int) -> Dict[str, Any]:
         """Get complete user progress information"""
         try:
@@ -58,6 +60,7 @@ class ProgressTracker:
             self._cache[user_id] = copy.deepcopy(default_progress)
             return default_progress
     
+    # Creacion - Crear Registro de Progreso
     def create_user_progress(self, user_id: int) -> bool:
         """Create initial progress record for new user"""
         try:
@@ -73,6 +76,7 @@ class ProgressTracker:
             logger.error(f"Error creating user progress: {e}")
             return False
     
+    # Actualizacion - Actualizar Progreso de Usuario
     def update_user_progress(self, user_id: int, **kwargs) -> bool:
         """Update user progress fields"""
         try:
@@ -114,6 +118,7 @@ class ProgressTracker:
             logger.error(f"Error updating user progress: {e}")
             return False
     
+    # Progreso - Completar Nivel
     def complete_level(self, user_id: int, level_name: str) -> bool:
         """Mark a level as completed"""
         try:
@@ -143,6 +148,7 @@ class ProgressTracker:
             logger.error(f"Error completing level: {e}")
             return False
     
+    # Progreso - Reiniciar Progreso de Nivel
     def reset_level_progress(self, user_id: int, level_name: str) -> bool:
         """Reset progress for a specific level"""
         try:
@@ -172,6 +178,7 @@ class ProgressTracker:
             logger.error(f"Error resetting level progress: {e}")
             return False
     
+    # Progreso - Reiniciar Todo el Progreso
     def reset_all_progress(self, user_id: int) -> bool:
         """Reset all level progress for a user"""
         try:
@@ -195,6 +202,7 @@ class ProgressTracker:
             logger.error(f"Error resetting all progress: {e}")
             return False
     
+    # Actualizacion - Actualizar Tiempo de Estudio
     def update_time_spent(self, user_id: int, minutes: int) -> bool:
         """Update total time spent learning"""
         try:
@@ -211,6 +219,7 @@ class ProgressTracker:
             logger.error(f"Error updating time spent: {e}")
             return False
     
+    # Contador - Incrementar Analisis Creados
     def increment_analyses_created(self, user_id: int) -> bool:
         """Increment count of data analyses created"""
         try:
@@ -227,6 +236,7 @@ class ProgressTracker:
             logger.error(f"Error incrementing analyses count: {e}")
             return False
     
+    # Calculo - Calcular Progreso Total
     def calculate_total_progress(self, progress_dict: Dict[str, Any]) -> float:
         """Calculate total progress percentage"""
         try:
@@ -237,6 +247,7 @@ class ProgressTracker:
             logger.error(f"Error calculating total progress: {e}")
             return 0.0
     
+    # Contador - Contar Niveles Completados
     def count_completed_levels(self, progress_dict: Dict[str, Any]) -> int:
         """Count completed levels"""
         try:
@@ -249,6 +260,7 @@ class ProgressTracker:
             logger.error(f"Error counting completed levels: {e}")
             return 0
     
+    # Consulta - Obtener Nivel Actual
     def get_current_level(self, progress_dict: Dict[str, Any]) -> str:
         """Get the current level the user should work on"""
         try:
@@ -260,6 +272,7 @@ class ProgressTracker:
             logger.error(f"Error getting current level: {e}")
             return "nivel1"
     
+    # Estadisticas - Obtener Estadisticas de Niveles
     def get_level_stats(self, user_id: int) -> Dict[str, Any]:
         """Get detailed statistics for all levels"""
         try:
@@ -291,6 +304,7 @@ class ProgressTracker:
             logger.error(f"Error getting level stats: {e}")
             return {}
     
+    # Inicializacion - Obtener Progreso por Defecto
     def get_default_progress(self) -> Dict[str, Any]:
         """Get default progress structure"""
         default_progress = {
@@ -307,6 +321,7 @@ class ProgressTracker:
         
         return default_progress
     
+    # Logging - Registrar Actividad de Progreso
     def log_progress_activity(self, user_id: int, activity_type: str, details: Dict[str, Any]):
         """Log progress-related activities"""
         try:

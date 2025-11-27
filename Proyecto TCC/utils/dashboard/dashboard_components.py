@@ -7,6 +7,7 @@ from datetime import datetime
 
 
 from utils.ui.icon_system import get_icon, replace_emojis
+# Configuracion - Obtener Configuracion por Defecto
 def get_default_config(component_type, df):
     """Get default configuration for a component type"""
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -60,6 +61,7 @@ def get_default_config(component_type, df):
     
     return {}
 
+# Configuracion - Configurar Componente
 def configure_component(component, df):
     """Configure a component based on its type"""
     config = component['config']
@@ -242,6 +244,7 @@ def configure_component(component, df):
         key=f"title_{component['id']}"
     )
 
+# UI - Crear Botones de Componentes
 def create_component_buttons(key_prefix="", expand_all=False):
     """Create buttons for adding different component types"""
     st.markdown(replace_emojis("### 🎯 Tipos de Componentes"), unsafe_allow_html=True)
@@ -306,6 +309,7 @@ def create_component_buttons(key_prefix="", expand_all=False):
     return None
 
 
+# Dashboard - Agregar Componente al Dashboard
 def add_component_to_dashboard(component_type, df, *, layout=None, overrides=None, title=None):
     """Add a new component to the dashboard"""
     if not component_type:

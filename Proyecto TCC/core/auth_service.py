@@ -49,6 +49,7 @@ class AuthService:
     # USER REGISTRATION AND AUTHENTICATION
     # ============================================================================
     
+    # Usuario - Registrar Usuario
     def register_user(self, username: str, email: str, password: str, 
                      first_name: str, last_name: str) -> Tuple[bool, str]:
         """
@@ -129,6 +130,7 @@ class AuthService:
             logger.error(f"Registration error: {e}")
             return False, security_features.sanitize_error_message(e)
     
+    # Autenticacion - Autenticar Usuario
     def authenticate_user(self, username: str, password: str) -> Tuple[bool, str, Optional[Dict]]:
         """Authenticate user login"""
         try:
@@ -202,6 +204,7 @@ class AuthService:
             logger.error(f"Authentication error: {e}")
             return False, security_features.sanitize_error_message(e), None
     
+    # Autenticacion - Cerrar Sesion
     def logout_user(self, session_token: str) -> bool:
         """Logout user and invalidate session"""
         try:
@@ -213,6 +216,7 @@ class AuthService:
             logger.error(f"Logout error: {e}")
             return False
     
+    # Consulta - Verificar Existencia de Usuario
     def user_exists(self, username: str, email: str) -> bool:
         """Check if user exists by username or email"""
         try:
@@ -226,15 +230,18 @@ class AuthService:
             logger.error(f"User exists check error: {e}")
             return False
     
+    # Seguridad - Hashear Contraseña
     def hash_password(self, password: str) -> str:
         """Hash password using bcrypt"""
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     
+    # Seguridad - Verificar Contraseña
     def verify_password(self, password: str, password_hash: str) -> bool:
         """Verify password against hash"""
         return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
     
+    # Sesion - Crear Sesion de Usuario
     def create_session(self, user_id: int) -> str:
         """Create a new session for user"""
         session_token = secrets.token_urlsafe(32)
@@ -249,6 +256,7 @@ class AuthService:
         
         return session_token
     
+    # Sesion - Invalidar Sesion
     def invalidate_session(self, session_token: str):
         """Invalidate a session"""
         with db_manager.get_connection() as conn:
@@ -257,6 +265,7 @@ class AuthService:
             """, (session_token,))
             conn.commit()
     
+    # Sesion - Actualizar Actividad de Sesion
     def update_session_activity(self, session_token: str):
         """Update session last activity time"""
         with db_manager.get_connection() as conn:
@@ -267,6 +276,7 @@ class AuthService:
             """, (datetime.now().isoformat(), session_token))
             conn.commit()
     
+    # Seguridad - Incrementar Intentos Fallidos
     def increment_failed_attempts(self, user_id: int):
         """Increment failed login attempts"""
         with db_manager.get_connection() as conn:
@@ -285,6 +295,7 @@ class AuthService:
             
             conn.commit()
     
+    # Seguridad - Reiniciar Intentos Fallidos
     def reset_failed_attempts(self, user_id: int):
         """Reset failed login attempts"""
         with db_manager.get_connection() as conn:
@@ -295,6 +306,7 @@ class AuthService:
             """, (user_id,))
             conn.commit()
     
+    # Seguridad - Desbloquear Cuenta
     def unlock_account(self, user_id: int):
         """Unlock a locked account"""
         with db_manager.get_connection() as conn:
@@ -305,6 +317,7 @@ class AuthService:
             """, (user_id,))
             conn.commit()
     
+    # Usuario - Actualizar Ultimo Login
     def update_last_login(self, user_id: int):
         """Update user's last login time"""
         with db_manager.get_connection() as conn:
@@ -315,6 +328,7 @@ class AuthService:
             """, (datetime.now().isoformat(), user_id))
             conn.commit()
     
+    # Logging - Registrar Actividad de Usuario
     def log_activity(self, user_id: int, activity_type: str, details: Dict[str, Any]):
         """Log user activity"""
         try:
@@ -323,6 +337,7 @@ class AuthService:
         except Exception as e:
             logger.error(f"Error logging user activity: {e}")
 
+    # Contraseña - Recuperar Contraseña
     def forgot_password(self, username: str) -> Tuple[bool, Optional[str], Optional[str], Optional[str]]:
         """
         Generate a new random password for a user (password recovery).
@@ -382,6 +397,7 @@ class AuthService:
             logger.error(f"Password recovery error: {e}")
             return False, None, None, None
 
+    # Usuario - Actualizar Email
     def update_email(self, user_id: int, new_email: str) -> Tuple[bool, str]:
         """
         Update user email address
@@ -427,6 +443,7 @@ class AuthService:
             logger.error(f"Email update error: {e}")
             return False, security_features.sanitize_error_message(e)
     
+    # Contraseña - Actualizar Contraseña
     def update_password(self, user_id: int, current_password: str, new_password: str) -> Tuple[bool, str]:
         """
         Update user password
@@ -488,6 +505,7 @@ class AuthService:
             logger.error(f"Password update error: {e}")
             return False, security_features.sanitize_error_message(e)
     
+    # Sesion - Verificar Sesion
     def verify_session(self, session_token: str) -> Tuple[bool, Optional[Dict]]:
         """Verify if a session is valid and return user data"""
         try:
@@ -528,6 +546,7 @@ class AuthService:
 auth_service = AuthService()
 
 # Streamlit session state integration
+# Inicializacion - Inicializar Sesion de Autenticacion
 def init_auth_session():
     """Initialize authentication in Streamlit session state"""
     if 'auth_initialized' not in st.session_state:
@@ -535,6 +554,7 @@ def init_auth_session():
         st.session_state.user = None
         st.session_state.authenticated = False
 
+# Autenticacion - Iniciar Sesion de Usuario
 def login_user(username: str, password: str) -> Tuple[bool, str]:
     """Login user and store in session state"""
     init_auth_session()
@@ -549,6 +569,7 @@ def login_user(username: str, password: str) -> Tuple[bool, str]:
     else:
         return False, message
 
+# Autenticacion - Cerrar Sesion de Usuario
 def logout_user():
     """Logout user and clear session state"""
     init_auth_session()
@@ -560,6 +581,7 @@ def logout_user():
     st.session_state.authenticated = False
     st.session_state.session_token = None
 
+# Consulta - Obtener Usuario Actual
 def get_current_user() -> Optional[Dict]:
     """Get current authenticated user"""
     init_auth_session()
@@ -580,6 +602,7 @@ def get_current_user() -> Optional[Dict]:
     
     return st.session_state.user
 
+# Autenticacion - Requerir Autenticacion
 def require_auth():
     """Decorator to require authentication for pages"""
     user = get_current_user()

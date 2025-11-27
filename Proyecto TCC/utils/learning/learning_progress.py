@@ -2,6 +2,7 @@ import streamlit as st
 from core.progress_tracker import progress_tracker
 from utils.ui.icon_system import get_icon, replace_emojis
 
+# Progreso - Obtener Progreso de Niveles
 @st.cache_data(show_spinner=False, ttl=60)
 def get_level_progress(user_id):
     """Get current progress across all levels from database
@@ -27,6 +28,7 @@ def get_level_progress(user_id):
         st.error(f"Error getting progress: {e}")
         return 0, 0, {'nivel0': False, 'nivel1': False, 'nivel2': False, 'nivel3': False, 'nivel4': False}
 
+# UI - Mostrar Seccion de Aprendizaje
 def show_learning_section(total_progress, completed_count, progress):
     """Show the learning section with progress tracking"""
     st.markdown("---")
@@ -329,6 +331,7 @@ def show_learning_section(total_progress, completed_count, progress):
             del st.session_state.selected_template
         st.rerun()
 
+# UI - Mostrar Perfil de Usuario
 def show_user_profile_section(username, total_progress, completed_count, user_id):
     """Show user profile section with progress metrics"""
     st.markdown("---")
@@ -366,6 +369,7 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
             if st.button("❓ Ayuda", use_container_width=True):
                 st.switch_page("pages/00_Ayuda.py")
 
+# Base de Datos - Guardar Progreso de Nivel
 def save_level_progress(user_id, level_name, completed=True):
     """Save level completion progress to database"""
     try:
@@ -390,6 +394,7 @@ def save_level_progress(user_id, level_name, completed=True):
         st.error(f"Error saving progress: {e}")
         return False
 
+# Progreso - Reiniciar Todo el Progreso
 def reset_all_progress(user_id):
     """Reset all level progress to incomplete"""
     try:
@@ -415,6 +420,7 @@ def reset_all_progress(user_id):
         st.error(f"Error resetting progress: {e}")
         return False
 
+# UI - Mostrar Boton de Reinicio de Progreso
 def show_progress_reset_button(user_id):
     """Show a button to reset progress with confirmation"""
     st.markdown("---")
@@ -460,6 +466,7 @@ def show_progress_reset_button(user_id):
                 st.session_state.show_reset_confirmation = False
                 st.rerun()
 
+# UI - Mostrar Progreso Detallado
 def show_detailed_progress(user_id):
     """Show detailed progress information"""
     if st.session_state.get('show_detailed_progress', False):

@@ -11,9 +11,11 @@ from typing import Dict, List, Any, Optional, Union
 class DataValidation:
     """Data validation and quality checks"""
     
+    # Inicializacion - Inicializar Validacion de Datos
     def __init__(self, df: pd.DataFrame):
         self.df = df.copy()
     
+    # Analisis - Analizar Valores Faltantes
     def analyze_missing_values(self) -> Dict[str, Any]:
         """Analyze missing values in the dataset"""
         missing_info = {}
@@ -31,6 +33,7 @@ class DataValidation:
         
         return missing_info
     
+    # Limpieza - Llenar Valores Faltantes
     def fill_missing_values(self, method: str = 'auto', 
                            columns: Optional[List[str]] = None,
                            custom_values: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
@@ -83,6 +86,7 @@ class DataValidation:
         
         return df_filled
     
+    # Limpieza - Remover Duplicados
     def remove_duplicates(self, subset: Optional[List[str]] = None, 
                          keep: str = 'first') -> pd.DataFrame:
         """
@@ -98,6 +102,7 @@ class DataValidation:
         
         return df_no_duplicates, removed_count
     
+    # Analisis - Detectar Outliers
     def detect_outliers(self, columns: Optional[List[str]] = None, 
                        method: str = 'iqr', 
                        threshold: float = 1.5) -> Dict[str, Any]:
@@ -145,6 +150,7 @@ class DataValidation:
         
         return outliers_info
     
+    # Analisis - Analizar Tipos de Datos
     def analyze_data_types(self) -> Dict[str, Any]:
         """Analyze data types and suggest optimizations"""
         type_info = {}
@@ -180,6 +186,7 @@ class DataValidation:
         
         return type_info
     
+    # Validacion - Validar Calidad de Datos
     def validate_data_quality(self) -> Dict[str, Any]:
         """Comprehensive data quality validation"""
         quality_report = {
@@ -220,6 +227,7 @@ class DataValidation:
         
         return quality_report
     
+    # Sugerencias - Sugerir Acciones de Limpieza
     def suggest_cleaning_actions(self, quality_report: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Suggest cleaning actions based on quality report"""
         suggestions = []
@@ -268,6 +276,7 @@ class DataValidation:
         
         return suggestions
     
+    # Estadisticas - Obtener Estadisticas de Columnas
     def get_column_statistics(self, columns: Optional[List[str]] = None) -> Dict[str, Any]:
         """Get detailed statistics for columns"""
         if columns is None:

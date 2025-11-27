@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+# Visualizacion - Crear Grafico de Series Temporales
 def create_time_series_chart(df, metric=None):
     """Crear visualización de series temporales de forma flexible"""
     # Buscar columnas de fecha
@@ -58,6 +59,7 @@ def create_time_series_chart(df, metric=None):
     except:
         return None
 
+# Visualizacion - Crear Analisis por Categoria
 def create_category_analysis(df):
     """Crear gráficos de análisis por categoría de forma flexible"""
     # Buscar columnas categóricas
@@ -85,6 +87,7 @@ def create_category_analysis(df):
     except:
         return None
 
+# Visualizacion - Crear Analisis Regional
 def create_regional_analysis(df):
     """Crear visualización de rendimiento regional de forma flexible"""
     # Buscar columnas categóricas (excluyendo la primera que ya se usó en category_analysis)
@@ -112,6 +115,7 @@ def create_regional_analysis(df):
     except:
         return None
 
+# Visualizacion - Crear Matriz de Correlacion
 def create_correlation_matrix(df, columns=None):
     """Crear matriz de correlación de forma flexible"""
     if columns is None:
@@ -135,6 +139,7 @@ def create_correlation_matrix(df, columns=None):
     except:
         return None
 
+# Visualizacion - Crear Graficos de Calculos Personalizados
 def create_custom_calculation_charts(df, custom_calculations):
     """Crear gráficos para cálculos personalizados"""
     charts = []

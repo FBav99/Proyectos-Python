@@ -15,10 +15,12 @@ from utils.ui.icon_system import get_icon, replace_emojis
 # Configure error handling
 configure_streamlit_error_handling()
 
+# Seguridad - Generar Estado OAuth
 def generate_state():
     """Generate a random state parameter for OAuth security"""
     return secrets.token_urlsafe(32)
 
+# Seguridad - Generar PKCE (Deprecated)
 def generate_pkce():
     """(Deprecated in this app) Kept for compatibility, but PKCE is not used now."""
     code_verifier = secrets.token_urlsafe(32)
@@ -27,6 +29,7 @@ def generate_pkce():
     ).decode().rstrip('=')
     return code_verifier, code_challenge
 
+# Principal - Login OAuth
 @safe_main
 def main():
     """Página de login con OAuth (Google/Microsoft)"""
@@ -130,6 +133,7 @@ def main():
         if st.button("❓ Ayuda", use_container_width=True):
             st.switch_page("pages/00_Ayuda.py")
 
+# UI - Mostrar Formulario de Login Local
 def show_local_login():
     """Show local login form"""
     with st.form("local_login_form"):
@@ -151,6 +155,7 @@ def show_local_login():
         else:
             st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
 
+# OAuth - Manejar Flujo de Google
 def handle_google_oauth():
     """Handle Google OAuth flow"""
     try:
@@ -200,6 +205,7 @@ def handle_google_oauth():
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Google OAuth: {str(e)}", unsafe_allow_html=True)
 
+# OAuth - Manejar Flujo de Microsoft
 def handle_microsoft_oauth():
     """Handle Microsoft OAuth flow"""
     try:
@@ -244,6 +250,7 @@ def handle_microsoft_oauth():
     except Exception as e:
         st.markdown(f"{get_icon("❌", 20)} Error en Microsoft OAuth: {str(e)}", unsafe_allow_html=True)
 
+# OAuth - Manejar Callback y Token
 def handle_oauth_callback():
     """Handle OAuth callback and token exchange"""
     # Check if we're in a callback
@@ -305,6 +312,7 @@ def handle_oauth_callback():
     
     return False  # No callback to handle
 
+# OAuth - Callback de Google
 def handle_google_callback(code):
     """Handle Google OAuth callback"""
     try:
@@ -358,6 +366,7 @@ def handle_google_callback(code):
         st.markdown(f"{get_icon("❌", 20)} Error en callback de Google: {str(e)}", unsafe_allow_html=True)
         return False
 
+# OAuth - Callback de Microsoft
 def handle_microsoft_callback(code):
     """Handle Microsoft OAuth callback"""
     try:
@@ -411,18 +420,21 @@ def handle_microsoft_callback(code):
         st.markdown(f"{get_icon("❌", 20)} Error en callback de Microsoft: {str(e)}", unsafe_allow_html=True)
         return False
 
+# OAuth - Obtener Info de Usuario Google
 def get_google_user_info(access_token):
     """Get user info from Google"""
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get('https://www.googleapis.com/oauth2/v2/userinfo', headers=headers)
     return response.json()
 
+# OAuth - Obtener Info de Usuario Microsoft
 def get_microsoft_user_info(access_token):
     """Get user info from Microsoft"""
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get('https://graph.microsoft.com/v1.0/me', headers=headers)
     return response.json()
 
+# Usuario - Crear Usuario OAuth
 def create_oauth_user(user_info, provider):
     """Create or update user in local config from OAuth info"""
     try:

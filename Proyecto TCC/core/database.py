@@ -174,6 +174,7 @@ if POSTGRES_AVAILABLE:
             return _POOL_CACHE[connection_string]
 
 # Detectar tipo de base de datos desde secrets (Streamlit Cloud)
+# Consulta - Obtener Tipo de Base de Datos
 def get_db_type():
     """Detecta el tipo de base de datos desde secrets"""
     try:
@@ -183,6 +184,7 @@ def get_db_type():
     except:
         return "sqlite"  # Default a SQLite
 
+# Consulta - Obtener Connection String de Supabase
 def get_supabase_connection_string():
     """Obtiene el connection string de Supabase desde secrets"""
     try:
@@ -203,6 +205,7 @@ class DatabaseManager:
     conexiones, creación de tablas, y operaciones CRUD básicas.
     """
     
+    # Inicializacion - Inicializar Gestor de Base de Datos
     def __init__(self, db_path: str = DB_PATH):
         """Inicializa el gestor de base de datos con la ruta especificada"""
         self.db_path = db_path
@@ -216,12 +219,14 @@ class DatabaseManager:
             logger.warning("Instala con: pip install psycopg2-binary")
             self.db_type = "sqlite"
     
+    # Inicializacion - Asegurar Directorio de Migraciones
     def ensure_migrations_dir(self):
         """Asegura que el directorio de migraciones existe"""
         if not os.path.exists(MIGRATIONS_DIR):
             os.makedirs(MIGRATIONS_DIR)
             logger.info(f"Created migrations directory: {MIGRATIONS_DIR}")
     
+    # Base de Datos - Ejecutar SQL
     def _execute_sql(self, conn, sql):
         """Helper method to execute SQL for both SQLite and PostgreSQL"""
         if self.db_type == "supabase":
@@ -231,12 +236,14 @@ class DatabaseManager:
         else:
             return conn.execute(sql)
     
+    # Base de Datos - Obtener Literal Booleano
     def get_boolean_literal(self, value: bool) -> str:
         """Return boolean literal suitable for current database backend"""
         if self.db_type == "supabase":
             return "TRUE" if value else "FALSE"
         return "1" if value else "0"
     
+    # Conexion - Obtener Conexion a Base de Datos
     @contextmanager
     def get_connection(self):
         """Get database connection with proper configuration (SQLite or PostgreSQL)"""
@@ -281,6 +288,7 @@ class DatabaseManager:
             finally:
                 conn.close()
     
+    # Inicializacion - Inicializar Base de Datos
     def init_database(self):
         """Initialize database with essential tables including file uploads"""
         logger.info("Initializing database with essential tables...")
@@ -309,6 +317,7 @@ class DatabaseManager:
         
         logger.info("Database initialization completed with essential tables and file uploads")
     
+    # Tabla - Crear Tabla de Usuarios
     def create_users_table(self):
         """Create users table"""
         with self.get_connection() as conn:
@@ -357,6 +366,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Sesiones
     def create_user_sessions_table(self):
         """Create user sessions table"""
         with self.get_connection() as conn:
@@ -392,6 +402,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Progreso
     def create_user_progress_table(self):
         """Create user progress table"""
         with self.get_connection() as conn:
@@ -431,6 +442,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Intentos de Quiz
     def create_quiz_attempts_table(self):
         """Create quiz attempts table"""
         with self.get_connection() as conn:
@@ -468,6 +480,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Respuestas de Quiz
     def create_quiz_answers_table(self):
         """Create quiz answers table"""
         with self.get_connection() as conn:
@@ -501,6 +514,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Logros
     def create_achievements_table(self):
         """Create achievements table (optional - for future gamification)"""
         with self.get_connection() as conn:
@@ -532,6 +546,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Archivos Subidos
     def create_uploaded_files_table(self):
         """Create uploaded files table"""
         with self.get_connection() as conn:
@@ -571,6 +586,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Sesiones de Analisis
     def create_file_analysis_sessions_table(self):
         """Create file analysis sessions table"""
         with self.get_connection() as conn:
@@ -608,6 +624,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Dashboards
     def create_dashboards_table(self):
         """Create dashboards table"""
         with self.get_connection() as conn:
@@ -643,6 +660,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Componentes de Dashboard
     def create_dashboard_components_table(self):
         """Create dashboard components table"""
         with self.get_connection() as conn:
@@ -680,6 +698,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Log de Actividad
     def create_user_activity_log_table(self):
         """Create user activity log table (optional - for security auditing)"""
         with self.get_connection() as conn:
@@ -713,6 +732,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Metricas del Sistema
     def create_system_metrics_table(self):
         """Create system metrics table"""
         with self.get_connection() as conn:
@@ -742,6 +762,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Rate Limiting
     def create_rate_limiting_table(self):
         """Create rate limiting table"""
         with self.get_connection() as conn:
@@ -769,6 +790,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Tabla - Crear Tabla de Respuestas de Encuestas
     def create_survey_responses_table(self):
         """Create survey responses table for all survey types"""
         with self.get_connection() as conn:
@@ -802,6 +824,7 @@ class DatabaseManager:
                 """)
             conn.commit()
     
+    # Indice - Crear Indices de Base de Datos
     def create_indexes(self):
         """Create database indexes for performance"""
         with self.get_connection() as conn:
@@ -844,6 +867,7 @@ class DatabaseManager:
             
             conn.commit()
     
+    # Consulta - Verificar Existencia de Base de Datos
     def check_database_exists(self) -> bool:
         """Check if database exists (SQLite file or PostgreSQL connection)"""
         if self.db_type == "supabase":
@@ -882,6 +906,7 @@ class DatabaseManager:
                 # If we can't connect, database might be corrupted or locked
                 return False
     
+    # Inicializacion - Asegurar Inicializacion de Base de Datos
     def ensure_database_initialized(self):
         """Ensure database is initialized - creates it if it doesn't exist or is incomplete"""
         if not self.check_database_exists():
@@ -893,6 +918,7 @@ class DatabaseManager:
                 logger.error(f"Error initializing database: {e}")
                 raise
     
+    # Consulta - Obtener Informacion de Base de Datos
     def get_database_info(self) -> Dict[str, Any]:
         """Get database information"""
         if not self.check_database_exists():
@@ -948,6 +974,7 @@ db_manager = DatabaseManager()
 # Using a module-level flag to prevent multiple initializations
 _db_initialized = False
 
+# Inicializacion - Auto Inicializar Base de Datos
 def _auto_init_database():
     """Auto-initialize database when module is imported"""
     global _db_initialized
@@ -969,22 +996,27 @@ def _auto_init_database():
 # Run auto-initialization (only once)
 _auto_init_database()
 
+# Conexion - Obtener Conexion (Compatibilidad)
 def get_db_connection():
     """Get database connection (for backward compatibility)"""
     return db_manager.get_connection()
 
+# Inicializacion - Inicializar Base de Datos (Compatibilidad)
 def init_database():
     """Initialize database (for backward compatibility)"""
     return db_manager.init_database()
 
+# Consulta - Verificar Existencia (Compatibilidad)
 def check_database_exists():
     """Check if database exists (for backward compatibility)"""
     return db_manager.check_database_exists()
 
+# Inicializacion - Asegurar Inicializacion (Compatibilidad)
 def ensure_database_initialized():
     """Ensure database is initialized - creates it if it doesn't exist or is incomplete"""
     return db_manager.ensure_database_initialized()
 
+# Consulta - Obtener Informacion (Compatibilidad)
 def get_database_info():
     """Get database info (for backward compatibility)"""
     return db_manager.get_database_info()

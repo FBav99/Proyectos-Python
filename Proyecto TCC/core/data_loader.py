@@ -4,6 +4,7 @@ import streamlit as st
 
 from utils.ui.icon_system import get_icon, replace_emojis
 from utils.data.data_handling import load_excel_with_sheet_selection
+# Datos - Cargar Datos de Muestra
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_sample_data():
     """Generar conjunto de datos de muestra para demostración"""
@@ -29,6 +30,7 @@ def load_sample_data():
     
     return df.sort_values('Date').reset_index(drop=True)
 
+# Archivo - Cargar Archivo Subido
 def load_uploaded_file(uploaded_file):
     """Cargar archivo subido por el usuario"""
     try:
@@ -53,6 +55,7 @@ def load_uploaded_file(uploaded_file):
         st.sidebar.error(f"Error al cargar archivo: {str(e)}")
         return None
 
+# Datos - Obtener Datos de Archivo o Muestra
 def get_data(uploaded_file):
     """Obtener datos del archivo subido o usar datos de muestra"""
     if uploaded_file is not None:

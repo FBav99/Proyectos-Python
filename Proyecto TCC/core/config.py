@@ -12,6 +12,7 @@ import streamlit as st
 # PAGE CONFIGURATION
 # ============================================================================
 
+# Configuracion - Configurar Pagina
 def setup_page_config():
     """Configura la página principal de Streamlit con título, icono y layout"""
     st.set_page_config(
@@ -52,6 +53,7 @@ CUSTOM_CSS = """
 </style>
 """
 
+# Estilo - Aplicar CSS Personalizado
 def apply_custom_css():
     """
     Aplica los estilos CSS personalizados a la aplicación.

@@ -99,6 +99,7 @@ DASHBOARD_CUSTOM_CSS = """
 """
 
 
+# Archivo - Cargar DataFrame Subido
 def load_uploaded_dataframe(uploaded_file):
     """Carga un archivo subido por el usuario y devuelve un DataFrame."""
     from utils.data.data_handling import load_excel_with_sheet_selection
@@ -109,6 +110,7 @@ def load_uploaded_dataframe(uploaded_file):
     return df if df is not None else pd.DataFrame()
 
 
+# Analisis - Analizar Columnas del Dataset
 def analyze_dataset_columns(df):
     """Analiza columnas del dataset y las organiza según su uso recomendado."""
     id_columns = [col for col in df.columns if 'id' in col.lower()]
@@ -154,6 +156,7 @@ def analyze_dataset_columns(df):
     }
 
 
+# UI - Seleccionar Datos del Dashboard
 def select_dashboard_data():
     """Gestiona la selección de datos para el dashboard y devuelve el DataFrame activo."""
     st.markdown("### 📂 Selecciona o carga tus datos")
@@ -241,6 +244,7 @@ def select_dashboard_data():
     return current_df
 
 
+# Cache - Obtener Dashboards del Usuario
 def get_cached_user_dashboards():
     """Retorna dashboards guardados para el usuario autenticado utilizando caché local."""
     user_id = st.session_state.get('auth_user_id')
@@ -254,6 +258,7 @@ def get_cached_user_dashboards():
     return st.session_state.get('cached_user_dashboards', [])
 
 
+# UI - Mostrar Panel de Dashboards Guardados
 def render_saved_dashboards_panel():
     """Muestra un panel con dashboards guardados antes de seleccionar los datos."""
     user_id = st.session_state.get('auth_user_id')
@@ -305,6 +310,7 @@ def render_saved_dashboards_panel():
                         st.rerun()
 
 
+# UI - Controles Rapidos de Construccion
 def render_inline_builder_controls(df):
     """Renderiza controles rápidos para agregar componentes sin depender del sidebar."""
     st.markdown("### 🧱 Construye tu dashboard")
@@ -366,6 +372,7 @@ def render_inline_builder_controls(df):
             st.rerun()
 
 
+# Plantilla - Construir Componente de Plantilla
 def build_component_template(component_type, df, *, title=None, layout=None, overrides=None):
     """Crea un componente listo para usarse dentro de una plantilla."""
     config = get_default_config(component_type, df) or {}
@@ -381,6 +388,7 @@ def build_component_template(component_type, df, *, title=None, layout=None, ove
     }
 
 
+# Plantilla - Construir Plantilla Ejecutiva
 def build_executive_template(df):
     """Crea una plantilla con KPIs superiores y visualizaciones principales."""
     columns_info = analyze_dataset_columns(df)
@@ -460,6 +468,7 @@ def build_executive_template(df):
     return components
 
 
+# Plantilla - Construir Plantilla de Rendimiento
 def build_performance_template(df):
     """Plantilla enfocada en rendimiento con correlaciones y comparativas."""
     columns_info = analyze_dataset_columns(df)
@@ -550,6 +559,7 @@ def build_performance_template(df):
     return components
 
 
+# Plantilla - Construir Plantilla Operativa
 def build_operations_template(df):
     """Plantilla con enfoque operativo y análisis de distribución."""
     columns_info = analyze_dataset_columns(df)
@@ -617,6 +627,7 @@ def build_operations_template(df):
     return components
 
 
+# Cache - Obtener Plantillas de Dashboard
 @st.cache_resource
 def get_dashboard_templates(df):
     """Retorna la configuración de plantillas disponibles.
@@ -649,6 +660,7 @@ def get_dashboard_templates(df):
     ]
 
 
+# Estado - Limpiar Layout del Dashboard
 def clear_dashboard_layout():
     """Reinicia el dashboard a un lienzo en blanco."""
     st.session_state.dashboard_components = []
@@ -662,6 +674,7 @@ def clear_dashboard_layout():
     st.session_state.dashboards_cache_dirty = True
 
 
+# Plantilla - Aplicar Plantilla al Dashboard
 def apply_dashboard_template(template_config, df, *, data_label=None, force_rerun=False):
     """Aplica una plantilla al dashboard actual."""
     components = template_config["builder"](df)
@@ -679,6 +692,7 @@ def apply_dashboard_template(template_config, df, *, data_label=None, force_reru
         st.rerun()
 
 
+# UI - Mostrar Galeria de Plantillas
 def render_template_gallery(df, *, show_header=True):
     """Muestra las plantillas disponibles y opciones para aplicarlas."""
     if show_header:
@@ -724,6 +738,7 @@ def render_template_gallery(df, *, show_header=True):
 
         st.markdown("---")
 
+# Principal - Dashboard en Blanco
 @safe_main
 def main():
     """Dashboard en Blanco - Construcción Manual"""

@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+# Calculo - Calcular Metricas Clave
 def calculate_metrics(df):
     """Calcular métricas clave del negocio de forma flexible"""
     metrics = {}
@@ -38,6 +39,7 @@ def calculate_metrics(df):
     
     return metrics
 
+# Calculo - Calcular Metricas de Crecimiento
 def calculate_growth_metrics(df):
     """Calcular métricas de crecimiento de forma flexible"""
     metrics = {}
@@ -83,6 +85,7 @@ def calculate_growth_metrics(df):
     
     return metrics
 
+# Calculo - Calcular Perspectivas de Rendimiento
 def calculate_performance_insights(df):
     """Calcular perspectivas de rendimiento de forma flexible"""
     insights = []

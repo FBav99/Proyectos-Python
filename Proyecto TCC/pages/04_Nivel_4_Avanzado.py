@@ -30,19 +30,20 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 
 # Helper functions are now imported from utils.level_components and utils.level_data
 
+# Principal - Nivel 4 Avanzado
 @safe_main
 def main():
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     current_user = init_sidebar()
     
-    # Check if user is authenticated
+    # Validacion - Verificar Autenticacion de Usuario
     if not current_user:
         st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
-    # Get current user
+    # Usuario - Obtener Usuario Actual
     user = current_user
     if not user or 'id' not in user:
         st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
@@ -64,7 +65,7 @@ def main():
         st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Verificar que los niveles anteriores estén completados
+    # Validacion - Verificar Niveles Anteriores Completados
     if not all([progress['nivel1'], progress['nivel2'], progress['nivel3']]):
         st.warning("⚠️ Primero debes completar los Niveles 1, 2 y 3 antes de continuar con este nivel.")
         if st.button("Ir al Nivel 1", type="primary"):
@@ -85,7 +86,7 @@ def main():
     st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("¡Felicidades! Has llegado al nivel más avanzado. Ahora que dominas **conceptos básicos** (Nivel 0), **preparación de datos** (Nivel 1), **filtros** (Nivel 2) y **métricas** (Nivel 3), en este nivel aprenderás a crear cálculos personalizados, generar visualizaciones interactivas y crear dashboards completos para presentar tu información de manera profesional.")
     
-    # Add connection to all previous levels
+    # UI - Agregar Conexion con Todos los Niveles Anteriores
     create_info_box(
         "success-box",
         replace_emojis("🎓 Resumen de tu Jornada de Aprendizaje"),
@@ -181,16 +182,16 @@ def main():
     # 5. Practical Example Section
     st.header(replace_emojis("💡 Ejemplo Práctico: Dashboard Avanzado"))
     
-    # Show data quality insight for this level
+    # UI - Mostrar Insight de Calidad de Datos
     create_data_quality_insight('nivel4', 'clean')
     
-    # Create sample data
+    # Datos - Crear Datos de Muestra
     df = create_sample_data('clean')  # Use clean data for Level 4
     
-    # Show data overview
+    # UI - Mostrar Resumen de Datos
     st.subheader(replace_emojis("📊 Datos de Ejemplo"))
     
-    # Show how all concepts come together
+    # UI - Mostrar Integracion de Conceptos
     create_info_box(
         "info-box",
         "🔗 Todos los Conceptos se Unen Aquí",
@@ -199,15 +200,15 @@ def main():
     
     st.dataframe(df.head(10), use_container_width=True)
     
-    # Advanced calculations
+    # Calculo - Mostrar Calculos Avanzados
     st.subheader(replace_emojis("🔢 Cálculos Avanzados"))
     
-    # Calculate advanced metrics
+    # Calculo - Calcular Metricas Avanzadas
     df['Margen_Ganancia'] = ((df['Ventas'] - (df['Ventas'] * 0.6)) / df['Ventas'] * 100).round(2)
     df['Ingresos_Totales'] = df['Ventas'] * df['Cantidad']
     df['Eficiencia_Ventas'] = (df['Ingresos_Totales'] / df['Cantidad']).round(2)
     
-    # Show calculated metrics
+    # UI - Mostrar Metricas Calculadas
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -226,10 +227,10 @@ def main():
         avg_efficiency = df['Eficiencia_Ventas'].mean()
         st.metric("⚡ Eficiencia Promedio", f"${avg_efficiency:.2f}")
     
-    # Interactive visualizations
+    # UI - Mostrar Visualizaciones Interactivas
     st.subheader(replace_emojis("📊 Visualizaciones Interactivas"))
     
-    # Filter controls
+    # UI - Mostrar Controles de Filtros
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -241,7 +242,7 @@ def main():
     with col3:
         selected_regions = st.multiselect("Regiones", df['Region'].unique(), default=df['Region'].unique())
     
-    # Apply filters
+    # Filtro - Aplicar Filtros
     filtered_df = df[
         (df['Ventas'] >= min_sales) &
         (df['Categoria'].isin(selected_categories)) &
@@ -331,7 +332,7 @@ def main():
     
     st.markdown("Ahora puedes crear tu propio dashboard personalizado. Selecciona las métricas y visualizaciones que quieras incluir.")
     
-    # Dashboard configuration
+    # Dashboard - Configurar Dashboard
     col1, col2 = st.columns(2)
     
     with col1:
@@ -348,7 +349,7 @@ def main():
         show_trends = st.checkbox(replace_emojis("📈 Análisis de Tendencias"), value=True)
         show_correlation = st.checkbox("🔗 Matriz de Correlación", value=True)
     
-    # Generate custom dashboard
+    # Dashboard - Generar Dashboard Personalizado
     if st.button("🚀 Generar Dashboard Personalizado", type="primary"):
         st.subheader(replace_emojis("🎯 Tu Dashboard Personalizado"))
         
@@ -393,20 +394,20 @@ def main():
     st.markdown("### Pon a prueba tus conocimientos")
     st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
-    # Check if user passed the quiz
+    # Validacion - Verificar si Usuario Aprobo Quiz
     quiz_passed = st.session_state.get(f'quiz_nivel4_passed', False)
     quiz_completed = st.session_state.get(f'quiz_nivel4_completed', False)
     
-    # Always show quiz and results if quiz is completed (whether passed or not)
-    # This ensures results are always visible after completing the quiz
+    # UI - Mostrar Quiz y Resultados si esta Completado
+    # UI - Asegurar que Resultados sean Visibles Despues del Quiz
     from core.quiz_system import create_quiz
     create_quiz('nivel4', user['username'])
     
-    # Show passed message if quiz is passed
+    # UI - Mostrar Mensaje de Aprobacion si Quiz Aprobado
     if quiz_passed:
         st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     
-    # Check if quiz was just completed and passed (for first-time completion)
+    # Validacion - Verificar si Quiz Fue Completado y Aprobado Recientemente
     if quiz_completed and not quiz_passed:
         score = st.session_state.get(f'quiz_nivel4_score', 0)
         if score >= 3:
@@ -418,7 +419,7 @@ def main():
     # 8. Navigation or next steps
     st.header(replace_emojis("✅ Verificación del Nivel"))
     
-    # Only allow marking as complete if quiz is passed
+    # Validacion - Permitir Marcar Completado solo si Quiz Aprobado
     if not quiz_passed:
         st.warning("⚠️ Debes aprobar el quiz antes de poder marcar el nivel como completado.")
         nivel4_completed = False

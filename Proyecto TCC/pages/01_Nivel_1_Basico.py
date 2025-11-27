@@ -27,19 +27,20 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 
 # Helper functions are now imported from utils.level_components and utils.level_data
 
+# Principal - Nivel 1 Basico
 @safe_main
 def main():
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     current_user = init_sidebar()
     
-    # Check if user is authenticated
+    # Validacion - Verificar Autenticacion de Usuario
     if not current_user:
         st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
-    # Get current user
+    # Usuario - Obtener Usuario Actual
     user = current_user
     if not user or 'id' not in user:
         st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
@@ -61,7 +62,7 @@ def main():
         st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Verificar que el nivel anterior esté completado
+    # Validacion - Verificar Nivel Anterior Completado
     if not progress.get('nivel0', False):
         st.warning("⚠️ Primero debes completar el Nivel 0 (Introducción) antes de continuar con este nivel.")
         if st.button("Ir al Nivel 0", type="primary"):
@@ -82,7 +83,7 @@ def main():
     st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("Ahora que ya entiendes **qué son los datos** y **cómo se organizan** (como aprendiste en el Nivel 0), en este nivel aprenderás los pasos prácticos para preparar y cargar datos correctamente en herramientas de análisis. Es el primer paso técnico para trabajar con datos reales.")
     
-    # Add connection to previous level
+    # UI - Agregar Conexion con Nivel Anterior
     create_info_box(
         "info-box",
         "🔗 Conectando con el Nivel 0",
@@ -223,7 +224,7 @@ def main():
         }
     )
     
-    # Example section
+    # UI - Mostrar Seccion de Ejemplo
     st.header(replace_emojis("🎯 Ejemplo Práctico"))
     
     create_info_box(
@@ -232,7 +233,7 @@ def main():
         "<p>Te mostraré cómo preparar datos correctamente y qué verificar después de cargarlos.</p>"
     )
     
-    # Show data quality insight for this level
+    # UI - Mostrar Insight de Calidad de Datos
     create_data_quality_insight('nivel1', 'dirty')
     
     df = create_sample_data('dirty')  # Use dirty data for Level 1
@@ -264,7 +265,7 @@ def main():
             st.markdown(replace_emojis("**📅 datetime64:** Fechas y horas"), unsafe_allow_html=True)
             st.markdown(replace_emojis("**✅ bool:** Verdadero o Falso"), unsafe_allow_html=True)
     
-    # Show dirty vs clean data comparison
+    # UI - Mostrar Comparacion de Datos Sucios vs Limpios
     st.subheader(replace_emojis("🔄 Comparación: Datos Sin Procesar vs Datos Limpios"))
     
     create_info_box(
@@ -318,7 +319,7 @@ def main():
         for improvement in improvements:
             st.markdown(f"- {improvement}")
     
-    # Show the impact
+    # UI - Mostrar Impacto de Limpieza
     st.markdown(replace_emojis("**📈 Impacto de la limpieza:**"), unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
@@ -334,7 +335,7 @@ def main():
         st.metric("Calidad general", "75%", "25%")
         st.metric("Calidad mejorada", "95%", "20%")
     
-    # Tips section
+    # UI - Mostrar Seccion de Tips
     st.header(replace_emojis("💡 Consejos Importantes"))
     
     with st.container():
@@ -353,7 +354,7 @@ def main():
         st.markdown("- **Verifica la calidad:** Siempre revisa que los datos se cargaron sin errores")
         st.markdown("- **Mantén copias de seguridad:** Guarda una copia de tus datos originales")
     
-    # Practice activity
+    # UI - Mostrar Actividad de Practica
     st.header(replace_emojis("🎯 Actividad Práctica"))
     with st.container():
         st.markdown(replace_emojis("### 📝 Ejercicio para practicar la preparación de datos:"), unsafe_allow_html=True)
@@ -364,13 +365,13 @@ def main():
         st.markdown("5. **Verifica la calidad:** Revisa que no haya errores, datos faltantes o inconsistencias")
         st.markdown("6. **Guarda correctamente:** Guarda en el formato que elegiste (.csv o .xlsx)")
     
-    # Data upload and testing section
+    # UI - Mostrar Seccion de Carga y Prueba de Datos
     st.header(replace_emojis("📤 Prueba lo que Aprendiste"))
     with st.container():
         st.markdown(replace_emojis("### 🚀 Sube tu propio archivo de datos"), unsafe_allow_html=True)
         st.markdown("Ahora puedes poner en práctica lo que aprendiste. Sube un archivo CSV o Excel para ver cómo se cargan y analizan los datos.")
     
-    # File uploader
+    # UI - Mostrar Cargador de Archivos
     uploaded_file = st.file_uploader(
         "Selecciona tu archivo de datos",
         type=['csv', 'xlsx', 'xls'],
@@ -550,20 +551,20 @@ def main():
     st.markdown("### Pon a prueba tus conocimientos")
     st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
-    # Check if user passed the quiz
+    # Validacion - Verificar si Usuario Aprobo Quiz
     quiz_passed = st.session_state.get(f'quiz_nivel1_passed', False)
     quiz_completed = st.session_state.get(f'quiz_nivel1_completed', False)
     
-    # Always show quiz and results if quiz is completed (whether passed or not)
-    # This ensures results are always visible after completing the quiz
+    # UI - Mostrar Quiz y Resultados si esta Completado
+    # UI - Asegurar que Resultados sean Visibles Despues del Quiz
     from core.quiz_system import create_quiz
     create_quiz('nivel1', user['username'])
     
-    # Show passed message if quiz is passed
+    # UI - Mostrar Mensaje de Aprobacion si Quiz Aprobado
     if quiz_passed:
         st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     
-    # Check if quiz was just completed and passed (for first-time completion)
+    # Validacion - Verificar si Quiz Fue Completado y Aprobado Recientemente
     if quiz_completed and not quiz_passed:
         score = st.session_state.get(f'quiz_nivel1_score', 0)
         if score >= 3:
@@ -575,7 +576,7 @@ def main():
     # 7. Navigation or next steps
     st.header(replace_emojis("✅ Verificación del Nivel"))
     
-    # Only allow marking as complete if quiz is passed
+    # Validacion - Permitir Marcar Completado solo si Quiz Aprobado
     if not quiz_passed:
         st.warning("⚠️ Debes aprobar el quiz antes de poder marcar el nivel como completado.")
         nivel1_completed = False
@@ -614,7 +615,7 @@ def main():
             st.session_state.survey_level = 'nivel1'
             st.switch_page("pages/99_Survey_Nivel.py")
     
-    # Additional resources
+    # UI - Mostrar Recursos Adicionales
     create_info_box(
         "info-box",
         replace_emojis("📚 ¿Quieres saber más?"),

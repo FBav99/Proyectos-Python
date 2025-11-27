@@ -38,6 +38,7 @@ st.set_page_config(
     layout="wide"
 )
 
+# Principal - Pagina de Ayuda
 @safe_main
 def main():
     # Initialize sidebar with user info (always visible)

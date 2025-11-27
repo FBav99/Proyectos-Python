@@ -28,19 +28,20 @@ st.markdown(load_level_styles(), unsafe_allow_html=True)
 
 # Sample data functions are now imported from utils.level_data
 
+# Principal - Nivel 2 Filtros
 @safe_main
 def main():
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     current_user = init_sidebar()
     
-    # Check if user is authenticated
+    # Validacion - Verificar Autenticacion de Usuario
     if not current_user:
         st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a este nivel."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
             st.switch_page("Inicio.py")
         return
     
-    # Get current user
+    # Usuario - Obtener Usuario Actual
     user = current_user
     if not user or 'id' not in user:
         st.markdown(replace_emojis("❌ Error: No se pudo obtener la información del usuario."), unsafe_allow_html=True)
@@ -62,7 +63,7 @@ def main():
         st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Verificar que el nivel anterior esté completado
+    # Validacion - Verificar Nivel Anterior Completado
     if not progress['nivel1']:
         st.warning("⚠️ Primero debes completar el Nivel 1 antes de continuar con este nivel.")
         if st.button("Ir al Nivel 1", type="primary"):
@@ -83,7 +84,7 @@ def main():
     st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("Ahora que ya sabes **preparar y cargar datos** correctamente (como aprendiste en el Nivel 1), en este nivel aprenderás a usar filtros para encontrar exactamente la información que necesitas. Los filtros te ayudan a organizar y analizar datos de manera más efectiva.")
     
-    # Add connection to previous level
+    # UI - Agregar Conexion con Nivel Anterior
     create_info_box(
         "info-box",
         "🔗 Conectando con el Nivel 1",
@@ -191,7 +192,7 @@ def main():
         }
     )
     
-    # Example section
+    # UI - Mostrar Seccion de Ejemplo
     st.header(replace_emojis("🎯 Ejemplo Práctico"))
     
     create_info_box(
@@ -200,10 +201,10 @@ def main():
         "<p>Te mostraré cómo aplicar diferentes tipos de filtros y ver cómo cambian los resultados.</p>"
     )
     
-    # Show data quality insight for this level
+    # UI - Mostrar Insight de Calidad de Datos
     create_data_quality_insight('nivel2', 'clean')
     
-    # Show data transformation
+    # UI - Mostrar Transformacion de Datos
     create_info_box(
         "success-box",
         "✨ Transformación de Datos Completada",
@@ -277,31 +278,31 @@ def main():
             value=1
         )
     
-    # Aplicar filtros
+    # Filtro - Aplicar Filtros
     df_filtrado = df.copy()
     
-    # Filtro de fechas
+    # Filtro - Aplicar Filtro de Fechas
     df_filtrado = df_filtrado[
         (df_filtrado['Fecha'].dt.date >= fecha_inicio) &
         (df_filtrado['Fecha'].dt.date <= fecha_fin)
     ]
     
-    # Filtro de categoría
+    # Filtro - Aplicar Filtro de Categoria
     if categoria_seleccionada != 'Todas':
         df_filtrado = df_filtrado[df_filtrado['Categoria'] == categoria_seleccionada]
     
-    # Filtro de región
+    # Filtro - Aplicar Filtro de Region
     if region_seleccionada != 'Todas':
         df_filtrado = df_filtrado[df_filtrado['Region'] == region_seleccionada]
     
-    # Filtros numéricos
+    # Filtro - Aplicar Filtros Numericos
     df_filtrado = df_filtrado[
         (df_filtrado['Ventas'] >= ventas_min) &
         (df_filtrado['Ventas'] <= ventas_max) &
         (df_filtrado['Calificacion'] >= calificacion_min)
     ]
     
-    # Mostrar resultados filtrados
+    # UI - Mostrar Resultados Filtrados
     st.markdown(replace_emojis("### 📊 Resultados Filtrados"), unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
@@ -322,21 +323,21 @@ def main():
         st.metric("Calificación promedio", f"{df_filtrado['Calificacion'].mean():.1f}")
         st.metric("Productos únicos", df_filtrado['Categoria'].nunique())
     
-    # Mostrar datos filtrados
+    # UI - Mostrar Datos Filtrados
     if len(df_filtrado) > 0:
         st.markdown(replace_emojis("**📋 Datos filtrados:**"), unsafe_allow_html=True)
         st.dataframe(df_filtrado, use_container_width=True)
     else:
         st.warning("⚠️ No hay datos que coincidan con los filtros seleccionados. Intenta ajustar los filtros.")
     
-    # Tips section
+    # UI - Mostrar Seccion de Tips
     st.header(replace_emojis("💡 Consejos Importantes"))
     
     st.markdown('<div class="warning-box"><h3>⚠️ Errores comunes a evitar:</h3><ul><li><strong>Filtros muy restrictivos:</strong> Si filtras demasiado, podrías no obtener resultados</li><li><strong>Olvidar quitar filtros:</strong> Asegúrate de limpiar filtros cuando cambies de análisis</li><li><strong>Filtros contradictorios:</strong> No uses filtros que se contradigan entre sí</li><li><strong>Ignorar el contexto:</strong> Usa filtros que tengan sentido para tu análisis</li></ul></div>', unsafe_allow_html=True)
     
     st.markdown('<div class="success-box"><h3>✅ Buenas prácticas:</h3><ul><li><strong>Planifica tu análisis:</strong> Piensa qué información necesitas antes de filtrar</li><li><strong>Usa filtros gradualmente:</strong> Empieza con uno y ve agregando más</li><li><strong>Verifica los resultados:</strong> Siempre revisa que los filtros den los resultados esperados</li><li><strong>Documenta tus filtros:</strong> Anota qué filtros usaste para poder repetir el análisis</li></ul></div>', unsafe_allow_html=True)
     
-    # Practice activity
+    # UI - Mostrar Actividad de Practica
     st.header(replace_emojis("🎯 Actividad Práctica"))
     st.markdown('<div class="card"><h3>📝 Ejercicio para practicar:</h3><ol><li><strong>Analiza ventas por período:</strong> Usa filtros de fecha para ver ventas del último trimestre</li><li><strong>Filtra por categoría:</strong> Ve solo los productos de una categoría específica</li><li><strong>Aplica filtros numéricos:</strong> Establece un rango de precios o ventas</li><li><strong>Combina filtros:</strong> Usa fecha + categoría + región juntos</li><li><strong>Observa los cambios:</strong> Nota cómo cambian las métricas con cada filtro</li></ol></div>', unsafe_allow_html=True)
     
@@ -345,20 +346,20 @@ def main():
     st.markdown("### Pon a prueba tus conocimientos")
     st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
     
-    # Check if user passed the quiz
+    # Validacion - Verificar si Usuario Aprobo Quiz
     quiz_passed = st.session_state.get(f'quiz_nivel2_passed', False)
     quiz_completed = st.session_state.get(f'quiz_nivel2_completed', False)
     
-    # Always show quiz and results if quiz is completed (whether passed or not)
-    # This ensures results are always visible after completing the quiz
+    # UI - Mostrar Quiz y Resultados si esta Completado
+    # UI - Asegurar que Resultados sean Visibles Despues del Quiz
     from core.quiz_system import create_quiz
     create_quiz('nivel2', user['username'])
     
-    # Show passed message if quiz is passed
+    # UI - Mostrar Mensaje de Aprobacion si Quiz Aprobado
     if quiz_passed:
         st.markdown(replace_emojis("✅ ¡Has aprobado el quiz! Ahora puedes marcar el nivel como completado."), unsafe_allow_html=True)
     
-    # Check if quiz was just completed and passed (for first-time completion)
+    # Validacion - Verificar si Quiz Fue Completado y Aprobado Recientemente
     if quiz_completed and not quiz_passed:
         score = st.session_state.get(f'quiz_nivel2_score', 0)
         if score >= 3:
@@ -370,7 +371,7 @@ def main():
     # 7. Navigation or next steps
     st.header(replace_emojis("✅ Verificación del Nivel"))
     
-    # Only allow marking as complete if quiz is passed
+    # Validacion - Permitir Marcar Completado solo si Quiz Aprobado
     if not quiz_passed:
         st.warning("⚠️ Debes aprobar el quiz antes de poder marcar el nivel como completado.")
         nivel2_completed = False
@@ -409,7 +410,7 @@ def main():
             st.session_state.survey_level = 'nivel2'
             st.switch_page("pages/99_Survey_Nivel.py")
     
-    # Additional resources
+    # UI - Mostrar Recursos Adicionales
     create_info_box(
         "info-box",
         replace_emojis("📚 ¿Quieres saber más?"),
