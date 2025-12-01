@@ -46,6 +46,56 @@ def warm_initial_caches():
     st.session_state["_warm_start_complete"] = True
 
 
+# UI - Mostrar Banner de Nivel Actual
+def show_current_level_banner(progress):
+    """Show a banner indicating the user's current learning level"""
+    # Determinar el nivel actual
+    level_order = ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']
+    current_level = None
+    current_level_name = None
+    current_level_subtitle = None
+    
+    for level in level_order:
+        if not progress.get(level, False):
+            current_level = level
+            break
+    
+    # Si todos los niveles están completados
+    if current_level is None:
+        current_level = 'completed'
+        current_level_name = 'Todos los Niveles'
+        current_level_subtitle = '¡Felicidades! Has completado todos los niveles'
+        level_icon = '🏆'
+        level_color = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+    else:
+        # Mapeo de niveles a nombres y subtítulos
+        level_info = {
+            'nivel0': ('Nivel 0', 'Introducción', '🧭', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'),
+            'nivel1': ('Nivel 1', 'Básico', '📚', 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'),
+            'nivel2': ('Nivel 2', 'Filtros', '🔍', 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'),
+            'nivel3': ('Nivel 3', 'Métricas', '📊', 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'),
+            'nivel4': ('Nivel 4', 'Avanzado', '🚀', 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)')
+        }
+        
+        current_level_name, current_level_subtitle, level_icon, level_color = level_info.get(
+            current_level, 
+            ('Nivel Actual', 'Continuar aprendiendo', '🎓', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)')
+        )
+    
+    # Mostrar el banner
+    st.markdown(f"""
+    <div style="background: {level_color}; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.3);">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <div style="font-size: 2.5rem;">{get_icon(level_icon, 40)}</div>
+            <div style="text-align: center; flex: 1; min-width: 200px;">
+                <h3 style="color: white; margin: 0; font-size: 1.4rem; font-weight: 600;">Tu Nivel Actual: {current_level_name}</h3>
+                <p style="color: white; margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">{current_level_subtitle}</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 # ============================================================================
 # MAIN FUNCTION
 # ============================================================================
@@ -115,6 +165,13 @@ def main():
                     st.switch_page("pages/99_Survey_Inicial.py")
             
             st.markdown("---")
+    
+    # ============================================================================
+    # SECCIÓN BANNER NIVEL ACTUAL - Mostrar nivel actual del usuario
+    # ============================================================================
+    # Solo mostrar el banner si el usuario tiene progreso (no es OAuth o tiene ID)
+    if 'oauth_provider' not in current_user:
+        show_current_level_banner(progress)
     
     # ============================================================================
     # SECCIÓN QUICK START - Botones de acción principal
