@@ -25,6 +25,8 @@ from utils.ui import (clear_selected_template, get_current_user,
                       show_header, show_quick_start_section)
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 from data.sample_datasets import get_sample_datasets
+from utils.ui.onboarding import show_onboarding_tour, check_onboarding_status
+from core.database import DatabaseManager
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +65,8 @@ def show_current_level_banner(progress):
     # Si todos los niveles están completados
     if current_level is None:
         current_level = 'completed'
-        current_level_name = 'Todos los Niveles'
-        current_level_subtitle = '¡Felicidades! Has completado todos los niveles'
+        current_level_name = 'Todos los Niveles Completados'
+        current_level_subtitle = '¡Felicidades! Visita la Conclusión para ver tu resumen y próximos pasos'
         level_icon = '🏆'
         level_color = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     else:
@@ -94,6 +96,13 @@ def show_current_level_banner(progress):
         </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Si todos los niveles están completados, mostrar botón para conclusión
+    if current_level == 'completed':
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🎓 Ver Conclusión y Próximos Pasos", type="primary", use_container_width=True, key="banner_conclusion_button"):
+                st.switch_page("pages/05_Conclusion.py")
 
 
 # ============================================================================
@@ -131,6 +140,33 @@ def main():
         st.markdown(f"{get_icon("🎉", 20)} ¡Bienvenido, {welcome_name}! Tu cuenta se creó correctamente.", unsafe_allow_html=True)
     
     # ============================================================================
+    # SECCIÓN ONBOARDING - Tour guiado para nuevos usuarios
+    # ============================================================================
+    if 'oauth_provider' not in current_user:
+        db_manager = DatabaseManager()
+        user_id = current_user['id']
+        
+        # Check if user needs onboarding (first time or not completed)
+        onboarding_completed = check_onboarding_status(user_id, db_manager)
+        
+        # Show onboarding if:
+        # 1. User hasn't completed it in DB, OR
+        # 2. User just registered (registration_welcome exists), OR
+        # 3. User manually requests it (session state)
+        should_show_onboarding = (
+            not onboarding_completed or 
+            welcome_data is not None or
+            st.session_state.get('show_onboarding', False)
+        )
+        
+        if should_show_onboarding:
+            onboarding_active = show_onboarding_tour(user_id, db_manager)
+            
+            # If onboarding is active, don't show other content
+            if onboarding_active:
+                st.stop()  # Stop rendering rest of page
+    
+    # ============================================================================
     # SECCIÓN HEADER - Bienvenida e información del usuario
     # ============================================================================
     show_header(name)
@@ -143,28 +179,6 @@ def main():
         total_progress = 0
         completed_count = 0
         progress = {}
-    
-    # ============================================================================
-    # SECCIÓN ENCUESTA INICIAL - Botón prominente para encuesta (solo para pruebas)
-    # ============================================================================
-    # Solo mostrar si el usuario no ha completado la encuesta inicial
-    if 'oauth_provider' not in current_user:
-        from core.survey_system import survey_system
-        user_id = current_user['id']
-        if not survey_system.has_completed_survey(user_id, 'initial'):
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); padding: 2rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 3px solid #fff;">
-                <h2 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.6rem;">{get_icon("📋", 24)} Encuesta Inicial - Período de Pruebas</h2>
-                <p style="color: white; text-align: center; margin-bottom: 1.5rem; font-size: 1.1rem; opacity: 0.95;">Ayúdanos a mejorar la plataforma completando nuestra encuesta inicial</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                if st.button("📝 Completar Encuesta Inicial", type="primary", use_container_width=True, key="initial_survey_banner"):
-                    st.switch_page("pages/99_Survey_Inicial.py")
-            
-            st.markdown("---")
     
     # ============================================================================
     # SECCIÓN BANNER NIVEL ACTUAL - Mostrar nivel actual del usuario

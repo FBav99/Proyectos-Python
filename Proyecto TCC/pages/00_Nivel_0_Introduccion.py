@@ -478,14 +478,9 @@ def main():
         )
         
         st.subheader(replace_emojis("🚀 ¿Qué sigue?"))
-        st.markdown("Antes de continuar, nos gustaría conocer tu opinión sobre este nivel.")
         
         # Show next level preview
         create_level_preview('nivel1')
-        
-        if st.button("Completar Encuesta del Nivel", type="primary"):
-            st.session_state.survey_level = 'nivel0'
-            st.switch_page("pages/99_Survey_Nivel.py")
     
     # UI - Mostrar Recursos Adicionales
     create_info_box(

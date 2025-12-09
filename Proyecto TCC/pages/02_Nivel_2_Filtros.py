@@ -405,10 +405,6 @@ def main():
         
         # Show next level preview
         create_level_preview('nivel3')
-        
-        if st.button("Completar Encuesta del Nivel", type="primary"):
-            st.session_state.survey_level = 'nivel2'
-            st.switch_page("pages/99_Survey_Nivel.py")
     
     # UI - Mostrar Recursos Adicionales
     create_info_box(

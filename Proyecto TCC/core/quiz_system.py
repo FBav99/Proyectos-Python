@@ -37,6 +37,48 @@ QUIZ_QUESTIONS = {
             'options': ['Solo contar números', 'Examinar información para encontrar respuestas, patrones e insights', 'Solo hacer gráficos', 'Eliminar datos'],
             'correct': 1,
             'explanation': 'El análisis de datos es examinar la información para encontrar respuestas, patrones e insights que ayuden a tomar mejores decisiones.'
+        },
+        {
+            'question': '¿Por qué es importante organizar los datos?',
+            'options': ['Para que se vean bonitos', 'Para facilitar el análisis y encontrar información rápidamente', 'Solo por costumbre', 'No es importante'],
+            'correct': 1,
+            'explanation': 'Organizar los datos facilita el análisis y permite encontrar información rápidamente, lo que lleva a mejores decisiones.'
+        },
+        {
+            'question': '¿Qué es un dataset?',
+            'options': ['Un solo número', 'Una colección organizada de datos relacionados', 'Un gráfico', 'Un programa'],
+            'correct': 1,
+            'explanation': 'Un dataset es una colección organizada de datos relacionados que se pueden analizar juntos.'
+        },
+        {
+            'question': '¿Cuál es la diferencia entre datos cualitativos y cuantitativos?',
+            'options': ['No hay diferencia', 'Cualitativos son números, cuantitativos son texto', 'Cuantitativos son números medibles, cualitativos son descripciones', 'Son lo mismo'],
+            'correct': 2,
+            'explanation': 'Los datos cuantitativos son números que se pueden medir (ej: edad, precio), mientras que los cualitativos son descripciones o categorías (ej: color, nombre).'
+        },
+        {
+            'question': '¿Qué significa "datos estructurados"?',
+            'options': ['Datos organizados en formato de tabla', 'Datos desordenados', 'Solo imágenes', 'Solo texto'],
+            'correct': 0,
+            'explanation': 'Los datos estructurados están organizados en formato de tabla con filas y columnas claramente definidas.'
+        },
+        {
+            'question': '¿Qué es un ejemplo de dato numérico?',
+            'options': ['El nombre de un producto', 'El precio de venta', 'El color de un objeto', 'La descripción'],
+            'correct': 1,
+            'explanation': 'El precio de venta es un dato numérico porque es un número que se puede medir y calcular.'
+        },
+        {
+            'question': '¿Qué es un ejemplo de dato categórico?',
+            'options': ['El precio', 'La cantidad vendida', 'La categoría del producto', 'El total de ventas'],
+            'correct': 2,
+            'explanation': 'La categoría del producto es un dato categórico porque agrupa productos en categorías como "Electrónica" o "Ropa".'
+        },
+        {
+            'question': '¿Para qué sirven los datos en una empresa?',
+            'options': ['Solo para guardar', 'Para tomar decisiones informadas y mejorar el negocio', 'Para hacer bonito', 'No sirven para nada'],
+            'correct': 1,
+            'explanation': 'Los datos ayudan a tomar decisiones informadas, identificar problemas, encontrar oportunidades y mejorar el negocio.'
         }
     ],
     'nivel1': [
@@ -69,6 +111,48 @@ QUIZ_QUESTIONS = {
             'options': ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD', 'DD-MM-YYYY'],
             'correct': 2,
             'explanation': 'YYYY-MM-DD es el formato ISO estándar internacional.'
+        },
+        {
+            'question': '¿Qué es un archivo Excel (.xlsx)?',
+            'options': ['Solo texto', 'Un formato de hoja de cálculo que puede contener múltiples hojas', 'Solo números', 'Un programa'],
+            'correct': 1,
+            'explanation': 'Excel es un formato de hoja de cálculo que puede contener múltiples hojas, formato y fórmulas.'
+        },
+        {
+            'question': '¿Qué es importante verificar al cargar datos?',
+            'options': ['Solo el nombre del archivo', 'La calidad, completitud y formato de los datos', 'Solo el tamaño', 'Nada'],
+            'correct': 1,
+            'explanation': 'Al cargar datos es importante verificar la calidad, completitud y formato para asegurar que el análisis sea correcto.'
+        },
+        {
+            'question': '¿Qué son los "duplicados" en un dataset?',
+            'options': ['Filas que aparecen más de una vez', 'Columnas vacías', 'Datos incorrectos', 'Números grandes'],
+            'correct': 0,
+            'explanation': 'Los duplicados son filas que aparecen más de una vez exactamente igual en el dataset.'
+        },
+        {
+            'question': '¿Por qué es importante limpiar los datos antes de analizarlos?',
+            'options': ['Porque se ven mejor', 'Para asegurar que el análisis sea preciso y confiable', 'Solo por costumbre', 'No es importante'],
+            'correct': 1,
+            'explanation': 'Limpiar los datos asegura que el análisis sea preciso y confiable, eliminando errores que puedan afectar los resultados.'
+        },
+        {
+            'question': '¿Qué significa "consistencia" en los datos?',
+            'options': ['Que todos los datos sean iguales', 'Que los datos sigan el mismo formato y estándares', 'Que haya muchos datos', 'Que los datos estén ordenados'],
+            'correct': 1,
+            'explanation': 'La consistencia significa que los datos sigan el mismo formato y estándares a lo largo de todo el dataset.'
+        },
+        {
+            'question': '¿Qué es mejor: un archivo CSV o Excel para datos simples?',
+            'options': ['Siempre Excel', 'CSV es más simple y compatible, Excel tiene más características', 'Ninguno sirve', 'Siempre CSV'],
+            'correct': 1,
+            'explanation': 'CSV es más simple y compatible con más programas, mientras que Excel ofrece más características como múltiples hojas y formato.'
+        },
+        {
+            'question': '¿Qué debes hacer si encuentras errores en los datos al cargarlos?',
+            'options': ['Ignorarlos', 'Corregirlos o eliminarlos antes de continuar', 'Solo contarlos', 'Cambiar el formato'],
+            'correct': 1,
+            'explanation': 'Si encuentras errores, debes corregirlos o eliminarlos antes de continuar para asegurar la calidad del análisis.'
         }
     ],
     'nivel2': [
@@ -101,6 +185,48 @@ QUIZ_QUESTIONS = {
             'options': ['Solo números pares', 'Condiciones basadas en valores numéricos', 'Números grandes', 'Cálculos matemáticos'],
             'correct': 1,
             'explanation': 'Los filtros numéricos permiten establecer condiciones basadas en valores numéricos (mayor que, menor que, etc.).'
+        },
+        {
+            'question': '¿Qué es un filtro categórico?',
+            'options': ['Filtrar por números', 'Seleccionar datos basados en categorías o valores de texto', 'Filtrar fechas', 'Filtrar colores'],
+            'correct': 1,
+            'explanation': 'Los filtros categóricos permiten seleccionar datos basados en categorías o valores de texto específicos.'
+        },
+        {
+            'question': '¿Qué significa "filtrar por mayor que" (>)?',
+            'options': ['Seleccionar valores menores', 'Seleccionar valores que son mayores a un número específico', 'Seleccionar todos los valores', 'Eliminar valores'],
+            'correct': 1,
+            'explanation': 'Filtrar por "mayor que" selecciona solo los valores que son mayores al número especificado.'
+        },
+        {
+            'question': '¿Qué es combinar múltiples filtros?',
+            'options': ['Usar solo un filtro', 'Aplicar varios filtros al mismo tiempo para ser más específico', 'Eliminar filtros', 'Cambiar el orden'],
+            'correct': 1,
+            'explanation': 'Combinar múltiples filtros permite aplicar varios criterios al mismo tiempo para encontrar datos muy específicos.'
+        },
+        {
+            'question': '¿Qué es un filtro de texto parcial?',
+            'options': ['Buscar coincidencias exactas', 'Buscar palabras o frases que contengan cierto texto', 'Solo buscar números', 'No existe'],
+            'correct': 1,
+            'explanation': 'Los filtros de texto parcial permiten buscar registros que contengan ciertas palabras o frases dentro del texto.'
+        },
+        {
+            'question': '¿Por qué es útil filtrar datos por período de tiempo?',
+            'options': ['Solo por estética', 'Para analizar tendencias y cambios en un período específico', 'Para hacer el análisis más lento', 'No es útil'],
+            'correct': 1,
+            'explanation': 'Filtrar por período de tiempo permite analizar tendencias y cambios específicos, como ventas por mes o trimestre.'
+        },
+        {
+            'question': '¿Qué sucede si aplicas un filtro muy restrictivo?',
+            'options': ['Obtienes más resultados', 'Obtienes menos resultados pero más específicos', 'No pasa nada', 'Se eliminan todos los datos'],
+            'correct': 1,
+            'explanation': 'Un filtro muy restrictivo reduce el número de resultados pero los hace más específicos y relevantes para tu análisis.'
+        },
+        {
+            'question': '¿Qué es mejor: un filtro simple o múltiples filtros combinados?',
+            'options': ['Siempre simple', 'Depende de lo que necesites: filtros combinados para análisis más específicos', 'Siempre múltiples', 'No importa'],
+            'correct': 1,
+            'explanation': 'Depende de tu necesidad: filtros simples para análisis generales, filtros combinados para análisis más específicos y detallados.'
         }
     ],
     'nivel3': [
@@ -133,6 +259,48 @@ QUIZ_QUESTIONS = {
             'options': ['Un tipo de gráfico', 'Un Indicador Clave de Rendimiento', 'Un formato de archivo', 'Un filtro'],
             'correct': 1,
             'explanation': 'KPI significa Key Performance Indicator (Indicador Clave de Rendimiento).'
+        },
+        {
+            'question': '¿Qué es la moda?',
+            'options': ['El valor más común', 'El promedio', 'El valor más alto', 'El valor más bajo'],
+            'correct': 0,
+            'explanation': 'La moda es el valor que aparece con mayor frecuencia en un conjunto de datos.'
+        },
+        {
+            'question': '¿Qué es una métrica de suma (total)?',
+            'options': ['El promedio', 'La suma de todos los valores', 'El valor máximo', 'La cantidad'],
+            'correct': 1,
+            'explanation': 'La suma total es el resultado de sumar todos los valores de una columna numérica.'
+        },
+        {
+            'question': '¿Cuándo es útil usar la mediana en lugar del promedio?',
+            'options': ['Nunca', 'Cuando hay valores extremos que pueden distorsionar el promedio', 'Siempre usar promedio', 'Cuando hay pocos datos'],
+            'correct': 1,
+            'explanation': 'La mediana es útil cuando hay valores extremos (outliers) que pueden distorsionar el promedio.'
+        },
+        {
+            'question': '¿Qué es una métrica de crecimiento?',
+            'options': ['El valor actual', 'El cambio porcentual entre dos períodos', 'Solo números positivos', 'El promedio'],
+            'correct': 1,
+            'explanation': 'Las métricas de crecimiento miden el cambio porcentual entre dos períodos, como crecimiento mensual o anual.'
+        },
+        {
+            'question': '¿Qué es un KPI para un negocio de ventas?',
+            'options': ['Solo el color del logo', 'Ventas totales, número de clientes, tasa de conversión', 'Solo el nombre', 'Solo las fechas'],
+            'correct': 1,
+            'explanation': 'KPIs comunes para ventas incluyen: ventas totales, número de clientes, tasa de conversión, y promedio de venta por cliente.'
+        },
+        {
+            'question': '¿Qué significa "interpretar" una métrica?',
+            'options': ['Solo ver el número', 'Entender qué significa el número y qué acciones tomar', 'Ignorarla', 'Copiarla'],
+            'correct': 1,
+            'explanation': 'Interpretar una métrica significa entender qué significa el número en contexto y qué acciones puedes tomar basándote en ella.'
+        },
+        {
+            'question': '¿Por qué es importante comparar métricas?',
+            'options': ['Solo para tener más números', 'Para entender tendencias, identificar problemas y tomar decisiones', 'Para complicar el análisis', 'No es importante'],
+            'correct': 1,
+            'explanation': 'Comparar métricas permite entender tendencias, identificar problemas, ver mejoras y tomar decisiones basadas en datos.'
         }
     ],
     'nivel4': [
@@ -165,6 +333,48 @@ QUIZ_QUESTIONS = {
             'options': ['Un tipo de gráfico', 'Una visualización interactiva de métricas clave', 'Un filtro', 'Un cálculo'],
             'correct': 1,
             'explanation': 'Un dashboard es una visualización interactiva que muestra las métricas y KPIs más importantes.'
+        },
+        {
+            'question': '¿Qué es una visualización interactiva?',
+            'options': ['Un gráfico estático', 'Un gráfico donde puedes hacer zoom, filtrar y explorar datos', 'Solo texto', 'Un cálculo'],
+            'correct': 1,
+            'explanation': 'Una visualización interactiva permite explorar los datos haciendo zoom, filtrando y seleccionando elementos específicos.'
+        },
+        {
+            'question': '¿Qué es un gráfico de barras usado para mostrar?',
+            'options': ['Tendencias en el tiempo', 'Comparar valores entre diferentes categorías', 'Relaciones entre variables', 'Solo números'],
+            'correct': 1,
+            'explanation': 'Los gráficos de barras son ideales para comparar valores entre diferentes categorías o grupos.'
+        },
+        {
+            'question': '¿Qué es un gráfico de líneas usado para mostrar?',
+            'options': ['Comparar categorías', 'Mostrar tendencias y cambios a lo largo del tiempo', 'Mostrar proporciones', 'Mostrar relaciones'],
+            'correct': 1,
+            'explanation': 'Los gráficos de líneas son ideales para mostrar tendencias y cambios a lo largo del tiempo.'
+        },
+        {
+            'question': '¿Qué es un insight en análisis de datos?',
+            'options': ['Un número cualquiera', 'Un descubrimiento importante que puede llevar a acciones valiosas', 'Un error', 'Un gráfico'],
+            'correct': 1,
+            'explanation': 'Un insight es un descubrimiento importante en los datos que puede llevar a acciones o decisiones valiosas.'
+        },
+        {
+            'question': '¿Qué es importante al crear un dashboard?',
+            'options': ['Poner todos los datos posibles', 'Enfocarse en las métricas más importantes y mantener el diseño claro', 'Usar muchos colores', 'Poner pocos datos'],
+            'correct': 1,
+            'explanation': 'Un buen dashboard se enfoca en las métricas más importantes y mantiene un diseño claro y fácil de entender.'
+        },
+        {
+            'question': '¿Qué significa "análisis comparativo"?',
+            'options': ['Analizar solo un dato', 'Comparar diferentes períodos, grupos o categorías para encontrar diferencias', 'Eliminar datos', 'Solo promediar'],
+            'correct': 1,
+            'explanation': 'El análisis comparativo compara diferentes períodos, grupos o categorías para encontrar diferencias y patrones.'
+        },
+        {
+            'question': '¿Qué es una visualización de dispersión (scatter plot) usada para mostrar?',
+            'options': ['Solo números', 'La relación entre dos variables numéricas', 'Solo categorías', 'Solo tiempo'],
+            'correct': 1,
+            'explanation': 'Los gráficos de dispersión muestran la relación entre dos variables numéricas y ayudan a identificar patrones o correlaciones.'
         }
     ]
 }
@@ -210,6 +420,9 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
         st.session_state.pop(f'{prefix}_q{idx}', None)
         st.session_state.pop(f'{prefix}_q_{idx}', None)
         st.session_state.pop(f'{prefix}_submit_{idx}', None)
+    
+    # Clear selected questions so new ones are chosen on next start
+    st.session_state.pop(f'{prefix}_selected_questions', None)
 
     if keep_expanded:
         st.session_state[f'{prefix}_expanded'] = True
@@ -219,15 +432,22 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
 def create_quiz(level, username):
     """Create and display a quiz for a specific level."""
 
-    questions = QUIZ_QUESTIONS.get(level, [])
+    # Get all questions from the question bank
+    question_bank = QUIZ_QUESTIONS.get(level, [])
 
-    if not questions:
+    if not question_bank:
         st.error("No hay preguntas disponibles para este nivel.")
+        return
+
+    # Ensure we have at least 5 questions in the bank
+    if len(question_bank) < 5:
+        st.error(f"Se necesitan al menos 5 preguntas en el banco. Actualmente hay {len(question_bank)}.")
         return
 
     prefix = f'quiz_{level}'
     expander_key = f'{prefix}_expanded'
     skipped_key = f'{prefix}_skipped'
+    selected_questions_key = f'{prefix}_selected_questions'
 
     if st.session_state.get(skipped_key):
         st.info("Has pospuesto este quiz. Puedes retomarlo cuando quieras. Recuerda que necesitas aprobarlo para completar el nivel.")
@@ -257,26 +477,39 @@ def create_quiz(level, username):
             st.session_state[f'{prefix}_answers'] = []
             st.session_state[f'{prefix}_completed'] = False
             st.session_state[f'{prefix}_question_order'] = []
+            st.session_state[selected_questions_key] = []
         
         # Ensure answers are preserved if quiz is completed
         if st.session_state.get(f'{prefix}_completed', False) and f'{prefix}_answers' not in st.session_state:
             st.session_state[f'{prefix}_answers'] = []
 
+        # Get selected questions (5 random questions from the bank)
+        selected_questions = st.session_state.get(selected_questions_key, [])
+        if not selected_questions:
+            # Select 5 random questions from the bank
+            selected_questions = random.sample(question_bank, 5)
+            st.session_state[selected_questions_key] = selected_questions
+        
+        questions = selected_questions
         total_questions = len(questions)
 
         if not st.session_state[f'{prefix}_started']:
             st.markdown("""
             #### 📋 Instrucciones
-            - Responde 5 preguntas relacionadas con lo aprendido en este nivel.
+            - Se te presentarán 5 preguntas seleccionadas aleatoriamente de un banco más grande.
             - Cada pregunta tiene 4 opciones y solo una es correcta.
-            - El orden de las preguntas cambia cada vez para que practiques mejor.
+            - Las preguntas cambian cada vez que inicias el quiz.
             - Necesitas al menos 3 respuestas correctas para aprobar el nivel.
             """)
 
             col_start, col_skip = st.columns([2, 1])
             with col_start:
                 if st.button("🚀 Comenzar Quiz", type="primary", use_container_width=True, key=f"{prefix}_start"):
-                    st.session_state[f'{prefix}_question_order'] = random.sample(range(total_questions), total_questions)
+                    # Select 5 random questions from the bank
+                    selected_questions = random.sample(question_bank, 5)
+                    st.session_state[selected_questions_key] = selected_questions
+                    # Create order for the 5 selected questions
+                    st.session_state[f'{prefix}_question_order'] = list(range(5))
                     st.session_state[f'{prefix}_current_question'] = 0
                     st.session_state[f'{prefix}_score'] = 0
                     st.session_state[f'{prefix}_answers'] = []
@@ -292,8 +525,14 @@ def create_quiz(level, username):
                     st.rerun()
             return
 
+        # Ensure selected questions and question order exist
+        if not st.session_state.get(selected_questions_key):
+            selected_questions = random.sample(question_bank, 5)
+            st.session_state[selected_questions_key] = selected_questions
+            questions = selected_questions
+        
         if not st.session_state.get(f'{prefix}_question_order'):
-            st.session_state[f'{prefix}_question_order'] = random.sample(range(total_questions), total_questions)
+            st.session_state[f'{prefix}_question_order'] = list(range(5))
 
         # Always keep expander open during quiz or when completed
         if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
@@ -325,12 +564,22 @@ def create_quiz(level, username):
             selected_option = st.radio(
                 "Selecciona tu respuesta:",
                 question['options'],
-                key=f"{prefix}_q_{current_index}"
+                key=f"{prefix}_q_{current_index}",
+                index=None
             )
+            
+            # Validacion - Verificar que se haya seleccionado una opcion
+            if selected_option is None:
+                st.warning("Por favor selecciona una respuesta antes de continuar.")
 
             col_answer, col_restart = st.columns([2, 1])
             with col_answer:
-                if st.button("✅ Enviar y continuar", type="primary", use_container_width=True, key=f"{prefix}_submit_{current_index}"):
+                submit_disabled = selected_option is None
+                if st.button("✅ Enviar y continuar", type="primary", use_container_width=True, key=f"{prefix}_submit_{current_index}", disabled=submit_disabled):
+                    # This check is redundant but serves as a safety measure
+                    if selected_option is None:
+                        st.stop()
+                    
                     correct = question['options'].index(selected_option) == question['correct']
 
                     if correct:
@@ -361,7 +610,9 @@ def create_quiz(level, username):
                     _reset_quiz_state(level, total_questions, keep_expanded=True)
                     st.rerun()
         else:
-            show_quiz_results(level, username, questions, expander_key)
+            # Use selected questions for results display
+            selected_questions = st.session_state.get(selected_questions_key, questions)
+            show_quiz_results(level, username, selected_questions, expander_key)
 
 
 # Quiz - Mostrar Resultados de Quiz

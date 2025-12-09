@@ -33,31 +33,8 @@ def show_learning_section(total_progress, completed_count, progress):
     """Show the learning section with progress tracking"""
     st.markdown("---")
     
-    # Validacion - Verificar si Usuario Completo Encuesta Inicial
-    from core.survey_system import survey_system
-    user = st.session_state.get('user')
-    if user and user.get('id'):
-        user_id = user['id']
-        if not survey_system.has_completed_survey(user_id, 'initial'):
-            st.markdown(f"""
-            <div style="background: rgba(0, 123, 255, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #007bff;">
-                <h3 style="color: #007bff; margin-bottom: 1rem;">{get_icon('📋', 20)} Encuesta Inicial</h3>
-                <p style="color: #666; margin-bottom: 1rem;">Antes de comenzar con los niveles, nos gustaría conocer un poco sobre ti. Esto nos ayuda a mejorar la experiencia.</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button("📝 Completar Encuesta Inicial", type="primary", use_container_width=True):
-                st.switch_page("pages/99_Survey_Inicial.py")
-            
-            st.markdown(replace_emojis("💡 Puedes completar la encuesta más tarde, pero te recomendamos hacerlo antes de comenzar."), unsafe_allow_html=True)
-            st.markdown("---")
     
-    st.markdown(f"""
-    <div style="background: rgba(255, 193, 7, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #ffc107;">
-        <h3 style="color: #ffc107; margin-bottom: 1rem;">{get_icon('🎓', 20)} Sistema de Aprendizaje por Niveles</h3>
-        <p style="color: #666; margin-bottom: 1rem;">Completa nuestros niveles paso a paso para dominar todas las funcionalidades</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div style="background: rgba(255, 193, 7, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #ffc107;"><h3 style="color: #ffc107; margin-bottom: 1rem;">{get_icon("🎓", 20)} Sistema de Aprendizaje por Niveles</h3><p style="color: #666; margin-bottom: 1rem;">Completa nuestros niveles paso a paso para dominar todas las funcionalidades</p></div>', unsafe_allow_html=True)
     
     # UI - Indicador de Progreso
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -228,12 +205,7 @@ def show_learning_section(total_progress, completed_count, progress):
         
         # Reset confirmation dialog
         if st.session_state.get('show_reset_confirmation', False):
-            st.markdown(f"""
-            <div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;">
-                <h4 style="color: #dc3545; margin-bottom: 1rem;">{get_icon("⚠️", 18)} Confirmar Reinicio de Progreso</h4>
-                <p style="color: #666; margin-bottom: 1rem;">Esta acción eliminará todo tu progreso en los niveles. <strong>Esta acción no se puede deshacer.</strong></p>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;"><h4 style="color: #dc3545; margin-bottom: 1rem;">{get_icon("⚠️", 18)} Confirmar Reinicio de Progreso</h4><p style="color: #666; margin-bottom: 1rem;">Esta acción eliminará todo tu progreso en los niveles. <strong>Esta acción no se puede deshacer.</strong></p></div>', unsafe_allow_html=True)
             
             col1, col2, col3 = st.columns([1, 1, 1])
             
@@ -305,11 +277,18 @@ def show_learning_section(total_progress, completed_count, progress):
 
     level_navigation = [
         ("nivel0", "🧭 Nivel 0: Introducción", "pages/00_Nivel_0_Introduccion.py"),
-        ("nivel1", replace_emojis("📚 Nivel 1: Básico"), "pages/01_Nivel_1_Basico.py"),
-        ("nivel2", replace_emojis("🔍 Nivel 2: Filtros"), "pages/02_Nivel_2_Filtros.py"),
-        ("nivel3", replace_emojis("📊 Nivel 3: Métricas"), "pages/03_Nivel_3_Metricas.py"),
-        ("nivel4", replace_emojis("🚀 Nivel 4: Avanzado"), "pages/04_Nivel_4_Avanzado.py"),
+        ("nivel1", "📚 Nivel 1: Básico", "pages/01_Nivel_1_Basico.py"),
+        ("nivel2", "🔍 Nivel 2: Filtros", "pages/02_Nivel_2_Filtros.py"),
+        ("nivel3", "📊 Nivel 3: Métricas", "pages/03_Nivel_3_Metricas.py"),
+        ("nivel4", "🚀 Nivel 4: Avanzado", "pages/04_Nivel_4_Avanzado.py"),
     ]
+    
+    # Si todos los niveles están completados, agregar enlace a conclusión
+    all_levels_completed = all([progress.get(key, False) for key in ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']])
+    if all_levels_completed:
+        st.markdown("")
+        if st.button("🎓 Conclusión y Próximos Pasos", use_container_width=True, type="primary", key="conclusion_button"):
+            st.switch_page("pages/05_Conclusion.py")
 
     next_pending_level = next((level for level, _, _ in level_navigation if not progress.get(level, False)), None)
 
@@ -339,11 +318,11 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(replace_emojis("📊 Niveles Completados"), f"{completed_count}/5")
+        st.metric("📊 Niveles Completados", f"{completed_count}/5")
     with col2:
-        st.metric(replace_emojis("📈 Progreso Total"), f"{total_progress:.1f}%")
+        st.metric("📈 Progreso Total", f"{total_progress:.1f}%")
     with col3:
-        st.metric(replace_emojis("🎯 Usuario"), username)
+        st.metric("🎯 Usuario", username)
     
     # UI - Opciones de Reinicio de Progreso y Vista Detallada
     if user_id:
@@ -352,11 +331,7 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
     
     # UI - Navegacion Rapida para Usuarios con Experiencia
     if completed_count >= 2:
-        st.markdown(f"""
-        <div style="background: rgba(40, 167, 69, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #28a745;">
-            <p style="color: #28a745; margin: 0; font-weight: 500;">{get_icon("💡", 16)} <strong>¡Ya tienes experiencia!</strong> Puedes ir directamente a crear dashboards avanzados.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div style="background: rgba(40, 167, 69, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #28a745;"><p style="color: #28a745; margin: 0; font-weight: 500;">{get_icon("💡", 16)} <strong>¡Ya tienes experiencia!</strong> Puedes ir directamente a crear dashboards avanzados.</p></div>', unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -438,12 +413,7 @@ def show_progress_reset_button(user_id):
     
     # UI - Dialogo de Confirmacion de Reinicio
     if st.session_state.get('show_reset_confirmation', False):
-        st.markdown(f"""
-        <div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;">
-            <h4 style="color: #dc3545; margin-bottom: 1rem;">{get_icon("⚠️", 18)} Confirmar Reinicio de Progreso</h4>
-            <p style="color: #666; margin-bottom: 1rem;">Esta acción eliminará todo tu progreso en los niveles. <strong>Esta acción no se puede deshacer.</strong></p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;"><h4 style="color: #dc3545; margin-bottom: 1rem;">{get_icon("⚠️", 18)} Confirmar Reinicio de Progreso</h4><p style="color: #666; margin-bottom: 1rem;">Esta acción eliminará todo tu progreso en los niveles. <strong>Esta acción no se puede deshacer.</strong></p></div>', unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns([1, 1, 1])
         

@@ -446,18 +446,14 @@ def main():
         
         st.markdown(replace_emojis("🎉 ¡Felicidades! Has completado todos los niveles del curso. ¡Eres un experto en análisis de datos!"), unsafe_allow_html=True)
         
-        st.markdown(replace_emojis("### 📝 Antes de continuar, nos gustaría conocer tu opinión sobre este nivel y la experiencia general."), unsafe_allow_html=True)
+        st.info(replace_emojis("💡 **Próximo paso:** Visita la sección de Conclusión para ver un resumen de todo lo aprendido, conocer qué esperar al aplicar tus conocimientos, y obtener recomendaciones personalizadas de herramientas BI profesionales."))
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         with col1:
-            if st.button("📝 Encuesta del Nivel 4", type="primary"):
-                st.session_state.survey_level = 'nivel4'
-                st.switch_page("pages/99_Survey_Nivel.py")
+            if st.button("🎓 Ver Conclusión", type="primary", use_container_width=True):
+                st.switch_page("pages/05_Conclusion.py")
         with col2:
-            if st.button("🏆 Encuesta Final", type="primary"):
-                st.switch_page("pages/99_Survey_Final.py")
-        with col3:
-            if st.button("📊 Crear Dashboard", type="secondary"):
+            if st.button("📊 Crear Dashboard", type="secondary", use_container_width=True):
                 st.switch_page("pages/08_Dashboard_Blanco.py")
     
     # 8. Navigation

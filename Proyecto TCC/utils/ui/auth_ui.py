@@ -97,7 +97,7 @@ def show_login_form():
             st.switch_page("pages/06_Recuperar_Password.py")
     with col3:
         if st.button("🌐 Login con Google/Microsoft", use_container_width=True):
-            st.switch_page("pages/07_OAuth_Login.py")
+            st.switch_page("pages/07_Inicio_de_Sesion_con_Google.py")
 
 # UI - Mostrar Sidebar de Usuario
 def show_user_sidebar(current_user=None):
@@ -146,6 +146,16 @@ def show_user_sidebar(current_user=None):
                 """, unsafe_allow_html=True)
             
             st.markdown("---")
+            
+            # Botón temporal para pruebas de onboarding (solo usuarios de BD)
+            if 'oauth_provider' not in current_user:
+                if st.button("🎯 Ver Tour de Introducción", use_container_width=True, key="test_onboarding"):
+                    st.session_state.show_onboarding = True
+                    st.session_state.onboarding_step = 0
+                    st.session_state.onboarding_active = True
+                    st.rerun()
+                st.markdown("---")
+            
             if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
                 logout_user()
                 st.rerun()

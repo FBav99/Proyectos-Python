@@ -373,16 +373,8 @@ def main():
         # Show next level preview
         create_level_preview('nivel4')
         
-        st.markdown("Antes de continuar, nos gustaría conocer tu opinión sobre este nivel.")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("📝 Completar Encuesta del Nivel", type="primary"):
-                st.session_state.survey_level = 'nivel3'
-                st.switch_page("pages/99_Survey_Nivel.py")
-        with col2:
-            if st.button("🏠 Volver al Inicio"):
-                st.switch_page("Inicio.py")
+        if st.button("🏠 Volver al Inicio"):
+            st.switch_page("Inicio.py")
     
     # 8. Navigation
     st.markdown("---")

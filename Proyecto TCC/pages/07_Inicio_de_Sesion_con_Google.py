@@ -34,7 +34,7 @@ def generate_pkce():
 def main():
     """Página de login con OAuth (Google/Microsoft)"""
     st.set_page_config(
-        page_title="OAuth Login - Google/Microsoft",
+        page_title="Inicio de Sesión con Google",
         page_icon="🌐",
         layout="wide"
     )
@@ -469,3 +469,4 @@ def create_oauth_user(user_info, provider):
 
 if __name__ == "__main__":
     main()
+
