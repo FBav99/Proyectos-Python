@@ -9,7 +9,7 @@ def load_auth_config():
     """Load authentication configuration from YAML file with short-lived caching"""
     config_path = 'config/config.yaml'
     
-    # Default config structure as per official GitHub documentation
+    # Configuracion - Estructura de Configuracion por Defecto
     default_config = {
         'credentials': {
             'usernames': {
@@ -33,7 +33,7 @@ def load_auth_config():
         }
     }
     
-    # Try to load existing config file
+    # Archivo - Intentar Cargar Archivo de Configuracion Existente
     if os.path.exists(config_path):
         try:
             with open(config_path, 'r') as file:
@@ -45,7 +45,7 @@ def load_auth_config():
             # Don't expose error details to user
             return default_config
     
-    # If file doesn't exist, try to create it (will fail on Streamlit Cloud, but that's OK)
+    # Archivo - Intentar Crear Archivo si No Existe
     try:
         # Try to create directory if it doesn't exist
         os.makedirs(os.path.dirname(config_path), exist_ok=True)
@@ -62,10 +62,10 @@ def init_authentication():
     """Initialize authentication system"""
     config = load_auth_config()
     
-    # Hash passwords using the correct API
+    # Seguridad - Hashear Contraseñas usando API Correcta
     hashed_credentials = stauth.Hasher.hash_passwords(config['credentials'])
     
-    # Initialize the Authenticate class with the correct parameters
+    # Inicializacion - Inicializar Clase Authenticate con Parametros Correctos
     authenticator = stauth.Authenticate(
         credentials=hashed_credentials,
         cookie_name=config['cookie']['name'],
@@ -108,7 +108,7 @@ def check_achievement(username, achievement_type):
     
     new_achievements = []
     
-    # Level completion achievements
+    # Logros - Logros de Completacion de Niveles
     if achievement_type == 'level_completion':
         completed_levels = sum([
             progress.get('nivel1_completed', False),
@@ -122,18 +122,18 @@ def check_achievement(username, achievement_type):
         elif completed_levels == 4 and 'all_levels' not in achievements:
             new_achievements.append('all_levels')
     
-    # Quiz achievements
+    # Logros - Logros de Quiz
     elif achievement_type == 'quiz_perfect':
         if 'quiz_master' not in achievements:
             new_achievements.append('quiz_master')
     
-    # Data analysis achievements
+    # Logros - Logros de Analisis de Datos
     elif achievement_type == 'analysis_created':
         analyses_count = progress.get('data_analyses_created', 0)
         if analyses_count >= 5 and 'data_analyst' not in achievements:
             new_achievements.append('data_analyst')
     
-    # Update achievements
+    # Actualizacion - Actualizar Logros
     if new_achievements:
         progress['achievements'].extend(new_achievements)
         update_user_progress(username, achievements=progress['achievements'])

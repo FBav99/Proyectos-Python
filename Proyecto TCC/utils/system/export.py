@@ -6,7 +6,7 @@ def export_data(df, filters_applied, metrics):
     """Crear funcionalidad de exportación"""
     buffer = io.BytesIO()
     
-    # Crear archivo Excel con múltiples hojas
+    # Archivo - Crear Archivo Excel con Multiples Hojas
     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='Datos_Filtrados', index=False)
         
@@ -33,7 +33,7 @@ Generado el: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 ## Métricas Clave
 """
     
-    # Agregar métricas disponibles de forma dinámica
+    # Procesamiento - Agregar Metricas Disponibles de Forma Dinamica
     if 'total_value' in metrics:
         summary_text += f"- Valor Total: ${metrics['total_value']:,.2f}\n"
     

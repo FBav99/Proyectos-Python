@@ -31,7 +31,7 @@ def analyze_data_quality(df):
         'inconsistencies': {}
     }
     
-    # Analyze numeric columns
+    # Analisis - Analizar Columnas Numericas
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     for col in numeric_cols:
         analysis['numeric_analysis'][col] = {
@@ -58,7 +58,7 @@ def analyze_data_quality(df):
             'values': outliers.astype(str).tolist()
         }
     
-    # Analyze categorical columns
+    # Analisis - Analizar Columnas Categoricas
     categorical_cols = df.select_dtypes(include=['object']).columns
     for col in categorical_cols:
         unique_values = df[col].nunique()
@@ -70,7 +70,7 @@ def analyze_data_quality(df):
             'whitespace_only': (df[col].str.strip() == '').sum() if df[col].dtype == 'object' else 0
         }
     
-    # Analyze date columns
+    # Analisis - Analizar Columnas de Fecha
     date_cols = df.select_dtypes(include=['datetime64']).columns
     for col in date_cols:
         analysis['date_analysis'][col] = {
@@ -88,7 +88,7 @@ def create_quality_report(df, analysis):
     
     st.markdown(replace_emojis("## 📊 Reporte de Calidad de Datos"), unsafe_allow_html=True)
     
-    # Basic Information
+    # UI - Mostrar Informacion Basica
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric(replace_emojis("📈 Filas"), f"{analysis['basic_info']['rows']:,}")
@@ -99,14 +99,14 @@ def create_quality_report(df, analysis):
     with col4:
         st.metric(replace_emojis("🔄 Duplicados"), analysis['basic_info']['duplicates'])
     
-    # Data Quality Score
+    # UI - Mostrar Puntuacion de Calidad de Datos
     quality_score = calculate_quality_score(analysis)
     st.markdown(f"### {get_icon("🎯", 20)} Puntuación de Calidad: {quality_score:.1f}/100", unsafe_allow_html=True)
     
-    # Progress bar for quality score
+    # UI - Mostrar Barra de Progreso de Calidad
     st.progress(quality_score / 100)
     
-    # Detailed Analysis Tabs
+    # UI - Mostrar Tabs de Analisis Detallado
     tab1, tab2, tab3, tab4, tab5 = st.tabs([replace_emojis("📋 General"), "❌ Valores Faltantes", "🔢 Numéricas", "📝 Categóricas", "📅 Fechas"])
     
     with tab1:
@@ -129,7 +129,7 @@ def calculate_quality_score(analysis):
     """Calculate overall data quality score"""
     score = 100
     
-    # Penalize missing data
+    # Calculo - Penalizar Datos Faltantes
     missing_percentages = analysis['missing_data']['missing_percentages']
     for col, percentage in missing_percentages.items():
         if percentage > 50:
@@ -139,7 +139,7 @@ def calculate_quality_score(analysis):
         elif percentage > 5:
             score -= 5
     
-    # Penalize duplicates
+    # Calculo - Penalizar Duplicados
     duplicate_percentage = analysis['basic_info']['duplicates'] / analysis['basic_info']['rows'] * 100
     if duplicate_percentage > 10:
         score -= 15
@@ -148,7 +148,7 @@ def calculate_quality_score(analysis):
     elif duplicate_percentage > 1:
         score -= 5
     
-    # Penalize outliers
+    # Calculo - Penalizar Outliers
     for col, outlier_info in analysis['outliers'].items():
         if outlier_info['percentage'] > 10:
             score -= 10
@@ -162,13 +162,13 @@ def show_general_analysis(df, analysis):
     """Show general data analysis"""
     st.markdown(replace_emojis("### 📊 Información General"), unsafe_allow_html=True)
     
-    # Data types summary
+    # UI - Mostrar Resumen de Tipos de Datos
     st.markdown("#### Tipos de Datos:")
     type_counts = pd.Series(analysis['data_types']).value_counts()
     fig = px.pie(values=type_counts.values, names=type_counts.index, title="Distribución de Tipos de Datos")
     st.plotly_chart(fig, use_container_width=True)
     
-    # Column information table
+    # UI - Mostrar Tabla de Informacion de Columnas
     st.markdown("#### Información de Columnas:")
     column_info = pd.DataFrame({
         'Columna': df.columns,
@@ -276,7 +276,7 @@ def create_data_cleaning_options(df, analysis):
     
     cleaned_df = df.copy()
     
-    # Missing data handling
+    # UI - Mostrar Manejo de Datos Faltantes
     st.markdown(replace_emojis("### ❌ Manejo de Valores Faltantes"), unsafe_allow_html=True)
     
     for col in analysis['missing_data']['columns_with_missing']:
@@ -311,7 +311,7 @@ def create_data_cleaning_options(df, analysis):
                     value = cleaned_df[col].mode().iloc[0] if not cleaned_df[col].mode().empty else "Desconocido"
                     cleaned_df[col] = cleaned_df[col].fillna(value)
     
-    # Duplicate handling
+    # UI - Mostrar Manejo de Duplicados
     st.markdown(replace_emojis("### 🔄 Manejo de Duplicados"), unsafe_allow_html=True)
     if analysis['basic_info']['duplicates'] > 0:
         duplicate_action = st.selectbox(
@@ -322,7 +322,7 @@ def create_data_cleaning_options(df, analysis):
         if duplicate_action == "Eliminar duplicados":
             cleaned_df = cleaned_df.drop_duplicates()
     
-    # Outlier handling
+    # UI - Mostrar Manejo de Outliers
     st.markdown(replace_emojis("### 📊 Manejo de Outliers"), unsafe_allow_html=True)
     for col in analysis['outliers']:
         outlier_pct = analysis['outliers'][col]['percentage']
@@ -353,18 +353,18 @@ def data_quality_page(df):
     st.markdown("# 🧹 Análisis y Limpieza de Datos")
     st.markdown("### Paso 2: Revisa la calidad de tus datos antes de continuar")
     
-    # Analyze data quality
+    # Analisis - Analizar Calidad de Datos
     analysis = analyze_data_quality(df)
     
-    # Show quality report
+    # UI - Mostrar Reporte de Calidad
     create_quality_report(df, analysis)
     
     st.divider()
     
-    # Data cleaning options
+    # UI - Mostrar Opciones de Limpieza de Datos
     cleaned_df = create_data_cleaning_options(df, analysis)
     
-    # Show comparison
+    # UI - Mostrar Comparacion de Datos
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(replace_emojis("### 📊 Datos Originales"), unsafe_allow_html=True)
@@ -378,7 +378,7 @@ def data_quality_page(df):
         st.metric("Columnas", len(cleaned_df.columns))
         st.metric("Memoria", f"{cleaned_df.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB")
     
-    # Action buttons
+    # UI - Mostrar Botones de Accion
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("✅ Usar Datos Limpiados", type="primary"):

@@ -180,6 +180,6 @@ def delete_dashboard(dashboard_id: int, user_id: int) -> None:
         )
         conn.commit()
     
-    # Invalidate cache to ensure fresh data on next call
+    # Cache - Invalidar Cache para Asegurar Datos Frescos
     list_user_dashboards.clear()
 

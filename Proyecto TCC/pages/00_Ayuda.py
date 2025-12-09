@@ -41,10 +41,10 @@ st.set_page_config(
 # Principal - Pagina de Ayuda
 @safe_main
 def main():
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     init_sidebar()
     
-    # Load level styles for consistent appearance
+    # UI - Cargar Estilos de Nivel para Apariencia Consistente
     st.markdown(load_level_styles(), unsafe_allow_html=True)
     
     # Introduction
@@ -55,7 +55,7 @@ def main():
     Ya seas un principiante o un usuario avanzado, encontrarás funcionalidades útiles para tu análisis.
     """)
     
-    # Create help sections using modular components
+    # UI - Crear Secciones de Ayuda usando Componentes Modulares
     create_help_header()
     create_learning_levels_section()
     create_dashboard_blanco_section()

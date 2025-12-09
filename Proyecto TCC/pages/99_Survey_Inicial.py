@@ -20,10 +20,10 @@ st.set_page_config(
 
 @safe_main
 def main():
-    # Initialize sidebar
+    # UI - Inicializar Sidebar
     current_user = init_sidebar()
     
-    # Check if user is authenticated
+    # Validacion - Verificar si Usuario esta Autenticado
     if not current_user:
         st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a esta encuesta."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
@@ -32,7 +32,7 @@ def main():
     
     user_id = current_user['id']
     
-    # Check if user has already completed this survey
+    # Validacion - Verificar si Usuario ya Completo esta Encuesta
     if survey_system.has_completed_survey(user_id, 'initial'):
         st.markdown(replace_emojis("✅ Ya completaste esta encuesta. ¡Gracias por tu participación!"), unsafe_allow_html=True)
         st.info("Puedes continuar con los niveles de aprendizaje.")
@@ -46,7 +46,7 @@ def main():
     
     st.divider()
     
-    # Survey questions
+    # UI - Mostrar Preguntas de Encuesta
     with st.form("initial_survey_form"):
         st.subheader(replace_emojis("📊 Experiencia con Análisis de Datos"))
         

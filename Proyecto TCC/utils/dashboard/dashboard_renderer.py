@@ -251,10 +251,10 @@ def render_component(component, df):
     component_type = component['type']
     config = component['config']
     
-    # Add component header
+    # UI - Agregar Encabezado de Componente
     st.markdown(f"### {component.get('title', component_type)}")
     
-    # Render based on component type
+    # Renderizado - Renderizar Basado en Tipo de Componente
     if component_type == replace_emojis("📈 Métricas"):
         display_metric(config, df)
     
@@ -291,7 +291,7 @@ def render_component(component, df):
     else:
         st.warning(f"Tipo de componente no reconocido: {component_type}")
     
-    # Add component controls
+    # UI - Agregar Controles de Componente
     st.markdown("---")
     col1, col2 = st.columns(2)
     

@@ -33,7 +33,7 @@ def show_learning_section(total_progress, completed_count, progress):
     """Show the learning section with progress tracking"""
     st.markdown("---")
     
-    # Check if user has completed initial survey
+    # Validacion - Verificar si Usuario Completo Encuesta Inicial
     from core.survey_system import survey_system
     user = st.session_state.get('user')
     if user and user.get('id'):
@@ -59,7 +59,7 @@ def show_learning_section(total_progress, completed_count, progress):
     </div>
     """, unsafe_allow_html=True)
     
-    # Progress indicator
+    # UI - Indicador de Progreso
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.progress(total_progress / 100)
@@ -207,11 +207,11 @@ def show_learning_section(total_progress, completed_count, progress):
                         st.switch_page(target_page)
                     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Add progress reset button in learning section
+    # UI - Agregar Boton de Reinicio de Progreso en Seccion de Aprendizaje
     st.markdown("---")
     st.markdown(f"### {get_icon('🔄', 20)} Opciones de Progreso", unsafe_allow_html=True)
     
-    # Get user ID for reset functionality
+    # Consulta - Obtener ID de Usuario para Funcionalidad de Reinicio
     user = st.session_state.get('user')
     if user and user.get('id'):
         user_id = user['id']
@@ -300,7 +300,7 @@ def show_learning_section(total_progress, completed_count, progress):
             except Exception as e:
                 st.error(f"Error al obtener progreso detallado: {e}")
     
-    # Navigation buttons
+    # UI - Botones de Navegacion
     level_columns = st.columns(5)
 
     level_navigation = [
@@ -323,7 +323,7 @@ def show_learning_section(total_progress, completed_count, progress):
     if st.button("❓ Ayuda y Recursos", use_container_width=True, key="learn_ayuda"):
         st.switch_page("pages/00_Ayuda.py")
     
-    # Back button
+    # UI - Boton de Regreso
     if st.button("⬅️ Volver", key="back_from_learning"):
         st.session_state.show_learning_section = False
         # Clear selected_template to avoid redirect loops
@@ -345,12 +345,12 @@ def show_user_profile_section(username, total_progress, completed_count, user_id
     with col3:
         st.metric(replace_emojis("🎯 Usuario"), username)
     
-    # Progress reset and detailed view options
+    # UI - Opciones de Reinicio de Progreso y Vista Detallada
     if user_id:
         show_progress_reset_button(user_id)
         show_detailed_progress(user_id)
     
-    # Quick navigation for experienced users
+    # UI - Navegacion Rapida para Usuarios con Experiencia
     if completed_count >= 2:
         st.markdown(f"""
         <div style="background: rgba(40, 167, 69, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #28a745;">
@@ -436,7 +436,7 @@ def show_progress_reset_button(user_id):
         if st.button("📊 Ver Progreso Detallado", use_container_width=True):
             st.session_state.show_detailed_progress = True
     
-    # Reset confirmation dialog
+    # UI - Dialogo de Confirmacion de Reinicio
     if st.session_state.get('show_reset_confirmation', False):
         st.markdown(f"""
         <div style="background: rgba(220, 53, 69, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #dc3545;">

@@ -50,7 +50,7 @@ def sanitize_error_message(error_msg: str) -> str:
     if not error_msg:
         return "An error occurred"
     
-    # Remove paths
+    # Limpieza - Remover Rutas de Mensajes de Error
     error_msg = re.sub(r'/mount/src/[^/]+/', '[APP]/', error_msg)
     error_msg = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[PATH]', error_msg)
     error_msg = re.sub(r'/home/[^/]+/', '[HOME]/', error_msg)
@@ -125,10 +125,10 @@ def configure_streamlit_error_handling():
     Configure Streamlit to suppress default error tracebacks
     This should be called at the start of your main page
     """
-    # Set Streamlit to show minimal errors
-    # Note: This is a workaround as Streamlit doesn't have a direct setting for this
+    # Configuracion - Configurar Streamlit para Mostrar Errores Minimos
+    # Nota: Esto es un workaround ya que Streamlit no tiene una configuracion directa para esto
     
-    # Override sys.excepthook to catch unhandled exceptions
+    # Configuracion - Sobrescribir sys.excepthook para Capturar Excepciones No Manejadas
     original_excepthook = sys.excepthook
     
     def custom_excepthook(exc_type, exc_value, exc_traceback):

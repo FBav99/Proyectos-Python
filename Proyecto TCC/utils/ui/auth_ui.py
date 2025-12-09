@@ -85,7 +85,7 @@ def show_login_form():
         else:
             st.markdown(f"{get_icon("❌", 20)} {message}", unsafe_allow_html=True)
     
-    # Add additional options
+    # UI - Agregar Opciones Adicionales
     st.markdown("---")
     st.markdown(replace_emojis("### 🔐 ¿Necesitas ayuda?"), unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
@@ -172,11 +172,11 @@ def show_user_sidebar(current_user=None):
 # Consulta - Obtener Usuario Actual
 def get_current_user():
     """Get current authenticated user (handles both database and OAuth users)"""
-    # First check for OAuth user in session state
+    # Validacion - Verificar Usuario OAuth en Session State
     if st.session_state.get('authenticated') and st.session_state.get('oauth_user'):
         return st.session_state.oauth_user
     
-    # Then check for database user
+    # Consulta - Obtener Usuario de Base de Datos
     return db_get_current_user()
 
 # Inicializacion - Inicializar Sidebar
@@ -191,12 +191,12 @@ def handle_authentication():
     """Handle authentication flow and return user info if authenticated"""
     current_user = get_current_user()
     
-    # Always show sidebar with username (even if not authenticated)
+    # UI - Mostrar Sidebar con Nombre de Usuario (Incluso si No Autenticado)
     name = show_user_sidebar(current_user)
     
     if not current_user:
         show_login_form()
         return None, None
     
-    # User is authenticated
+    # Validacion - Usuario Autenticado
     return current_user, name

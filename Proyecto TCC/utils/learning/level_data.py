@@ -108,17 +108,17 @@ def get_data_progression_info():
 
 def analyze_uploaded_data(df_uploaded):
     """Analyze uploaded data and return analysis results"""
-    # Calculate data types
+    # Calculo - Calcular Tipos de Datos
     numeric_cols = df_uploaded.select_dtypes(include=[np.number]).columns.tolist()
     text_cols = df_uploaded.select_dtypes(include=['object']).columns.tolist()
     date_cols = df_uploaded.select_dtypes(include=['datetime64']).columns.tolist()
     
-    # Check for missing values
+    # Validacion - Verificar Valores Faltantes
     missing_data = df_uploaded.isnull().sum()
     total_missing = missing_data.sum()
     missing_percentage = (total_missing / (len(df_uploaded) * len(df_uploaded.columns))) * 100
     
-    # Check for duplicate rows
+    # Validacion - Verificar Filas Duplicadas
     duplicates = df_uploaded.duplicated().sum()
     
     return {

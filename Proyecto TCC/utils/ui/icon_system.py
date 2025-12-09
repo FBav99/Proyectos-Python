@@ -120,6 +120,6 @@ def get_emoji_only(text: str) -> str:
     Extract emojis from text without converting to HTML
     Use this for component labels (st.button, st.text_input, etc.) that don't support HTML
     """
-    # For now, just return the text as-is (emojis will display natively)
-    # This is a placeholder for future logic if needed
+    # Procesamiento - Retornar Texto Tal Como Esta (Emojis se Mostraran Nativamente)
+    # Nota: Placeholder para Logica Futura si se Necesita
     return text

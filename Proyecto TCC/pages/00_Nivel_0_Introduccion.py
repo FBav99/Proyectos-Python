@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import io
 from datetime import datetime
-from utils.system import display_level_gif
 from utils.learning import load_level_styles, get_level_progress, create_step_card, create_info_box, create_sample_data, analyze_uploaded_data
 from utils.learning.learning_progress import save_level_progress
 from utils.learning.level_components import create_progression_summary, create_level_preview, create_achievement_display
@@ -220,13 +219,6 @@ def main():
             ]
         }
     )
-    
-    # 5. Optional media (images, diagrams, icons)
-    st.header(replace_emojis("🎥 Demostración Visual"))
-    try:
-        display_level_gif("nivel0", "conceptos_datos")
-    except:
-        st.info(replace_emojis("📹 GIF de demostración no disponible. Los conceptos incluyen: 1) Qué son los datos, 2) Tipos de datos, 3) Cómo organizarlos, 4) Qué puedes hacer con ellos."))
     
     # UI - Mostrar Seccion de Ejemplo
     st.header(replace_emojis("🎯 Ejemplo Práctico"))

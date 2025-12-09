@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional
 
 import bcrypt
 
-# Try to import PostgreSQL support (optional - for Supabase)
+# Importacion - Intentar Importar Soporte PostgreSQL (Opcional - para Supabase)
 try:
     import psycopg2
     from psycopg2.extras import RealDictCursor
@@ -30,7 +30,7 @@ except ImportError:  # pragma: no cover - Streamlit not available in all environ
     st = None
 
 # =============================================================================
-# PostgreSQL wrappers to emulate SQLite-style convenience methods
+# Wrapper - Wrappers de PostgreSQL para Emular Metodos Convenientes de SQLite
 # =============================================================================
 class PostgresConnectionWrapper:
     """Wrapper that mimics sqlite3 connection API for psycopg2 connections."""
@@ -150,11 +150,11 @@ class PostgresCursorWrapper:
     def __getattr__(self, item):
         return getattr(self._cursor, item)
 
-# Configurar logging
+# Configuracion - Configurar Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Configuración de base de datos
+# Configuracion - Configuracion de Base de Datos
 DB_PATH = 'tcc_database.db'
 MIGRATIONS_DIR = 'migrations'
 
@@ -173,8 +173,7 @@ if POSTGRES_AVAILABLE:
                 _POOL_CACHE[connection_string] = SimpleConnectionPool(minconn=1, maxconn=5, dsn=connection_string)
             return _POOL_CACHE[connection_string]
 
-# Detectar tipo de base de datos desde secrets (Streamlit Cloud)
-# Consulta - Obtener Tipo de Base de Datos
+# Consulta - Obtener Tipo de Base de Datos desde Secrets
 def get_db_type():
     """Detecta el tipo de base de datos desde secrets"""
     try:
@@ -969,9 +968,9 @@ class DatabaseManager:
 # Global database manager instance
 db_manager = DatabaseManager()
 
-# Auto-initialize database on module import (for Streamlit Cloud)
-# This ensures the database is always ready when any module imports this
-# Using a module-level flag to prevent multiple initializations
+# Inicializacion - Auto Inicializar Base de Datos al Importar Modulo
+# Esto asegura que la base de datos siempre este lista cuando cualquier modulo la importe
+# Usando una bandera a nivel de modulo para prevenir multiples inicializaciones
 _db_initialized = False
 
 # Inicializacion - Auto Inicializar Base de Datos
@@ -993,7 +992,7 @@ def _auto_init_database():
         # Still mark as attempted to avoid repeated tries
         _db_initialized = True
 
-# Run auto-initialization (only once)
+# Inicializacion - Ejecutar Auto Inicializacion (Solo una Vez)
 _auto_init_database()
 
 # Conexion - Obtener Conexion (Compatibilidad)

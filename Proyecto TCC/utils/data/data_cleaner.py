@@ -142,10 +142,10 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Cleaned DataFrame
     """
-    # Initialize cleaner
+    # Inicializacion - Inicializar Limpiador de Datos
     cleaner = DataCleaner(df)
     
-    # Store cleaner in session state to persist across reruns
+    # Estado - Guardar Limpiador en Session State para Persistencia
     if 'data_cleaner' not in st.session_state:
         st.session_state.data_cleaner = cleaner
     else:
@@ -153,13 +153,13 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
         if not st.session_state.data_cleaner.original_df.equals(df):
             st.session_state.data_cleaner = cleaner
     
-    # Use the session state cleaner
+    # Estado - Usar Limpiador de Session State
     cleaner = st.session_state.data_cleaner
     
-    # Main header with data overview
+    # UI - Mostrar Encabezado Principal con Resumen de Datos
     st.markdown("## 🧹 Limpieza de Datos")
     
-    # Quick data overview
+    # UI - Mostrar Resumen Rapido de Datos
     quality_report = cleaner.get_quality_report()
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -174,7 +174,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
     
     st.markdown("---")
     
-    # Main cleaning interface with better organization
+    # UI - Mostrar Interfaz Principal de Limpieza
     tab1, tab2, tab3, tab4 = st.tabs([replace_emojis("🚀 Limpieza Rápida"), "🔧 Limpieza Avanzada", "📊 Análisis", "📋 Historial"])
     
     with tab1:
@@ -683,7 +683,7 @@ def create_data_cleaning_interface(df: pd.DataFrame) -> pd.DataFrame:
                 st.markdown(replace_emojis("✅ Estado actual guardado!"), unsafe_allow_html=True)
                 st.rerun()
     
-    # Action buttons for using cleaned data
+    # UI - Mostrar Botones de Accion para Usar Datos Limpiados
     st.markdown("---")
     st.markdown(replace_emojis("### 🎯 Acciones con Datos Limpiados"), unsafe_allow_html=True)
     

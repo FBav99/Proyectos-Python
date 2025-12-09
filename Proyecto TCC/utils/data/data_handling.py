@@ -97,7 +97,7 @@ def show_upload_section():
     st.markdown("---")
     st.markdown(replace_emojis("### 📤 Subir tus Propios Datos"), unsafe_allow_html=True)
     
-    # Show current data info if exists
+    # UI - Mostrar Info de Datos Actuales si Existen
     if 'uploaded_data' in st.session_state and st.session_state.uploaded_data is not None:
         st.markdown(f"{get_icon("📊", 20)} Datos actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas", unsafe_allow_html=True)
         if st.button("⬅️ Volver a Datos Actuales", type="secondary"):
@@ -157,7 +157,7 @@ def show_upload_section():
         except Exception as e:
             st.markdown(f"{get_icon("❌", 20)} Error al cargar el archivo: {str(e)}", unsafe_allow_html=True)
     
-    # Back button
+    # UI - Mostrar Boton de Volver
     if st.button("⬅️ Volver", key="back_from_upload"):
         st.session_state.show_upload_section = False
         # Clear selected_template to avoid redirect loops
@@ -174,7 +174,7 @@ def show_examples_section():
     
     sample_datasets = get_sample_datasets()
     
-    # Display sample datasets in a clean grid
+    # UI - Mostrar Datasets de Ejemplo en Grid
     cols = st.columns(2)
     for i, (name, info) in enumerate(sample_datasets.items()):
         with cols[i % 2]:
@@ -201,7 +201,7 @@ def show_examples_section():
                     st.success(f"¡Dataset {name} cargado exitosamente!")
                     st.rerun()
     
-    # Back button
+    # UI - Mostrar Boton de Volver
     if st.button("⬅️ Volver", key="back_from_examples"):
         st.session_state.show_examples_section = False
         # Clear selected_template to avoid redirect loops

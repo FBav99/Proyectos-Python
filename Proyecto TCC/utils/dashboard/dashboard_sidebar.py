@@ -478,7 +478,7 @@ def _create_card_base(width, body_height, fonts, title):
     card = Image.new("RGB", (width, total_height), "#ffffff")
     draw = ImageDraw.Draw(card)
 
-    # Outer card
+    # UI - Tarjeta Externa
     draw.rounded_rectangle((0, 0, width, total_height), radius=18, fill="#ffffff", outline="#e2e8f0", width=2)
 
     # Header

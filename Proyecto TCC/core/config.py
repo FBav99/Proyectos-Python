@@ -26,7 +26,7 @@ def setup_page_config():
 # CUSTOM STYLES
 # ============================================================================
 
-# CSS personalizado para mejorar el estilo visual de la aplicación
+# Estilo - CSS Personalizado para Mejorar Estilo Visual
 CUSTOM_CSS = """
 <style>
     .main-header {

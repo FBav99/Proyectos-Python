@@ -26,10 +26,10 @@ def show_kpi_template(df, username):
     st.markdown(replace_emojis("### 🎯 Plantilla KPI - Nivel Macro"), unsafe_allow_html=True)
     st.markdown("*Dashboard ejecutivo con indicadores clave de rendimiento*")
     
-    # Calculate basic metrics
+    # Calculo - Calcular Metricas Basicas
     metrics = calculate_metrics(df)
     
-    # Display key KPIs in a prominent way
+    # UI - Mostrar KPIs de Forma Prominente
     st.markdown(replace_emojis("#### 📊 Indicadores Clave de Rendimiento"), unsafe_allow_html=True)
     
     # Main KPI row
@@ -50,7 +50,7 @@ def show_kpi_template(df, username):
         quality_score = 85  # Placeholder - could be calculated
         st.metric(replace_emojis("🎯 Calidad de Datos"), f"{quality_score}%", delta="+5%")
     
-    # Executive summary
+    # UI - Resumen Ejecutivo
     st.markdown(replace_emojis("#### 📋 Resumen Ejecutivo"), unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
@@ -66,7 +66,7 @@ def show_kpi_template(df, username):
         st.markdown(replace_emojis("- 🔍 Monitorear outliers"), unsafe_allow_html=True)
         st.markdown(replace_emojis("- 📊 Revisar métricas mensuales"), unsafe_allow_html=True)
     
-    # Simple trend chart if date column exists
+    # Visualizacion - Grafico de Tendencia Simple si Existe Columna de Fecha
     st.markdown(replace_emojis("#### 📈 Tendencia General"), unsafe_allow_html=True)
     time_chart = create_time_series_chart(df)
     if time_chart is not None:
@@ -74,7 +74,7 @@ def show_kpi_template(df, username):
     else:
         st.info("No se pudo crear el gráfico de tendencias. Verifica que tengas columnas de fecha y valores numéricos.")
     
-    # Update user progress
+    # Progreso - Actualizar Progreso de Usuario
     update_user_progress(username, data_analyses_created=1)
 
 def show_analytical_template(df, username):
@@ -83,16 +83,16 @@ def show_analytical_template(df, username):
     st.markdown(replace_emojis("### 📊 Plantilla Analítica - Nivel Medio"), unsafe_allow_html=True)
     st.markdown("*Dashboard analítico con análisis detallado por segmentos*")
     
-    # Calculate metrics
+    # Calculo - Calcular Metricas
     metrics = calculate_metrics(df)
     
-    # Display metrics dashboard
+    # UI - Mostrar Dashboard de Metricas
     display_metrics_dashboard(metrics, df)
     
-    # Segment analysis
+    # Analisis - Analisis por Segmentos
     st.markdown(replace_emojis("#### 🔍 Análisis por Segmentos"), unsafe_allow_html=True)
     
-    # Category analysis
+    # Analisis - Analisis por Categoria
     col1, col2 = st.columns(2)
     
     with col1:
@@ -111,7 +111,7 @@ def show_analytical_template(df, username):
         else:
             st.info("No hay suficientes datos categóricos para este análisis.")
     
-    # Correlation analysis
+    # Analisis - Analisis de Correlaciones
     st.markdown("#### 🔗 Análisis de Correlaciones")
     corr_chart = create_correlation_matrix(df)
     if corr_chart is not None:
@@ -119,7 +119,7 @@ def show_analytical_template(df, username):
     else:
         st.info("Se necesitan al menos 2 columnas numéricas para el análisis de correlaciones.")
     
-    # Time series analysis
+    # Analisis - Analisis de Series Temporales
     st.markdown(replace_emojis("#### 📈 Análisis Temporal"), unsafe_allow_html=True)
     time_chart = create_time_series_chart(df)
     if time_chart is not None:
@@ -127,7 +127,7 @@ def show_analytical_template(df, username):
     else:
         st.info("No se pudo crear el análisis temporal. Verifica que tengas columnas de fecha y valores numéricos.")
     
-    # Performance insights
+    # Analisis - Insights de Rendimiento
     st.markdown(replace_emojis("#### 💡 Insights de Rendimiento"), unsafe_allow_html=True)
     insights = calculate_performance_insights(df)
     for insight in insights[:3]:  # Show top 3 insights
@@ -142,18 +142,18 @@ def show_detailed_template(df, username):
     st.markdown(replace_emojis("### 🔍 Plantilla Detallada - Nivel Micro"), unsafe_allow_html=True)
     st.markdown("*Dashboard granular con análisis exhaustivo y patrones detallados*")
     
-    # Calculate comprehensive metrics
+    # Calculo - Calcular Metricas Comprehensivas
     metrics = calculate_metrics(df)
     growth_metrics = calculate_growth_metrics(df)
     
-    # Display all metrics
+    # UI - Mostrar Todas las Metricas
     display_metrics_dashboard(metrics, df)
     
-    # Growth metrics
+    # UI - Metricas de Crecimiento
     st.markdown(replace_emojis("#### 📈 Métricas de Crecimiento"), unsafe_allow_html=True)
     display_metrics_dashboard(growth_metrics, df)
     
-    # Detailed analysis tabs
+    # UI - Pestañas de Analisis Detallado
     tab1, tab2, tab3, tab4 = st.tabs([replace_emojis("📊 Distribuciones"), "🔍 Outliers", "📈 Tendencias", "🔗 Correlaciones"])
     
     with tab1:
@@ -219,15 +219,15 @@ def show_detailed_template(df, username):
         else:
             st.info("Se necesitan al menos 2 columnas numéricas para el análisis de correlaciones.")
     
-    # Custom calculations section
+    # UI - Seccion de Calculos Personalizados
     st.markdown(replace_emojis("#### 🧮 Cálculos Personalizados"), unsafe_allow_html=True)
     create_custom_calculations_ui(df)
     
-    # Export section
+    # UI - Seccion de Exportacion
     st.markdown(replace_emojis("#### 📤 Exportar Análisis"), unsafe_allow_html=True)
     display_export_section(df, {}, metrics)
     
-    # Update user progress
+    # Progreso - Actualizar Progreso de Usuario
     update_user_progress(username, data_analyses_created=1)
 
 def show_dashboard_selection(df, username):
@@ -236,7 +236,7 @@ def show_dashboard_selection(df, username):
     
     st.markdown(replace_emojis("# 📊 Dashboard de Análisis"), unsafe_allow_html=True)
     
-    # Template selection if not already selected
+    # UI - Seleccion de Plantilla si No Esta Seleccionada
     if selected_template == 'blank':
         st.markdown(replace_emojis("### 🎨 Selecciona el tipo de dashboard"), unsafe_allow_html=True)
         
@@ -269,7 +269,7 @@ def show_dashboard_selection(df, username):
                 st.session_state.selected_template = "detailed"
                 st.rerun()
     
-    # Show selected template
+    # UI - Mostrar Plantilla Seleccionada
     if selected_template == "kpi":
         show_kpi_template(df, username)
     elif selected_template == "analytical":
@@ -279,6 +279,6 @@ def show_dashboard_selection(df, username):
 
 def update_user_progress(username, **kwargs):
     """Update user progress in the database"""
-    # This function would update user progress in the database
-    # For now, it's a placeholder
+    # Progreso - Actualizar Progreso de Usuario en Base de Datos
+    # Nota: Por ahora es un placeholder
     pass

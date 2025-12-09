@@ -589,7 +589,7 @@ def get_current_user() -> Optional[Dict]:
     if not st.session_state.authenticated:
         return None
     
-    # Verify session is still valid
+    # Validacion - Verificar si Sesion es Valida
     if 'session_token' in st.session_state:
         valid, user_data = auth_service.verify_session(st.session_state.session_token)
         if valid:

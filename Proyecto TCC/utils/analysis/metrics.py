@@ -44,7 +44,7 @@ def calculate_growth_metrics(df):
     """Calcular métricas de crecimiento de forma flexible"""
     metrics = {}
     
-    # Buscar columnas de fecha
+    # Consulta - Buscar Columnas de Fecha
     date_cols = df.select_dtypes(include=['datetime64']).columns
     if len(date_cols) == 0:
         # Intentar convertir columnas que parezcan fechas
@@ -90,7 +90,7 @@ def calculate_performance_insights(df):
     """Calcular perspectivas de rendimiento de forma flexible"""
     insights = []
     
-    # Buscar columnas categóricas
+    # Consulta - Buscar Columnas Categoricas
     categorical_cols = df.select_dtypes(include=['object']).columns
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     

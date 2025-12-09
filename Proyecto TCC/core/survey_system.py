@@ -54,15 +54,15 @@ class SurveySystem:
         """Save survey response to database"""
         cache_payload = None
         try:
-            # Ensure survey_responses table exists
+            # Inicializacion - Asegurar que Tabla de Respuestas Existe
             self._ensure_table_exists()
             key = self._cache_key(user_id, survey_type, level)
             
             with db_manager.get_connection() as conn:
-                # Convert responses to JSON string
+                # Conversion - Convertir Respuestas a String JSON
                 responses_json = json.dumps(responses, ensure_ascii=False)
                 
-                # Check if survey already exists for this user/type/level
+                # Consulta - Verificar si Encuesta ya Existe para Usuario/Tipo/Nivel
                 if db_manager.db_type == "sqlite":
                     if level:
                         cursor = conn.execute("""
@@ -90,7 +90,7 @@ class SurveySystem:
                     existing = cursor.fetchone()
                 
                 if existing:
-                    # Update existing response
+                    # Actualizacion - Actualizar Respuesta Existente
                     if db_manager.db_type == "sqlite":
                         if level:
                             conn.execute("""
@@ -118,7 +118,7 @@ class SurveySystem:
                                 WHERE user_id = ? AND survey_type = ? AND level IS NULL
                             """), (responses_json, user_id, survey_type,))
                 else:
-                    # Insert new response
+                    # Insercion - Insertar Nueva Respuesta
                     if db_manager.db_type == "sqlite":
                         conn.execute("""
                             INSERT INTO survey_responses (user_id, survey_type, level, responses)
@@ -136,7 +136,7 @@ class SurveySystem:
             logger.error(f"Error saving survey response: {e}")
             return False
         else:
-            # Update caches on success
+            # Cache - Actualizar Caches en Exito
             self._completion_cache[key] = True
             try:
                 self._response_cache[key] = json.loads(cache_payload) if cache_payload is not None else responses
@@ -147,7 +147,7 @@ class SurveySystem:
     def has_completed_survey(self, user_id: int, survey_type: str, level: Optional[str] = None) -> bool:
         """Check if user has completed a specific survey"""
         try:
-            # Ensure survey_responses table exists
+            # Inicializacion - Asegurar que Tabla de Respuestas Existe
             self._ensure_table_exists()
             key = self._cache_key(user_id, survey_type, level)
             
@@ -155,7 +155,7 @@ class SurveySystem:
                 return self._completion_cache[key]
             
             with db_manager.get_connection() as conn:
-                # Use conn.execute for SQLite compatibility
+                # Base de Datos - Usar conn.execute para Compatibilidad SQLite
                 if db_manager.db_type == "sqlite":
                     if level:
                         cursor = conn.execute("""
@@ -257,7 +257,7 @@ class SurveySystem:
                         # Convert to dict for SQLite Row objects
                         row_dict = dict(zip([col[0] for col in cursor.description], row))
                     
-                    # Parse JSON responses
+                    # Conversion - Parsear Respuestas JSON
                     if 'responses' in row_dict:
                         row_dict['responses'] = json.loads(row_dict['responses'])
                     
@@ -270,6 +270,6 @@ class SurveySystem:
             return []
 
 
-# Global survey system instance
+# Instancia - Instancia Global de Survey System
 survey_system = SurveySystem()
 

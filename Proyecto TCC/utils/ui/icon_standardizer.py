@@ -11,9 +11,9 @@ import json
 class IconStandardizer:
     """Sistema para estandarizar y reemplazar iconos en el proyecto"""
     
-    # Mapeo estandarizado de iconos por categoría
-    # NOTA: Estos son emojis directos, no llamadas a replace_emojis() porque
-    # este diccionario se evalúa en tiempo de importación
+    # Configuracion - Mapeo Estandarizado de Iconos por Categoria
+    # Nota: Estos son emojis directos, no llamadas a replace_emojis() porque
+    # este diccionario se evalua en tiempo de importacion
     STANDARD_ICONS = {
         # Niveles de Aprendizaje
         'nivel0': '🌟',  # Introducción
@@ -120,8 +120,8 @@ class IconStandardizer:
         'soporte': '🆘',
     }
     
-    # Mapeo de emojis comunes a nombres estandarizados
-    # NOTA: Estos son emojis directos como claves
+    # Configuracion - Mapeo de Emojis Comunes a Nombres Estandarizados
+    # Nota: Estos son emojis directos como claves
     EMOJI_TO_STANDARD = {
         '📚': 'nivel1',
         '🔍': 'nivel2',

@@ -82,7 +82,7 @@ def apply_all_filters(df, original_df):
     """Aplicar todos los filtros"""
     filters_applied = {}
     
-    # Aplicar filtros en secuencia
+    # Procesamiento - Aplicar Filtros en Secuencia
     df, date_filters = apply_date_filter(df, original_df)
     filters_applied.update(date_filters)
     

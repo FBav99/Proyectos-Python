@@ -56,7 +56,7 @@ def create_gif_placeholder(nivel, gif_name, description=""):
         gif_name (str): Name of the GIF
         description (str): Description of what the GIF should show
     """
-    # Try to display a placeholder GIF using Streamlit's image function
+    # UI - Intentar Mostrar GIF Placeholder usando Funcion de Imagen de Streamlit
     try:
         # Using a reliable placeholder GIF
         placeholder_url = "https://media1.tenor.com/m/Ta7yC7OAADkAAAAd/fernet-branca.gif"

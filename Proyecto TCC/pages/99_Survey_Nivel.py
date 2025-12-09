@@ -29,10 +29,10 @@ LEVEL_INFO = {
 
 @safe_main
 def main():
-    # Initialize sidebar
+    # UI - Inicializar Sidebar
     current_user = init_sidebar()
     
-    # Check if user is authenticated
+    # Validacion - Verificar si Usuario esta Autenticado
     if not current_user:
         st.markdown(replace_emojis("🔐 Por favor inicia sesión para acceder a esta encuesta."), unsafe_allow_html=True)
         if st.button("Ir al Inicio", type="primary"):
@@ -41,7 +41,7 @@ def main():
     
     user_id = current_user['id']
     
-    # Get level from session state (query params not supported in switch_page)
+    # Estado - Obtener Nivel desde Session State
     level = st.session_state.get('survey_level', None)
     
     if not level or level not in LEVEL_INFO:
@@ -52,7 +52,7 @@ def main():
     
     level_info = LEVEL_INFO[level]
     
-    # Check if user has already completed this survey for this level
+    # Validacion - Verificar si Usuario ya Completo Encuesta para este Nivel
     if survey_system.has_completed_survey(user_id, 'level', level):
         icon_html = get_icon('✅', 20)
         st.markdown(f"{icon_html} Ya completaste la encuesta para el {level_info['name']}.", unsafe_allow_html=True)
@@ -81,7 +81,7 @@ def main():
     
     st.divider()
     
-    # Survey questions
+    # UI - Mostrar Preguntas de Encuesta
     with st.form("level_survey_form"):
         st.subheader(replace_emojis("📊 Calificación del Contenido"))
         
@@ -196,7 +196,7 @@ def main():
             else:
                 st.markdown(replace_emojis("❌ Hubo un error al guardar tus respuestas. Por favor intenta de nuevo."), unsafe_allow_html=True)
     
-    # Show navigation buttons after form submission (outside the form)
+    # UI - Mostrar Botones de Navegacion despues de Enviar Formulario
     if st.session_state.get(f'survey_{level}_submitted', False):
         st.divider()
         

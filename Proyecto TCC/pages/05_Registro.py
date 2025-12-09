@@ -52,7 +52,7 @@ def main():
         layout="wide"
     )
     
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     init_sidebar()
     
     st.markdown(f"""
@@ -62,10 +62,10 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Create registration form
+    # UI - Crear Formulario de Registro
     st.markdown(replace_emojis("### 🔐 Crear Nueva Cuenta"), unsafe_allow_html=True)
     
-    # Password requirements tooltip text
+    # UI - Texto de Ayuda para Requisitos de Contraseña
     password_help = "La contraseña debe tener: mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
     
     with st.form("registration_form", clear_on_submit=False):
@@ -200,13 +200,13 @@ def main():
                     st.session_state.registration_error = f'{get_icon("❌", 20)} Error durante el registro: {str(e)}'
                     st.rerun()
     
-    # Show error messages outside form (if any)
+    # UI - Mostrar Mensajes de Error fuera del Formulario
     if 'registration_error' in st.session_state and st.session_state.registration_error:
         st.error(st.session_state.registration_error)
         # Clear error after showing
         del st.session_state.registration_error
     
-    # Show success message outside form (if registration was successful)
+    # UI - Mostrar Mensaje de Exito fuera del Formulario
     if st.session_state.get('registration_success', False):
         user_info = st.session_state.get('registered_user', {})
         st.markdown(replace_emojis('✅ Usuario registrado exitosamente!'), unsafe_allow_html=True)

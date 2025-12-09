@@ -237,7 +237,7 @@ def configure_component(component, df):
             key=f"table_rows_{component['id']}"
         )
     
-    # Title configuration for all components
+    # Configuracion - Configuracion de Titulo para Todos los Componentes
     config['title'] = st.text_input(
         "Título del componente:",
         value=config.get('title', component['title']),
@@ -249,13 +249,13 @@ def create_component_buttons(key_prefix="", expand_all=False):
     """Create buttons for adding different component types"""
     st.markdown(replace_emojis("### 🎯 Tipos de Componentes"), unsafe_allow_html=True)
     
-    # Metrics category
+    # UI - Categoria de Metricas
     with st.expander(replace_emojis("📈 Métricas y KPIs"), expanded=expand_all):
         st.markdown("**Indicadores numéricos clave**")
         if st.button("📊 Agregar Métrica", key=f"{key_prefix}add_metric", use_container_width=True):
             return replace_emojis("📈 Métricas")
     
-    # Charts category
+    # UI - Categoria de Graficos
     with st.expander(replace_emojis("📊 Gráficos Básicos"), expanded=expand_all):
         st.markdown("**Visualizaciones fundamentales**")
         
@@ -274,7 +274,7 @@ def create_component_buttons(key_prefix="", expand_all=False):
             if st.button("📈 Área", key=f"{key_prefix}add_area", use_container_width=True):
                 return replace_emojis("📈 Gráfico de Área")
     
-    # Advanced charts category
+    # UI - Categoria de Graficos Avanzados
     with st.expander("🔬 Gráficos Avanzados", expanded=expand_all):
         st.markdown("**Análisis estadístico avanzado**")
         
@@ -293,7 +293,7 @@ def create_component_buttons(key_prefix="", expand_all=False):
             if st.button("📈 Violín", key=f"{key_prefix}add_violin", use_container_width=True):
                 return replace_emojis("📈 Gráfico de Violín")
     
-    # Analysis category
+    # UI - Categoria de Analisis
     with st.expander(replace_emojis("🔍 Análisis"), expanded=expand_all):
         st.markdown("**Herramientas de análisis**")
         

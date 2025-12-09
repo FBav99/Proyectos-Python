@@ -76,10 +76,10 @@ def create_progression_summary(user_progress):
     summary = get_progression_summary(user_progress)
     achievements = get_level_achievements()
     
-    # Main title
+    # UI - Titulo Principal
     st.markdown(replace_emojis("### 📊 Tu Progreso de Aprendizaje"), unsafe_allow_html=True)
     
-    # Progress stats in columns
+    # UI - Estadisticas de Progreso en Columnas
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Niveles Completados", len(summary['completed_levels']))
@@ -88,7 +88,7 @@ def create_progression_summary(user_progress):
     with col3:
         st.metric("Progreso Total", f"{summary['completion_percentage']:.0f}%")
     
-    # Achievements section
+    # UI - Seccion de Logros
     if summary['completed_levels']:
         st.markdown(replace_emojis("#### 🏆 Logros Desbloqueados:"), unsafe_allow_html=True)
         
@@ -102,7 +102,7 @@ def create_progression_summary(user_progress):
                     with st.container():
                         st.markdown(f"**{badge['icon']} {badge['title']}**")
     
-    # Next milestone
+    # UI - Proxima Meta
     next_milestone = summary['next_milestone']
     st.markdown(replace_emojis("#### 🎯 Siguiente Meta:"), unsafe_allow_html=True)
     st.markdown(f"**{next_milestone['title']}**", unsafe_allow_html=True)

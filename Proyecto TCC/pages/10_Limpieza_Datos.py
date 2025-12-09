@@ -18,7 +18,7 @@ def main():
     setup_page_config()
     apply_custom_css()
     
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     init_sidebar()
     
     # Título principal
@@ -39,7 +39,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Verificar si hay datos cargados
+    # Validacion - Verificar si hay Datos Cargados
     if 'uploaded_data' in st.session_state and st.session_state.uploaded_data is not None:
         # Header with current file info and upload new file option
         col1, col2 = st.columns([3, 1])

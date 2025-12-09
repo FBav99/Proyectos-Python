@@ -9,7 +9,7 @@ def create_sidebar_controls():
     """Crear controles de la barra lateral"""
     st.sidebar.title(replace_emojis("🔧 Controles"))
     
-    # Carga de archivos
+    # Archivo - Cargar Archivo desde Sidebar
     uploaded_file = st.sidebar.file_uploader(
         "Sube tu archivo de datos",
         type=['csv', 'xlsx', 'xls'],
@@ -22,7 +22,7 @@ def create_custom_calculations_ui(df):
     """Crear interfaz para cálculos personalizados"""
     st.sidebar.subheader(replace_emojis("🧮 Cálculos Personalizados"))
     
-    # Obtener columnas numéricas para cálculos
+    # Consulta - Obtener Columnas Numericas para Calculos
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
     date_cols = df.select_dtypes(include=['datetime64']).columns.tolist()
     
@@ -120,7 +120,7 @@ def display_metrics_dashboard(metrics, df):
     """Mostrar panel de métricas clave de forma flexible"""
     st.subheader(replace_emojis("🎯 Métricas Clave de Rendimiento"))
     
-    # Determinar cuántas columnas usar basado en las métricas disponibles
+    # Calculo - Determinar Cantidad de Columnas Basado en Metricas Disponibles
     available_metrics = []
     
     # Métricas básicas que siempre están disponibles
@@ -158,7 +158,7 @@ def display_metrics_dashboard(metrics, df):
     if 'avg_value_2' in metrics:
         available_metrics.append((replace_emojis("📈 Promedio 2"), f"{metrics['avg_value_2']:,.2f}", None))
     
-    # Mostrar métricas en columnas
+    # UI - Mostrar Metricas en Columnas
     if len(available_metrics) >= 4:
         cols = st.columns(4)
         for i, (title, value, delta) in enumerate(available_metrics[:4]):
@@ -174,7 +174,7 @@ def display_metrics_dashboard(metrics, df):
         for title, value, delta in available_metrics:
             st.metric(title, value, delta=delta)
     
-    # Si no hay métricas disponibles, mostrar información básica
+    # UI - Mostrar Informacion Basica si No Hay Metricas Disponibles
     if not available_metrics:
         col1, col2, col3, col4 = st.columns(4)
         with col1:

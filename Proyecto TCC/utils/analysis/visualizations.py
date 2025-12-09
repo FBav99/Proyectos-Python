@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 # Visualizacion - Crear Grafico de Series Temporales
 def create_time_series_chart(df, metric=None):
     """Crear visualización de series temporales de forma flexible"""
-    # Buscar columnas de fecha
+    # Consulta - Buscar Columnas de Fecha
     date_cols = df.select_dtypes(include=['datetime64']).columns
     if len(date_cols) == 0:
         # Intentar convertir columnas que parezcan fechas
@@ -33,7 +33,7 @@ def create_time_series_chart(df, metric=None):
     
     date_col = date_cols[0]
     
-    # Buscar métrica numérica
+    # Consulta - Buscar Metrica Numerica
     if metric is None:
         numeric_cols = df.select_dtypes(include=[np.number]).columns
         if len(numeric_cols) == 0:
@@ -62,14 +62,14 @@ def create_time_series_chart(df, metric=None):
 # Visualizacion - Crear Analisis por Categoria
 def create_category_analysis(df):
     """Crear gráficos de análisis por categoría de forma flexible"""
-    # Buscar columnas categóricas
+    # Consulta - Buscar Columnas Categoricas
     categorical_cols = df.select_dtypes(include=['object']).columns
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     
     if len(categorical_cols) == 0 or len(numeric_cols) == 0:
         return None
     
-    # Usar la primera categoría y la primera métrica numérica
+    # Procesamiento - Usar Primera Categoria y Primera Metrica Numerica
     cat_col = categorical_cols[0]
     metric_col = numeric_cols[0]
     
@@ -90,14 +90,14 @@ def create_category_analysis(df):
 # Visualizacion - Crear Analisis Regional
 def create_regional_analysis(df):
     """Crear visualización de rendimiento regional de forma flexible"""
-    # Buscar columnas categóricas (excluyendo la primera que ya se usó en category_analysis)
+    # Consulta - Buscar Columnas Categoricas (Excluyendo Primera que Ya se Uso)
     categorical_cols = df.select_dtypes(include=['object']).columns
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     
     if len(categorical_cols) < 2 or len(numeric_cols) == 0:
         return None
     
-    # Usar la segunda categoría y la primera métrica numérica
+    # Procesamiento - Usar Segunda Categoria y Primera Metrica Numerica
     cat_col = categorical_cols[1] if len(categorical_cols) > 1 else categorical_cols[0]
     metric_col = numeric_cols[0]
     

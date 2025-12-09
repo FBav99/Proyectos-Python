@@ -28,7 +28,7 @@ from data.sample_datasets import get_sample_datasets
 
 logger = logging.getLogger(__name__)
 
-# Configure error handling
+# Configuracion - Configurar Manejo de Errores
 configure_streamlit_error_handling()
 
 

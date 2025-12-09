@@ -204,7 +204,7 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
     for key in keys_to_clear:
         st.session_state.pop(key, None)
 
-    # Remove legacy flags and selection keys
+    # Limpieza - Remover Flags y Claves de Seleccion Legacy
     for idx in range(total_questions):
         st.session_state.pop(f'{prefix}_answered_{idx}', None)
         st.session_state.pop(f'{prefix}_q{idx}', None)
@@ -232,11 +232,11 @@ def create_quiz(level, username):
     if st.session_state.get(skipped_key):
         st.info("Has pospuesto este quiz. Puedes retomarlo cuando quieras. Recuerda que necesitas aprobarlo para completar el nivel.")
 
-    # Always keep expander open if quiz is completed or started
+    # UI - Mantener Expander Abierto si Quiz Completado o Iniciado
     if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
         st.session_state[expander_key] = True
 
-    # If quiz is completed, force expander to stay open
+    # UI - Forzar Expander Abierto si Quiz Completado
     if st.session_state.get(f'{prefix}_completed', False):
         expanded = True
         st.session_state[expander_key] = True
@@ -371,7 +371,7 @@ def show_quiz_results(level, username, questions, expander_key):
     prefix = f'quiz_{level}'
     st.session_state[expander_key] = True  # Force expander to stay open
 
-    # Verify that quiz data exists
+    # Validacion - Verificar que Datos de Quiz Existen
     if f'{prefix}_score' not in st.session_state or f'{prefix}_answers' not in st.session_state:
         st.error("Error: Los datos del quiz no están disponibles. Por favor, intenta el quiz nuevamente.")
         return
@@ -440,7 +440,7 @@ def show_quiz_results(level, username, questions, expander_key):
             if st.button(f"➡️ Ir al {next_label}", type="primary", use_container_width=True, key=f"{prefix}_next"):
                 st.switch_page(next_page)
 
-    # Only save quiz attempt once when results are first shown
+    # Base de Datos - Guardar Intento de Quiz Solo una Vez
     if not st.session_state.get(f'{prefix}_saved', False):
         save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers)
         st.session_state[f'{prefix}_saved'] = True
@@ -563,7 +563,7 @@ def show_achievements(username):
             </div>
             """, unsafe_allow_html=True)
     
-    # Progress towards next achievements
+    # UI - Mostrar Progreso hacia Proximos Logros
     st.markdown(replace_emojis("### 🎯 Próximos Logros"), unsafe_allow_html=True)
     
     if 'first_level' not in achievements:

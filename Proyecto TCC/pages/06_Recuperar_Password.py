@@ -17,7 +17,7 @@ from core.database import ensure_database_initialized
 try:
     ensure_database_initialized()
 except Exception as e:
-    # Error will be shown when page loads
+    # Error - Se mostrara cuando la pagina cargue
     pass
 
 # Validacion - Formato de Email
@@ -53,7 +53,7 @@ def main():
         layout="wide"
     )
     
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     init_sidebar()
     
     st.markdown("""
@@ -63,7 +63,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Tab selection for different recovery options
+    # UI - Seleccion de Tabs para Opciones de Recuperacion
     tab1, tab2, tab3 = st.tabs(["🔑 Recuperar Contraseña", "📧 Cambiar Email", replace_emojis("🔐 Cambiar Contraseña")])
     
     with tab1:

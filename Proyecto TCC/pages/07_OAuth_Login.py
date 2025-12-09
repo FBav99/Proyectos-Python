@@ -39,11 +39,11 @@ def main():
         layout="wide"
     )
     
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     from utils.ui import auth_ui
     current_user = auth_ui.init_sidebar()
     
-    # Check if user is already authenticated
+    # Validacion - Verificar si Usuario ya esta Autenticado
     if not current_user:
         current_user = get_current_user()
     if current_user:
@@ -66,7 +66,7 @@ def main():
     # OAuth Configuration
     st.markdown(replace_emojis("### 🔐 Opciones de Inicio de Sesión"), unsafe_allow_html=True)
     
-    # Check if OAuth is configured (support both bool and string values in secrets)
+    # Validacion - Verificar si OAuth esta Configurado
     try:
         raw_flag = st.secrets.get("oauth_configured", False)
     except Exception:
@@ -253,7 +253,7 @@ def handle_microsoft_oauth():
 # OAuth - Manejar Callback y Token
 def handle_oauth_callback():
     """Handle OAuth callback and token exchange"""
-    # Check if we're in a callback
+    # Validacion - Verificar si estamos en un Callback
     query_params = st.query_params
     
     if 'code' in query_params and 'state' in query_params:

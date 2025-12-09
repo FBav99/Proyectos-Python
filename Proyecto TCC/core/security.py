@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple
 import logging
 
-# Configure logging
+# Configuracion - Configurar Logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class SecurityManager:
         if not email:
             return False
         
-        # Basic email validation regex
+        # Validacion - Validar Formato de Email con Regex
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return bool(re.match(pattern, email))
     
@@ -57,13 +57,13 @@ class SecurityManager:
         if not input_str:
             return ""
         
-        # Remove potentially dangerous characters
+        # Seguridad - Remover Caracteres Potencialmente Peligrosos
         dangerous_chars = ['<', '>', '"', "'", '&', ';', '(', ')', '{', '}']
         sanitized = input_str
         for char in dangerous_chars:
             sanitized = sanitized.replace(char, '')
         
-        # Limit length
+        # Validacion - Limitar Longitud
         return sanitized[:100] if len(sanitized) > 100 else sanitized
     
     def check_rate_limit(self, identifier: str) -> Tuple[bool, str]:
@@ -73,13 +73,13 @@ class SecurityManager:
         if identifier in self.rate_limit_attempts:
             attempts, last_attempt = self.rate_limit_attempts[identifier]
             
-            # Check if lockout period has expired
+            # Validacion - Verificar si Periodo de Bloqueo Expiro
             if current_time - last_attempt > self.lockout_duration:
-                # Reset attempts after lockout period
+                # Seguridad - Reiniciar Intentos Despues de Periodo de Bloqueo
                 self.rate_limit_attempts[identifier] = (0, current_time)
                 return True, "Rate limit reset"
             
-            # Check if max attempts exceeded
+            # Validacion - Verificar si Maximo de Intentos Excedido
             if attempts >= self.max_login_attempts:
                 remaining_time = int(self.lockout_duration - (current_time - last_attempt))
                 return False, f"Too many attempts. Try again in {remaining_time} seconds"
@@ -96,10 +96,10 @@ class SecurityManager:
         attempts, _ = self.rate_limit_attempts[identifier]
         
         if success:
-            # Reset attempts on successful login
+            # Seguridad - Reiniciar Intentos en Login Exitoso
             self.rate_limit_attempts[identifier] = (0, current_time)
         else:
-            # Increment failed attempts
+            # Contador - Incrementar Intentos Fallidos
             self.rate_limit_attempts[identifier] = (attempts + 1, current_time)
     
     def generate_session_token(self, username: str) -> str:
@@ -112,7 +112,7 @@ class SecurityManager:
         if not token or not username:
             return False
         
-        # Check if token exists and is not expired
+        # Validacion - Verificar si Token Existe y No Expiro
         if token in self.session_tokens:
             token_data = self.session_tokens[token]
             if (token_data['username'] == username and 
@@ -154,27 +154,27 @@ class SecurityManager:
     
     def validate_oauth_state(self, state: str, stored_state: str) -> bool:
         """Validate OAuth state parameter"""
-        # If provider didn't send a state, reject
+        # Validacion - Rechazar si Proveedor No Envio State
         if not state:
             return False
         
-        # In some Streamlit OAuth flows, the callback can arrive in a fresh session
-        # where we no longer have the original stored_state in session_state.
-        # To avoid blocking legitimate logins in that case, we relax the check:
+        # Validacion - Manejar Caso de Callback en Sesion Nueva
+        # En algunos flujos OAuth de Streamlit, el callback puede llegar en una sesion nueva
+        # donde ya no tenemos el stored_state original. Para evitar bloquear logins legitimos,
+        # relajamos la validacion en ese caso.
         if not stored_state:
-            # Logically we can't compare, so allow the flow to continue.
-            # This keeps things simple for educational/demo purposes.
+            # Validacion - Permitir Flujo si No Hay Stored State
             logger.warning("OAuth callback received without stored_state; skipping strict state validation.")
             return True
         
-        # State should match exactly
+        # Validacion - State Debe Coincidir Exactamente
         return state == stored_state
     
     def sanitize_error_message(self, error: Exception) -> str:
         """Sanitize error messages to prevent information disclosure"""
         error_type = type(error).__name__
         
-        # Generic error messages based on error type
+        # Mensaje - Generar Mensajes de Error Genericos por Tipo
         if "authentication" in error_type.lower() or "auth" in error_type.lower():
             return "Authentication error occurred"
         elif "connection" in error_type.lower() or "network" in error_type.lower():
@@ -186,7 +186,7 @@ class SecurityManager:
         else:
             return "An error occurred. Please try again."
 
-# Global security manager instance
+# Instancia - Instancia Global de Security Manager
 security_manager = SecurityManager()
 
 def secure_login(username: str, password: str) -> Tuple[bool, str]:
@@ -196,20 +196,18 @@ def secure_login(username: str, password: str) -> Tuple[bool, str]:
         username = security_manager.sanitize_input(username)
         password = security_manager.sanitize_input(password)
         
-        # Validate inputs
+        # Validacion - Validar Entradas
         if not username or not password:
             return False, "Username and password are required"
         
-        # Check rate limiting
+        # Seguridad - Verificar Rate Limiting
         rate_limit_ok, rate_limit_msg = security_manager.check_rate_limit(username)
         if not rate_limit_ok:
             return False, rate_limit_msg
         
-        # Here you would validate against your authentication system
-        # For now, we'll assume the authentication is handled elsewhere
-        # and we just record the attempt
+        # Nota: La validacion contra el sistema de autenticacion se maneja en otro lugar
         
-        # Record attempt (success will be determined by auth system)
+        # Logging - Registrar Intento (el exito sera determinado por el sistema de auth)
         security_manager.record_attempt(username, True)  # Assume success for now
         
         return True, "Login successful"
@@ -221,11 +219,11 @@ def secure_login(username: str, password: str) -> Tuple[bool, str]:
 def secure_oauth_callback(code: str, state: str, stored_state: str) -> Tuple[bool, str]:
     """Secure OAuth callback handling"""
     try:
-        # Validate state parameter
+        # Validacion - Validar Parametro State
         if not security_manager.validate_oauth_state(state, stored_state):
             return False, "Invalid OAuth state"
         
-        # Sanitize code
+        # Seguridad - Sanitizar Codigo
         code = security_manager.sanitize_input(code)
         
         if not code:
@@ -245,16 +243,16 @@ def secure_user_registration(username: str, email: str, password: str) -> Tuple[
         email = security_manager.sanitize_input(email)
         password = security_manager.sanitize_input(password)
         
-        # Validate email
+        # Validacion - Validar Email
         if not security_manager.validate_email(email):
             return False, "Invalid email format"
         
-        # Validate password strength
+        # Validacion - Validar Fortaleza de Contraseña
         password_ok, password_msg = security_manager.validate_password_strength(password)
         if not password_ok:
             return False, password_msg
         
-        # Validate username
+        # Validacion - Validar Usuario
         if not username or len(username) < 3:
             return False, "Username must be at least 3 characters long"
         
@@ -270,7 +268,7 @@ def secure_user_registration(username: str, email: str, password: str) -> Tuple[
 def get_secure_session_info() -> Dict:
     """Get secure session information"""
     try:
-        # Clean up expired sessions
+        # Limpieza - Limpiar Sesiones Expiradas
         security_manager.cleanup_expired_sessions()
         
         return {
@@ -284,12 +282,12 @@ def get_secure_session_info() -> Dict:
         logger.error(f"Session info error: {str(e)}")
         return {'error': 'Unable to retrieve session information'}
 
-# Security decorators for Streamlit functions
+# Decorador - Decoradores de Seguridad para Funciones de Streamlit
 def secure_function(func):
     """Decorator to add security checks to functions"""
     def wrapper(*args, **kwargs):
         try:
-            # Add any additional security checks here
+            # Seguridad - Agregar Verificaciones de Seguridad Adicionales
             return func(*args, **kwargs)
         except Exception as e:
             logger.error(f"Function {func.__name__} error: {str(e)}")

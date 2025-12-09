@@ -751,7 +751,7 @@ def main():
     )
     apply_custom_css()
     
-    # Initialize sidebar with user info (always visible)
+    # UI - Inicializar Sidebar con Info de Usuario
     current_user = init_sidebar()
     if not current_user:
         st.error("Por favor inicia sesión para acceder a esta página.")
@@ -774,7 +774,7 @@ def main():
     st.markdown(f'<h1 class="main-header">{get_icon("🎨", 20)} Dashboard en Blanco</h1>', unsafe_allow_html=True)
     st.markdown(f'<p style="text-align: center; color: #666; font-size: 1.1rem;">Construye tu dashboard personalizado, <strong>{name}</strong></p>', unsafe_allow_html=True)
     
-    # Initialize dashboard components in session state
+    # Estado - Inicializar Componentes de Dashboard en Session State
     if 'dashboard_components' not in st.session_state:
         st.session_state.dashboard_components = []
     if 'dashboard_component_counter' not in st.session_state:
@@ -794,7 +794,7 @@ def main():
 
     st.markdown('<div class="dashboard-setup-card">', unsafe_allow_html=True)
 
-    # Data selection controls
+    # UI - Mostrar Controles de Seleccion de Datos
     df = select_dashboard_data()
     if df is None:
         st.markdown('</div>', unsafe_allow_html=True)
@@ -841,12 +841,12 @@ def main():
 
     show_dashboard_info(df, show_divider=False, container_class="dashboard-info-card")
 
-    # Create sidebar
+    # UI - Crear Sidebar
     create_dashboard_sidebar(df, show_component_controls=(builder_mode == "Lienzo en blanco"))
 
-    # Main content area
+    # UI - Area de Contenido Principal
     
-    # Component configuration section
+    # UI - Seccion de Configuracion de Componentes
     if st.session_state.get('editing_component') is not None:
         editing_id = st.session_state.editing_component
         component = next((c for c in st.session_state.dashboard_components if c['id'] == editing_id), None)
@@ -867,13 +867,13 @@ def main():
         else:
             st.session_state.editing_component = None
     
-    # Dashboard info
+    # UI - Mostrar Info de Dashboard
     st.markdown("### 🎛️ Vista del dashboard")
     st.markdown('<div class="dashboard-canvas">', unsafe_allow_html=True)
     render_dashboard(df)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Footer navigation
+    # UI - Mostrar Navegacion de Footer
     st.markdown("---")
     st.markdown("### 🧭 Navegación Rápida")
     
