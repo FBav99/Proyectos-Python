@@ -339,7 +339,8 @@ class DatabaseManager:
                         email_verified BOOLEAN DEFAULT FALSE,
                         verification_token VARCHAR(255),
                         reset_token VARCHAR(255),
-                        reset_token_expires TIMESTAMP
+                        reset_token_expires TIMESTAMP,
+                        onboarding_completed BOOLEAN DEFAULT FALSE
                     )
                 """)
             else:
@@ -359,7 +360,8 @@ class DatabaseManager:
                         email_verified BOOLEAN DEFAULT 0,
                         verification_token VARCHAR(255),
                         reset_token VARCHAR(255),
-                        reset_token_expires TIMESTAMP
+                        reset_token_expires TIMESTAMP,
+                        onboarding_completed BOOLEAN DEFAULT 0
                     )
                 """)
             conn.commit()

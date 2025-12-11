@@ -9,18 +9,21 @@ from utils.ui.icon_system import get_icon, replace_emojis
 
 
 @st.cache_data(show_spinner=False, ttl=300)
-def check_onboarding_status(user_id: int, db_manager) -> bool:
+def check_onboarding_status(user_id: int, _db_manager) -> bool:
     """
     Check if user has completed onboarding from database
     Returns True if onboarding completed, False otherwise
     
     Cached for 5 minutes to reduce database queries during page loads.
     Cache is invalidated when onboarding is marked as complete.
+    
+    Note: _db_manager has leading underscore to tell Streamlit not to hash it
+    (DatabaseManager objects are not hashable).
     """
     try:
-        with db_manager.get_connection() as conn:
+        with _db_manager.get_connection() as conn:
             cursor = conn.cursor()
-            if db_manager.db_type == "supabase":
+            if _db_manager.db_type == "supabase":
                 cursor.execute(
                     "SELECT onboarding_completed FROM users WHERE id = %s",
                     (user_id,)
