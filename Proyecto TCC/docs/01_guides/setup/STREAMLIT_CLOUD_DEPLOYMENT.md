@@ -245,7 +245,7 @@ def main():
 
 1. **Use Supabase (Recommended for School Projects)**
    - Free tier with 500MB storage
-   - See `SUPABASE_SETUP_GUIDE.md` for detailed instructions
+   - See `SUPABASE_SETUP_GUIDE.md` (in this same folder) for detailed instructions
    - Just add secrets and your app automatically uses PostgreSQL
    
 2. **Other Options:**

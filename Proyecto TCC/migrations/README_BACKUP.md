@@ -40,7 +40,7 @@ Una vez que tengas el archivo de exportación:
 
 1. Crea una cuenta en [Supabase](https://supabase.com)
 2. Crea un nuevo proyecto
-3. Obtén tu connection string (ver `SUPABASE_SETUP_GUIDE.md`)
+3. Obtén tu connection string (ver `../docs/01_guides/setup/SUPABASE_SETUP_GUIDE.md`)
 
 ### Paso 2: Configurar Streamlit Cloud Secrets
 
@@ -110,7 +110,7 @@ python migrations/migrate_sqlite_to_supabase.py backups/sqlite_export_YYYYMMDD_H
 
 ## 📚 Recursos Adicionales
 
-- `SUPABASE_SETUP_GUIDE.md` - Guía completa de configuración de Supabase
+- `../docs/01_guides/setup/SUPABASE_SETUP_GUIDE.md` - Guía completa de configuración de Supabase
 - `docs/01_guides/DATABASE_IMPLEMENTATION_GUIDE.md` - Documentación de la base de datos
 
 ---
