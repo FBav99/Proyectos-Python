@@ -8,10 +8,14 @@ from typing import List, Dict, Optional
 from utils.ui.icon_system import get_icon, replace_emojis
 
 
+@st.cache_data(show_spinner=False, ttl=300)
 def check_onboarding_status(user_id: int, db_manager) -> bool:
     """
     Check if user has completed onboarding from database
     Returns True if onboarding completed, False otherwise
+    
+    Cached for 5 minutes to reduce database queries during page loads.
+    Cache is invalidated when onboarding is marked as complete.
     """
     try:
         with db_manager.get_connection() as conn:
@@ -53,6 +57,9 @@ def mark_onboarding_complete(user_id: int, db_manager):
                     (user_id,)
                 )
             conn.commit()
+        
+        # Invalidate cache to ensure fresh data on next call
+        check_onboarding_status.clear()
     except Exception as e:
         # If column doesn't exist, that's okay - we'll handle it gracefully
         st.warning(f"Could not save onboarding status: {e}")

@@ -191,10 +191,14 @@ def main():
     # SECCIÓN ONBOARDING - Tour guiado para nuevos usuarios
     # ============================================================================
     if 'oauth_provider' not in current_user:
-        db_manager = DatabaseManager()
+        # Cache DatabaseManager instance per session to avoid recreating connections
+        if '_db_manager' not in st.session_state:
+            st.session_state._db_manager = DatabaseManager()
+        db_manager = st.session_state._db_manager
         user_id = current_user['id']
         
         # Check if user needs onboarding (first time or not completed)
+        # This is now cached to reduce database queries
         onboarding_completed = check_onboarding_status(user_id, db_manager)
         
         # Show onboarding if:

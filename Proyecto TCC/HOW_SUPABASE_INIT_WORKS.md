@@ -66,8 +66,8 @@ def init_database(self):
     self.create_quiz_attempts_table()
     self.create_quiz_answers_table()
     self.create_rate_limiting_table()
-    self.create_uploaded_files_table()
-    self.create_file_analysis_sessions_table()
+    self.create_survey_responses_table()
+    self.create_dashboards_table()
     self.create_indexes()
 ```
 

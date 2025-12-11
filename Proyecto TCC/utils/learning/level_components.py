@@ -31,6 +31,53 @@ def create_step_card(step_number, title, description, sections=None):
 
 def create_info_box(box_type, title, content):
     """Create info boxes with different styles"""
+    # Convert markdown lists to HTML if content contains list markers
+    if isinstance(content, str) and ('\n-' in content or '\n*' in content):
+        # Convert markdown lists to HTML
+        lines = content.split('\n')
+        html_lines = []
+        in_list = False
+        
+        for line in lines:
+            stripped = line.strip()
+            # Check if line is a list item
+            if stripped.startswith('- ') or stripped.startswith('* '):
+                if not in_list:
+                    html_lines.append('<ul>')
+                    in_list = True
+                # Remove markdown marker and convert bold
+                item_text = stripped[2:].strip()
+                # Convert **text** to <strong>text</strong> (handle multiple bold sections)
+                while '**' in item_text:
+                    item_text = item_text.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(f'<li>{item_text}</li>')
+            else:
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                if stripped:  # Only add non-empty lines
+                    # Convert **text** to <strong>text</strong>
+                    formatted_line = stripped
+                    while '**' in formatted_line:
+                        formatted_line = formatted_line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+                    html_lines.append(f'<p>{formatted_line}</p>')
+        
+        if in_list:
+            html_lines.append('</ul>')
+        
+        content = '\n'.join(html_lines)
+    elif isinstance(content, str):
+        # Convert **text** to <strong>text</strong> for non-list content
+        formatted_content = content
+        while '**' in formatted_content:
+            formatted_content = formatted_content.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+        # Convert newlines to <br> or wrap in <p>
+        if '\n' in formatted_content:
+            paragraphs = formatted_content.split('\n')
+            content = ''.join([f'<p>{p.strip()}</p>' if p.strip() else '' for p in paragraphs])
+        else:
+            content = formatted_content
+    
     html_content = f"""
     <div class="{box_type}">
         <h3>{title}</h3>

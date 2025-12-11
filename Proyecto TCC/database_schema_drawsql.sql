@@ -1,7 +1,10 @@
 -- ============================================================================
 -- PostgreSQL DDL for TCC Data Analysis Platform
--- Compatible with Supabase
--- Use this file to generate ERD in DrawSQL
+-- Compatible with Supabase and DrawSQL ERD Generator
+-- 
+-- This schema contains ONLY the tables currently in use (8 tables)
+-- Unused tables have been removed (uploaded_files, file_analysis_sessions,
+-- dashboard_components, user_activity_log)
 -- ============================================================================
 
 -- ============================================================================

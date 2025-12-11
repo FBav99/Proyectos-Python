@@ -301,20 +301,19 @@ class DatabaseManager:
         self.create_rate_limiting_table()
         self.create_survey_responses_table()
         
-        # File upload tables (needed for data analysis)
-        self.create_uploaded_files_table()
-        self.create_file_analysis_sessions_table()
+        # Dashboard table (used - stores dashboard configs with components as JSON)
         self.create_dashboards_table()
-        self.create_dashboard_components_table()
-        self.create_user_activity_log_table()
         
-        # Optional tables (can be enabled later if needed)
-        # self.create_user_activity_log_table()
+        # Unused tables removed (see docs/TABLE_USAGE_ANALYSIS.md):
+        # - uploaded_files (files handled in session_state, not persisted)
+        # - file_analysis_sessions (depends on uploaded_files)
+        # - dashboard_components (components stored as JSON in dashboards table)
+        # - user_activity_log (logging not implemented in database)
         
         # Create indexes
         self.create_indexes()
         
-        logger.info("Database initialization completed with essential tables and file uploads")
+        logger.info("Database initialization completed with essential tables")
     
     # Tabla - Crear Tabla de Usuarios
     def create_users_table(self):
@@ -844,17 +843,13 @@ class DatabaseManager:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_level ON quiz_attempts(user_id, level)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_quiz_attempts_completed ON quiz_attempts(completed_at)")
             
-            # File management indexes
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_files_user_id ON uploaded_files(user_id)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_files_uploaded_at ON uploaded_files(uploaded_at)")
-            
-            # Dashboard indexes
+            # Dashboard indexes (dashboards table is used)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_dashboards_user_id ON dashboards(user_id)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_dashboards_public ON dashboards(is_public)")
             
-            # Activity tracking indexes
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_activity_user_type ON user_activity_log(user_id, activity_type)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_activity_created ON user_activity_log(created_at)")
+            # Note: Indexes for unused tables removed:
+            # - uploaded_files indexes (table not used)
+            # - user_activity_log indexes (table not used)
             
             # Rate limiting indexes
             conn.execute("CREATE INDEX IF NOT EXISTS idx_rate_limiting_identifier ON rate_limiting(identifier)")

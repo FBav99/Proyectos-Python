@@ -618,16 +618,18 @@ def create_visualization_guide():
         
         create_step_card(
             step_number="3",
-            title="🥧 Gráfico Circular (Torta)",
-            description="**Usa para:**\n"
-                       "- Mostrar proporciones de un total\n"
-                       "- Máximo 5-6 categorías\n"
-                       "- Cuando quieres mostrar 'parte del todo'\n\n"
-                       "**Ejemplos:**\n"
-                       "- Distribución de gastos\n"
-                       "- Participación de mercado\n"
-                       "- Fuentes de tráfico web\n\n"
-                       "**⚠️ Evita:** Muchas categorías pequeñas (se vuelve confuso)"
+            title=replace_emojis("🥧 Gráfico Circular (Torta)"),
+            description=replace_emojis(
+                "**Usa para:**\n"
+                "- Mostrar proporciones de un total\n"
+                "- Máximo 5-6 categorías\n"
+                "- Cuando quieres mostrar 'parte del todo'\n\n"
+                "**Ejemplos:**\n"
+                "- Distribución de gastos\n"
+                "- Participación de mercado\n"
+                "- Fuentes de tráfico web\n\n"
+                "**⚠️ Evita:** Muchas categorías pequeñas (se vuelve confuso)"
+            )
         )
     
     with col2:
@@ -879,7 +881,7 @@ def create_dashboard_blanco_section():
 
 def create_quick_reference():
     """Create quick reference section for Dashboard en Blanco"""
-    st.markdown("""
+    st.markdown(replace_emojis("""
     ---
     ### 🎨 Referencia Rápida - Dashboard en Blanco
     
@@ -910,7 +912,7 @@ def create_quick_reference():
     - Usa títulos descriptivos para cada componente
     - Prueba diferentes configuraciones antes de decidir
     - Guarda tu trabajo regularmente
-    """)
+    """), unsafe_allow_html=True)
 
 def create_navigation_section():
     """Create the navigation section with action buttons"""
