@@ -147,12 +147,34 @@ def show_user_sidebar(current_user=None):
             
             st.markdown("---")
             
-            # Botón temporal para pruebas de onboarding (solo usuarios de BD)
+            # Botón para repetir el tour de onboarding (solo usuarios de BD)
             if 'oauth_provider' not in current_user:
-                if st.button("🎯 Ver Tour de Introducción", use_container_width=True, key="test_onboarding"):
+                # Check onboarding status to show appropriate button text
+                from core.database import DatabaseManager
+                from utils.ui.onboarding import check_onboarding_status
+                
+                if '_db_manager' not in st.session_state:
+                    st.session_state._db_manager = DatabaseManager()
+                db_manager = st.session_state._db_manager
+                user_id = current_user.get('id')
+                
+                onboarding_completed = False
+                if user_id:
+                    try:
+                        onboarding_completed = check_onboarding_status(user_id, db_manager)
+                    except:
+                        pass  # If check fails, assume not completed
+                
+                button_text = "🔄 Repetir Tour de Introducción" if onboarding_completed else "🎯 Ver Tour de Introducción"
+                button_help = " (Ya completado - puedes repetirlo)" if onboarding_completed else ""
+                
+                if st.button(button_text, use_container_width=True, key="repeat_onboarding", help=f"Tour guiado que explica las funcionalidades principales de la plataforma{button_help}"):
+                    # Reset onboarding state to start from beginning
                     st.session_state.show_onboarding = True
                     st.session_state.onboarding_step = 0
                     st.session_state.onboarding_active = True
+                    # Clear any cached onboarding status to force re-check
+                    check_onboarding_status.clear()
                     st.rerun()
                 st.markdown("---")
             

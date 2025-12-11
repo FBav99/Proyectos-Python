@@ -919,6 +919,40 @@ def create_navigation_section():
     st.divider()
     st.markdown(replace_emojis("## 🎯 ¿Listo para Comenzar?"), unsafe_allow_html=True)
     
+    # Botón para repetir el tour de onboarding (si el usuario está autenticado y es de BD)
+    from utils.ui import auth_ui
+    current_user = auth_ui.get_current_user()
+    
+    if current_user and 'oauth_provider' not in current_user:
+        # Check if user has completed onboarding
+        from core.database import DatabaseManager
+        from utils.ui.onboarding import check_onboarding_status
+        
+        user_id = current_user.get('id')
+        if user_id:
+            if '_db_manager' not in st.session_state:
+                st.session_state._db_manager = DatabaseManager()
+            db_manager = st.session_state._db_manager
+            
+            try:
+                onboarding_completed = check_onboarding_status(user_id, db_manager)
+                button_text = "🔄 Repetir Tour de Introducción" if onboarding_completed else "🎯 Ver Tour de Introducción"
+                
+                # Show tour button in a separate row for better visibility
+                col_tour = st.columns([1])
+                with col_tour[0]:
+                    if st.button(button_text, type="secondary", use_container_width=True, key="ayuda_onboarding", 
+                               help="Tour guiado que explica las funcionalidades principales de la plataforma"):
+                        st.session_state.show_onboarding = True
+                        st.session_state.onboarding_step = 0
+                        st.session_state.onboarding_active = True
+                        check_onboarding_status.clear()
+                        st.switch_page("Inicio.py")
+                st.markdown("---")
+            except:
+                pass  # If check fails, skip the button
+    
+    st.markdown(replace_emojis("### 📚 Navegación a Niveles"), unsafe_allow_html=True)
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
