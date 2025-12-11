@@ -44,7 +44,7 @@ def main():
         # Header with current file info and upload new file option
         col1, col2 = st.columns([3, 1])
         with col1:
-            st.markdown(f"### {get_icon("📊", 20)} Datos Actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas")
+            st.markdown(f"### {get_icon("📊", 20)} Datos Actuales: {len(st.session_state.uploaded_data)} filas, {len(st.session_state.uploaded_data.columns)} columnas", unsafe_allow_html=True)
         with col2:
             if st.button("📁 Subir Nuevo Archivo", type="secondary", use_container_width=True):
                 # Show confirmation dialog
@@ -55,9 +55,9 @@ def main():
             if 'current_data_name' in st.session_state and st.session_state.current_data_name:
                 data_type = st.session_state.get('current_data_type', 'uploaded_file')
                 if data_type == "sample_dataset":
-                    st.caption(f"{get_icon('📊', 16)} Dataset: {st.session_state.current_data_name}")
+                    st.markdown(f"{get_icon('📊', 16)} Dataset: {st.session_state.current_data_name}", unsafe_allow_html=True)
                 else:
-                    st.caption(f"{get_icon('📁', 16)} Archivo: {st.session_state.current_data_name}")
+                    st.markdown(f"{get_icon('📁', 16)} Archivo: {st.session_state.current_data_name}", unsafe_allow_html=True)
         
         # Confirmation dialog for uploading new file
         if st.session_state.get('show_upload_new', False):
@@ -93,17 +93,17 @@ def main():
             original_df = cleaner.original_df
             current_df = cleaner.cleaned_df
             # Debug info
-            st.write(f"{get_icon("🔍", 20)} Debug: Original rows: {len(original_df)}, Current rows: {len(current_df)}")
-            st.write(f"{get_icon("🔍", 20)} Debug: Original columns: {len(original_df.columns)}, Current columns: {len(current_df.columns)}")
+            st.markdown(f"{get_icon("🔍", 20)} Debug: Original rows: {len(original_df)}, Current rows: {len(current_df)}", unsafe_allow_html=True)
+            st.markdown(f"{get_icon("🔍", 20)} Debug: Original columns: {len(original_df.columns)}, Current columns: {len(current_df.columns)}", unsafe_allow_html=True)
         else:
             # Fallback to uploaded data if no cleaner in session state
             original_df = st.session_state.uploaded_data
             current_df = cleaned_df
-            st.write(replace_emojis("🔍 Debug: Using fallback data"))
+            st.markdown(replace_emojis("🔍 Debug: Using fallback data"), unsafe_allow_html=True)
         
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric(replace_emojis("📈 Filas Originales"), len(original_df))
+            st.metric("📈 Filas Originales", len(original_df))
         with col2:
             st.metric("🧹 Filas Limpiadas", len(current_df))
         with col3:
@@ -117,7 +117,7 @@ def main():
         col1, col2 = st.columns([2, 1])
         with col1:
             if st.button("👀 Ver Vista Previa de Datos Limpiados"):
-                st.subheader(replace_emojis("📊 Vista Previa de Datos Limpiados"))
+                st.markdown(replace_emojis("### 📊 Vista Previa de Datos Limpiados"), unsafe_allow_html=True)
                 st.dataframe(cleaned_df.head(20), use_container_width=True)
         
         with col2:
@@ -136,8 +136,8 @@ def main():
         # Mostrar opciones para cargar datos
         st.markdown(replace_emojis("### 📤 Cargar Datos para Limpiar"), unsafe_allow_html=True)
         
-        # Tabs para diferentes opciones de carga
-        tab1, tab2 = st.tabs([replace_emojis("📁 Subir Archivo"), "📊 Datasets de Ejemplo"])
+        # Tabs para diferentes opciones de carga (st.tabs no renderiza HTML, usar emoji directamente)
+        tab1, tab2 = st.tabs(["📁 Subir Archivo", "📊 Datasets de Ejemplo"])
         
         with tab1:
             show_upload_section()

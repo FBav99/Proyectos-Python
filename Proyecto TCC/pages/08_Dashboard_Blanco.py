@@ -102,10 +102,11 @@ DASHBOARD_CUSTOM_CSS = """
 # Archivo - Cargar DataFrame Subido
 def load_uploaded_dataframe(uploaded_file):
     """Carga un archivo subido por el usuario y devuelve un DataFrame."""
-    from utils.data.data_handling import load_excel_with_sheet_selection
+    from utils.data.data_handling import load_excel_with_sheet_selection, load_csv_with_delimiter_selection
     
     if uploaded_file.name.endswith('.csv'):
-        return pd.read_csv(uploaded_file)
+        df = load_csv_with_delimiter_selection(uploaded_file, key_prefix="dashboard_blank")
+        return df if df is not None else pd.DataFrame()
     df = load_excel_with_sheet_selection(uploaded_file, key_prefix="dashboard_blank")
     return df if df is not None else pd.DataFrame()
 
@@ -159,7 +160,7 @@ def analyze_dataset_columns(df):
 # UI - Seleccionar Datos del Dashboard
 def select_dashboard_data():
     """Gestiona la selección de datos para el dashboard y devuelve el DataFrame activo."""
-    st.markdown("### 📂 Selecciona o carga tus datos")
+    st.markdown(replace_emojis("### 📂 Selecciona o carga tus datos"), unsafe_allow_html=True)
     st.caption("Puedes subir tus propios datos o practicar con un dataset de ejemplo sin abandonar esta página.")
 
     render_saved_dashboards_panel()
@@ -183,7 +184,7 @@ def select_dashboard_data():
                 st.session_state.sample_data = None
                 st.session_state.dashboard_data_label = uploaded_file.name
                 st.success(f"Archivo `{uploaded_file.name}` cargado correctamente.")
-                with st.expander("👀 Vista previa (primeras 10 filas)", expanded=True):
+                with st.expander(replace_emojis("👀 Vista previa (primeras 10 filas)"), expanded=True):
                     st.dataframe(df.head(10), use_container_width=True)
             except Exception as exc:
                 st.error(f"No se pudo cargar el archivo. Detalle: {exc}")
@@ -212,7 +213,7 @@ def select_dashboard_data():
             st.write(sample_info['description'])
             st.markdown(f"**Nivel sugerido:** {sample_info['difficulty']}")
 
-            with st.expander("👀 Vista previa (primeras 10 filas)"):
+            with st.expander(replace_emojis("👀 Vista previa (primeras 10 filas)")):
                 st.dataframe(sample_info['data'].head(10), use_container_width=True)
 
             if st.button("Usar este dataset de ejemplo", key="dashboard_use_sample", use_container_width=True):
@@ -267,7 +268,8 @@ def render_saved_dashboards_panel():
 
     saved_dashboards = get_cached_user_dashboards()
 
-    with st.expander(replace_emojis("📁 Dashboards guardados"), expanded=False):
+    # UI - Usar emoji directamente en expander (Streamlit renderiza emojis nativamente)
+    with st.expander("📁 Dashboards guardados", expanded=False):
         if not saved_dashboards:
             st.info("No tienes dashboards guardados todavía. Puedes guardar uno desde la barra lateral.")
             return
@@ -283,7 +285,7 @@ def render_saved_dashboards_panel():
 
                 col_load, col_delete = st.columns([2, 1])
                 with col_load:
-                    if st.button("📂 Cargar en el constructor", key=f"main_load_dashboard_{dashboard['id']}", use_container_width=True):
+                    if st.button(replace_emojis("📂 Cargar en el constructor"), key=f"main_load_dashboard_{dashboard['id']}", use_container_width=True):
                         components = dashboard.get('config', {}).get('components', [])
                         st.session_state.dashboard_components = components
                         st.session_state.dashboard_component_counter = len(components)
@@ -303,7 +305,7 @@ def render_saved_dashboards_panel():
                         st.rerun()
 
                 with col_delete:
-                    if st.button("🗑️ Eliminar", key=f"main_delete_dashboard_{dashboard['id']}", use_container_width=True):
+                    if st.button(replace_emojis("🗑️ Eliminar"), key=f"main_delete_dashboard_{dashboard['id']}", use_container_width=True):
                         delete_dashboard(dashboard['id'], user_id)
                         st.session_state['dashboards_cache_dirty'] = True
                         st.success("Dashboard eliminado.")
@@ -313,7 +315,7 @@ def render_saved_dashboards_panel():
 # UI - Controles Rapidos de Construccion
 def render_inline_builder_controls(df):
     """Renderiza controles rápidos para agregar componentes sin depender del sidebar."""
-    st.markdown("### 🧱 Construye tu dashboard")
+    st.markdown(replace_emojis("### 🧱 Construye tu dashboard"), unsafe_allow_html=True)
     st.caption("Agrega componentes frecuentes desde aquí y utiliza el panel lateral para ajustes avanzados.")
 
     quick_components = [
@@ -333,8 +335,8 @@ def render_inline_builder_controls(df):
             "description": "Compara categorías rápidamente.",
         },
         {
-            "label": "🥧 Circular",
-            "type": "🥧 Gráfico Circular",
+            "label": replace_emojis("🥧 Circular"),
+            "type": replace_emojis("🥧 Gráfico Circular"),
             "description": "Visualiza proporciones.",
         },
         {
@@ -729,7 +731,7 @@ def render_template_gallery(df, *, show_header=True):
                 st.button("Dataset no disponible", key=f"example_disabled_{template['key']}", disabled=True, use_container_width=True)
 
         with col_clear:
-            if st.button("🧹 Limpiar plantilla", key=f"clear_{template['key']}", use_container_width=True):
+            if st.button(replace_emojis("🧹 Limpiar plantilla"), key=f"clear_{template['key']}", use_container_width=True):
                 st.session_state.dashboard_selected_template_key = None
                 st.session_state.dashboard_selected_template_title = None
                 st.session_state.dashboard_template_gallery_expanded = True
@@ -832,7 +834,7 @@ def main():
         render_inline_builder_controls(df)
         st.markdown('<div class="dashboard-subtle-divider"></div>', unsafe_allow_html=True)
         if st.session_state.dashboard_components:
-            if st.button("🧹 Limpiar dashboard", key="clear_dashboard_manual"):
+            if st.button(replace_emojis("🧹 Limpiar dashboard"), key="clear_dashboard_manual"):
                 clear_dashboard_layout()
                 st.rerun()
 
@@ -857,12 +859,12 @@ def main():
             
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("✅ Guardar Configuración", type="primary", use_container_width=True):
+                if st.button(replace_emojis("✅ Guardar Configuración"), type="primary", use_container_width=True):
                     st.session_state.editing_component = None
                     st.rerun()
             
             with col2:
-                if st.button("❌ Cancelar", use_container_width=True):
+                if st.button(replace_emojis("❌ Cancelar"), use_container_width=True):
                     st.session_state.editing_component = None
         else:
             st.session_state.editing_component = None
@@ -884,7 +886,7 @@ def main():
             st.switch_page("Inicio.py")
     
     with col2:
-        if st.button("📊 Ver Métricas", use_container_width=True):
+        if st.button(replace_emojis("📊 Ver Métricas"), use_container_width=True):
             st.switch_page("pages/03_Nivel_3_Metricas.py")
     
     with col3:

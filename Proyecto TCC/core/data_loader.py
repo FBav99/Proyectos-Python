@@ -3,7 +3,7 @@ import numpy as np
 import streamlit as st
 
 from utils.ui.icon_system import get_icon, replace_emojis
-from utils.data.data_handling import load_excel_with_sheet_selection
+from utils.data.data_handling import load_excel_with_sheet_selection, load_csv_with_delimiter_selection
 # Datos - Cargar Datos de Muestra
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_sample_data():
@@ -35,7 +35,9 @@ def load_uploaded_file(uploaded_file):
     """Cargar archivo subido por el usuario"""
     try:
         if uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
+            df = load_csv_with_delimiter_selection(uploaded_file, key_prefix="sidebar_loader")
+            if df is None:
+                return None
         else:
             df = load_excel_with_sheet_selection(uploaded_file, key_prefix="sidebar_loader")
             if df is None:

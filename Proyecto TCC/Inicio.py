@@ -56,6 +56,7 @@ def show_current_level_banner(progress):
     current_level = None
     current_level_name = None
     current_level_subtitle = None
+    learning_content = None
     
     for level in level_order:
         if not progress.get(level, False):
@@ -67,35 +68,82 @@ def show_current_level_banner(progress):
         current_level = 'completed'
         current_level_name = 'Todos los Niveles Completados'
         current_level_subtitle = '¡Felicidades! Visita la Conclusión para ver tu resumen y próximos pasos'
+        learning_content = None
         level_icon = '🏆'
         level_color = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     else:
-        # Mapeo de niveles a nombres y subtítulos
+        # Mapeo de niveles a nombres, subtítulos y contenido de aprendizaje
         level_info = {
-            'nivel0': ('Nivel 0', 'Introducción', '🧭', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'),
-            'nivel1': ('Nivel 1', 'Básico', '📚', 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'),
-            'nivel2': ('Nivel 2', 'Filtros', '🔍', 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'),
-            'nivel3': ('Nivel 3', 'Métricas', '📊', 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'),
-            'nivel4': ('Nivel 4', 'Avanzado', '🚀', 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)')
+            'nivel0': (
+                'Nivel 0', 
+                'Introducción', 
+                '🧭', 
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'entender qué son los datos, sus tipos principales y cómo se organizan en tablas'
+            ),
+            'nivel1': (
+                'Nivel 1', 
+                'Básico', 
+                '📚', 
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'cargar y preparar datos, verificar su calidad y limpiarlos para el análisis'
+            ),
+            'nivel2': (
+                'Nivel 2', 
+                'Filtros', 
+                '🔍', 
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'filtrar datos por condiciones específicas, rangos de fechas y combinar múltiples filtros'
+            ),
+            'nivel3': (
+                'Nivel 3', 
+                'Métricas', 
+                '📊', 
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'calcular métricas y KPIs, interpretar resultados y comparar datos para tomar decisiones'
+            ),
+            'nivel4': (
+                'Nivel 4', 
+                'Avanzado', 
+                '🚀', 
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'analizar tendencias, crear visualizaciones interactivas y construir dashboards profesionales'
+            )
         }
         
-        current_level_name, current_level_subtitle, level_icon, level_color = level_info.get(
+        current_level_name, current_level_subtitle, level_icon, level_color, learning_content = level_info.get(
             current_level, 
-            ('Nivel Actual', 'Continuar aprendiendo', '🎓', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)')
+            ('Nivel Actual', 'Continuar aprendiendo', '🎓', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 'continuar tu aprendizaje')
         )
     
     # Mostrar el banner
-    st.markdown(f"""
-    <div style="background: {level_color}; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.3);">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-            <div style="font-size: 2.5rem;">{get_icon(level_icon, 40)}</div>
-            <div style="text-align: center; flex: 1; min-width: 200px;">
-                <h3 style="color: white; margin: 0; font-size: 1.4rem; font-weight: 600;">Tu Nivel Actual: {current_level_name}</h3>
-                <p style="color: white; margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">{current_level_subtitle}</p>
+    if learning_content:
+        banner_html = f"""
+        <div style="background: {level_color}; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.3);">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="font-size: 2.5rem;">{get_icon(level_icon, 40)}</div>
+                <div style="text-align: center; flex: 1; min-width: 200px;">
+                    <h3 style="color: white; margin: 0; font-size: 1.4rem; font-weight: 600;">Tu Nivel Actual: {current_level_name}</h3>
+                    <p style="color: white; margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">{current_level_subtitle}</p>
+                    <p style="color: white; margin: 0.8rem 0 0 0; font-size: 0.95rem; opacity: 0.9; font-style: italic;">Actualmente, estás aprendiendo a {learning_content}</p>
+                </div>
             </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """
+    else:
+        banner_html = f"""
+        <div style="background: {level_color}; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.3);">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="font-size: 2.5rem;">{get_icon(level_icon, 40)}</div>
+                <div style="text-align: center; flex: 1; min-width: 200px;">
+                    <h3 style="color: white; margin: 0; font-size: 1.4rem; font-weight: 600;">Tu Nivel Actual: {current_level_name}</h3>
+                    <p style="color: white; margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">{current_level_subtitle}</p>
+                </div>
+            </div>
+        </div>
+        """
+    
+    st.markdown(banner_html, unsafe_allow_html=True)
     
     # Si todos los niveles están completados, mostrar botón para conclusión
     if current_level == 'completed':

@@ -16,6 +16,11 @@ from utils.learning import (
     load_level_styles,
     create_help_header,
     create_learning_levels_section,
+    create_platform_functions_section,
+    create_general_concepts_section,
+    create_best_practices_section,
+    create_external_tools_section,
+    create_decision_guide_section,
     create_dashboard_blanco_section,
     create_visualization_guide,
     create_common_scenarios,
@@ -47,17 +52,16 @@ def main():
     # UI - Cargar Estilos de Nivel para Apariencia Consistente
     st.markdown(load_level_styles(), unsafe_allow_html=True)
     
-    # Introduction
-    st.markdown("""
-    ## 🎯 Bienvenido al Panel de Análisis de Datos
-    
-    Esta herramienta te permite analizar tus datos de manera fácil e intuitiva. 
-    Ya seas un principiante o un usuario avanzado, encontrarás funcionalidades útiles para tu análisis.
-    """)
-    
     # UI - Crear Secciones de Ayuda usando Componentes Modulares
     create_help_header()
+    
+    # Secciones principales con índice navegable
     create_learning_levels_section()
+    create_platform_functions_section()
+    create_general_concepts_section()
+    create_best_practices_section()
+    create_external_tools_section()
+    create_decision_guide_section()
     create_dashboard_blanco_section()
     create_visualization_guide()
     create_common_scenarios()

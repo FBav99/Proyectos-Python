@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import csv
+import io
 from data.sample_datasets import get_sample_datasets
 from .data_cleaner import create_data_cleaning_interface
 
@@ -9,13 +11,13 @@ from utils.ui.icon_system import get_icon, replace_emojis
 def get_excel_sheet_names(uploaded_file):
     """Obtener lista de nombres de hojas de un archivo Excel"""
     try:
-        # Determinar el motor según la extensión del archivo
+        # Archivo - Determinar motor según extensión del archivo
         file_extension = uploaded_file.name.lower().split('.')[-1] if uploaded_file.name else ''
         
         if file_extension == 'xlsx':
             engine = 'openpyxl'
         elif file_extension == 'xls':
-            # Para archivos .xls antiguos, intentar con xlrd
+            # Archivo - Para archivos .xls antiguos, intentar con xlrd
             # Nota: xlrd 2.0+ no soporta .xls, solo .xlsx
             engine = 'xlrd'
         else:
@@ -25,7 +27,7 @@ def get_excel_sheet_names(uploaded_file):
         return excel_file.sheet_names
     except Exception as e:
         error_msg = str(e)
-        # Verificar si es un error relacionado con .xls y xlrd
+        # Error - Verificar si es error relacionado con .xls y xlrd
         if '.xls' in uploaded_file.name.lower() and 'xlrd' in error_msg.lower():
             st.error(f"Error al leer el archivo Excel: {error_msg}")
             st.warning("⚠️ **Nota importante:** Los archivos .xls (formato antiguo de Excel) tienen soporte limitado. "
@@ -47,14 +49,14 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
         DataFrame con los datos de la hoja seleccionada
     """
     try:
-        # Obtener lista de hojas
+        # Datos - Obtener lista de hojas
         sheet_names = get_excel_sheet_names(uploaded_file)
         
         if not sheet_names:
             st.error("No se pudieron leer las hojas del archivo Excel.")
             return None
         
-        # Determinar el motor según la extensión del archivo
+        # Archivo - Determinar motor según extensión del archivo
         file_extension = uploaded_file.name.lower().split('.')[-1] if uploaded_file.name else ''
         
         if file_extension == 'xlsx':
@@ -64,7 +66,7 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
         else:
             engine = None  # Dejar que pandas lo detecte automáticamente
         
-        # Si hay múltiples hojas, mostrar selector
+        # UI - Si hay múltiples hojas, mostrar selector
         if len(sheet_names) > 1:
             st.info(f"📑 Este archivo Excel contiene {len(sheet_names)} hojas. Selecciona la hoja que deseas cargar:")
             selected_sheet = st.selectbox(
@@ -76,13 +78,13 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
             df = pd.read_excel(uploaded_file, sheet_name=selected_sheet, engine=engine)
             st.success(f"✅ Hoja '{selected_sheet}' cargada exitosamente")
         else:
-            # Solo una hoja, cargar directamente
+            # Archivo - Solo una hoja, cargar directamente
             df = pd.read_excel(uploaded_file, sheet_name=sheet_names[0], engine=engine)
         
         return df
     except Exception as e:
         error_msg = str(e)
-        # Verificar si es un error relacionado con .xls y xlrd
+        # Error - Verificar si es error relacionado con .xls y xlrd
         if '.xls' in uploaded_file.name.lower() and ('xlrd' in error_msg.lower() or 'xls' in error_msg.lower()):
             st.error(f"Error al cargar el archivo Excel: {error_msg}")
             st.warning("⚠️ **Nota importante:** Los archivos .xls (formato antiguo de Excel) tienen soporte limitado. "
@@ -91,6 +93,154 @@ def load_excel_with_sheet_selection(uploaded_file, key_prefix="excel_sheet"):
         else:
             st.error(f"Error al cargar el archivo Excel: {error_msg}")
         return None
+
+# Archivo - Detectar Delimitador CSV
+def detect_csv_delimiter(uploaded_file, sample_size=1024):
+    """
+    Detectar automáticamente el delimitador de un archivo CSV.
+    
+    Args:
+        uploaded_file: Archivo subido por el usuario
+        sample_size: Tamaño de la muestra en bytes para analizar
+    
+    Returns:
+        Delimitador detectado (str) o None si no se puede detectar
+    """
+    try:
+        # Archivo - Guardar posición actual
+        current_pos = uploaded_file.tell()
+        
+        # Archivo - Leer muestra del archivo
+        uploaded_file.seek(0)
+        sample_bytes = uploaded_file.read(sample_size)
+        
+        # Archivo - Intentar decodificar con diferentes codificaciones
+        sample = None
+        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+        
+        for encoding in encodings:
+            try:
+                sample = sample_bytes.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        
+        if sample is None:
+            uploaded_file.seek(current_pos)
+            return None
+        
+        # Archivo - Resetear posición del archivo
+        uploaded_file.seek(0)
+        
+        # Datos - Usar csv.Sniffer para detectar delimitador
+        sniffer = csv.Sniffer()
+        delimiter = sniffer.sniff(sample, delimiters=',;\t|').delimiter
+        return delimiter
+    except Exception as e:
+        # Error - Si falla la detección, intentar resetear y retornar None
+        try:
+            uploaded_file.seek(0)
+        except:
+            pass
+        return None
+
+# Archivo - Cargar CSV con Seleccion de Delimitador
+def load_csv_with_delimiter_selection(uploaded_file, key_prefix="csv_delimiter"):
+    """
+    Cargar archivo CSV con soporte para selección de delimitador.
+    Detecta automáticamente el delimitador y permite cambiarlo si es necesario.
+    
+    Args:
+        uploaded_file: Archivo subido por el usuario
+        key_prefix: Prefijo para la clave única del selector de delimitador
+    
+    Returns:
+        DataFrame con los datos del CSV
+    """
+    try:
+        # Datos - Delimitadores comunes disponibles
+        delimiter_options = {
+            'Coma (,)': ',',
+            'Punto y coma (;)': ';',
+            'Tabulador (\\t)': '\t',
+            'Pipe (|)': '|',
+            'Espacio': ' '
+        }
+        
+        # Archivo - Detectar delimitador automáticamente
+        detected_delimiter = detect_csv_delimiter(uploaded_file)
+        
+        # UI - Mostrar información sobre delimitador detectado
+        if detected_delimiter:
+            # Datos - Encontrar nombre del delimitador detectado
+            detected_name = None
+            for name, delim in delimiter_options.items():
+                if delim == detected_delimiter:
+                    detected_name = name
+                    break
+            
+            if detected_name:
+                st.info(f"🔍 Delimitador detectado automáticamente: **{detected_name}** (`{repr(detected_delimiter)}`)")
+            else:
+                st.info(f"🔍 Delimitador detectado automáticamente: `{repr(detected_delimiter)}`")
+        else:
+            st.warning("⚠️ No se pudo detectar automáticamente el delimitador. Por favor, selecciona uno manualmente.")
+        
+        # UI - Mostrar selector de delimitador
+        delimiter_labels = list(delimiter_options.keys())
+        
+        # Datos - Si se detectó delimitador, usarlo como valor por defecto
+        default_index = 0
+        if detected_delimiter:
+            for i, (name, delim) in enumerate(delimiter_options.items()):
+                if delim == detected_delimiter:
+                    default_index = i
+                    break
+        
+        selected_delimiter_label = st.selectbox(
+            "Selecciona el delimitador:",
+            delimiter_labels,
+            index=default_index,
+            key=f"{key_prefix}_{uploaded_file.name}",
+            help="Si el delimitador detectado no es correcto, puedes seleccionar otro de la lista."
+        )
+        
+        selected_delimiter = delimiter_options[selected_delimiter_label]
+        
+        # Archivo - Cargar CSV con delimitador seleccionado
+        uploaded_file.seek(0)  # Asegurar que el archivo esté al inicio
+        
+        # Archivo - Intentar cargar con diferentes codificaciones
+        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+        df = None
+        encoding_used = None
+        
+        for encoding in encodings:
+            try:
+                uploaded_file.seek(0)
+                df = pd.read_csv(uploaded_file, delimiter=selected_delimiter, encoding=encoding)
+                encoding_used = encoding
+                break
+            except (UnicodeDecodeError, pd.errors.ParserError):
+                continue
+        
+        if df is None:
+            raise Exception("No se pudo cargar el archivo CSV. Verifica la codificación y el delimitador.")
+        
+        if detected_delimiter and selected_delimiter != detected_delimiter:
+            st.success(f"✅ Archivo CSV cargado con delimitador: **{selected_delimiter_label}**")
+        elif detected_delimiter:
+            st.success(f"✅ Archivo CSV cargado exitosamente (usando delimitador detectado)")
+        else:
+            st.success(f"✅ Archivo CSV cargado con delimitador: **{selected_delimiter_label}**")
+        
+        return df
+    except Exception as e:
+        error_msg = str(e)
+        st.error(f"Error al cargar el archivo CSV: {error_msg}")
+        st.warning("💡 **Sugerencia:** Verifica que el delimitador seleccionado sea correcto. Puedes intentar con otro delimitador de la lista.")
+        return None
+
 # UI - Mostrar Seccion de Carga de Archivos
 def show_upload_section():
     """Show the file upload section"""
@@ -104,8 +254,9 @@ def show_upload_section():
             st.rerun()
         st.markdown("---")
     
+    # UI - st.file_uploader no renderiza HTML, usar emoji directamente
     uploaded_file = st.file_uploader(
-        replace_emojis("📁 Sube tu archivo de datos"),
+        "📁 Sube tu archivo de datos",
         type=['csv', 'xlsx', 'xls'],
         help="Sube un archivo CSV o Excel para comenzar tu análisis"
     )
@@ -114,7 +265,9 @@ def show_upload_section():
         try:
             # Load data
             if uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file)
+                df = load_csv_with_delimiter_selection(uploaded_file, key_prefix="upload_section")
+                if df is None:
+                    return
             else:
                 df = load_excel_with_sheet_selection(uploaded_file, key_prefix="upload_section")
                 if df is None:

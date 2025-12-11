@@ -381,10 +381,12 @@ def main():
     if uploaded_file is not None:
         try:
             # Load the uploaded data
-            from utils.data.data_handling import load_excel_with_sheet_selection
+            from utils.data.data_handling import load_excel_with_sheet_selection, load_csv_with_delimiter_selection
             
             if uploaded_file.name.endswith('.csv'):
-                df_uploaded = pd.read_csv(uploaded_file)
+                df_uploaded = load_csv_with_delimiter_selection(uploaded_file, key_prefix="nivel1_basico")
+                if df_uploaded is None:
+                    return
             else:
                 df_uploaded = load_excel_with_sheet_selection(uploaded_file, key_prefix="nivel1_basico")
                 if df_uploaded is None:
