@@ -1,3 +1,8 @@
+# Nombre del Archivo: security.py
+# Descripción: Gestor de seguridad para autenticación y manejo de sesiones
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import hashlib
 import secrets
@@ -11,18 +16,20 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
+# Clase - Gestor de Seguridad
 class SecurityManager:
-    """Security manager for authentication and session handling"""
+    """Gestor de seguridad para autenticación y manejo de sesiones"""
     
     def __init__(self):
         self.rate_limit_attempts = {}
         self.session_tokens = {}
         self.max_login_attempts = 5
-        self.lockout_duration = 900  # 15 minutes
-        self.session_timeout = 3600  # 1 hour
+        self.lockout_duration = 900  # Configuracion - 15 minutos
+        self.session_timeout = 3600  # Configuracion - 1 hora
         
+    # Validacion - Validar Email
     def validate_email(self, email: str) -> bool:
-        """Validate email format"""
+        """Validar formato de email"""
         if not email:
             return False
         
@@ -30,30 +37,32 @@ class SecurityManager:
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return bool(re.match(pattern, email))
     
+    # Validacion - Validar Fortaleza de Contraseña
     def validate_password_strength(self, password: str) -> Tuple[bool, str]:
-        """Validate password strength"""
+        """Validar fortaleza de contraseña"""
         if not password:
-            return False, "Password cannot be empty"
+            return False, "La contraseña no puede estar vacía"
         
         if len(password) < 8:
-            return False, "Password must be at least 8 characters long"
+            return False, "La contraseña debe tener al menos 8 caracteres"
         
         if not re.search(r'[A-Z]', password):
-            return False, "Password must contain at least one uppercase letter"
+            return False, "La contraseña debe contener al menos una letra mayúscula"
         
         if not re.search(r'[a-z]', password):
-            return False, "Password must contain at least one lowercase letter"
+            return False, "La contraseña debe contener al menos una letra minúscula"
         
         if not re.search(r'\d', password):
-            return False, "Password must contain at least one number"
+            return False, "La contraseña debe contener al menos un número"
         
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-            return False, "Password must contain at least one special character"
+            return False, "La contraseña debe contener al menos un carácter especial"
         
-        return True, "Password meets strength requirements"
+        return True, "La contraseña cumple con los requisitos de fortaleza"
     
+    # Seguridad - Sanitizar Entrada
     def sanitize_input(self, input_str: str) -> str:
-        """Sanitize user input to prevent injection attacks"""
+        """Sanitizar entrada del usuario para prevenir ataques de inyección"""
         if not input_str:
             return ""
         
@@ -66,8 +75,9 @@ class SecurityManager:
         # Validacion - Limitar Longitud
         return sanitized[:100] if len(sanitized) > 100 else sanitized
     
+    # Validacion - Verificar Rate Limit
     def check_rate_limit(self, identifier: str) -> Tuple[bool, str]:
-        """Check if user is rate limited"""
+        """Verificar si el usuario está limitado por rate limit"""
         current_time = time.time()
         
         if identifier in self.rate_limit_attempts:
@@ -86,8 +96,9 @@ class SecurityManager:
         
         return True, "Rate limit check passed"
     
+    # Registro - Registrar Intento
     def record_attempt(self, identifier: str, success: bool):
-        """Record login attempt"""
+        """Registrar intento de login"""
         current_time = time.time()
         
         if identifier not in self.rate_limit_attempts:
@@ -102,13 +113,15 @@ class SecurityManager:
             # Contador - Incrementar Intentos Fallidos
             self.rate_limit_attempts[identifier] = (attempts + 1, current_time)
     
+    # Seguridad - Generar Token de Sesión
     def generate_session_token(self, username: str) -> str:
-        """Generate a secure session token"""
+        """Generar un token de sesión seguro"""
         token_data = f"{username}:{time.time()}:{secrets.token_hex(16)}"
         return hashlib.sha256(token_data.encode()).hexdigest()
     
+    # Validacion - Validar Token de Sesión
     def validate_session_token(self, token: str, username: str) -> bool:
-        """Validate session token"""
+        """Validar token de sesión"""
         if not token or not username:
             return False
         
@@ -121,8 +134,9 @@ class SecurityManager:
         
         return False
     
+    # Sesion - Crear Sesión
     def create_session(self, username: str) -> str:
-        """Create a new session for user"""
+        """Crear una nueva sesión para el usuario"""
         token = self.generate_session_token(username)
         self.session_tokens[token] = {
             'username': username,
@@ -131,18 +145,21 @@ class SecurityManager:
         }
         return token
     
+    # Sesion - Actualizar Actividad de Sesión
     def update_session_activity(self, token: str):
-        """Update session last activity time"""
+        """Actualizar tiempo de última actividad de sesión"""
         if token in self.session_tokens:
             self.session_tokens[token]['last_activity'] = time.time()
     
+    # Sesion - Invalidar Sesión
     def invalidate_session(self, token: str):
-        """Invalidate a session token"""
+        """Invalidar un token de sesión"""
         if token in self.session_tokens:
             del self.session_tokens[token]
     
+    # Limpieza - Limpiar Sesiones Expiradas
     def cleanup_expired_sessions(self):
-        """Clean up expired sessions"""
+        """Limpiar sesiones expiradas"""
         current_time = time.time()
         expired_tokens = [
             token for token, data in self.session_tokens.items()
@@ -152,8 +169,9 @@ class SecurityManager:
         for token in expired_tokens:
             del self.session_tokens[token]
     
+    # Validacion - Validar Estado OAuth
     def validate_oauth_state(self, state: str, stored_state: str) -> bool:
-        """Validate OAuth state parameter"""
+        """Validar parámetro de estado OAuth"""
         # Validacion - Rechazar si Proveedor No Envio State
         if not state:
             return False
@@ -170,8 +188,9 @@ class SecurityManager:
         # Validacion - State Debe Coincidir Exactamente
         return state == stored_state
     
+    # Seguridad - Sanitizar Mensaje de Error
     def sanitize_error_message(self, error: Exception) -> str:
-        """Sanitize error messages to prevent information disclosure"""
+        """Sanitizar mensajes de error para prevenir divulgación de información"""
         error_type = type(error).__name__
         
         # Mensaje - Generar Mensajes de Error Genericos por Tipo
@@ -189,14 +208,15 @@ class SecurityManager:
 # Instancia - Instancia Global de Security Manager
 security_manager = SecurityManager()
 
+# Autenticacion - Login Seguro
 def secure_login(username: str, password: str) -> Tuple[bool, str]:
-    """Secure login function with rate limiting and validation"""
+    """Función de login seguro con rate limiting y validación"""
     try:
-        # Sanitize inputs
+        # Seguridad - Sanitizar entradas
         username = security_manager.sanitize_input(username)
         password = security_manager.sanitize_input(password)
         
-        # Validacion - Validar Entradas
+        # Validacion - Validar entradas
         if not username or not password:
             return False, "Username and password are required"
         
@@ -284,10 +304,10 @@ def get_secure_session_info() -> Dict:
 
 # Decorador - Decoradores de Seguridad para Funciones de Streamlit
 def secure_function(func):
-    """Decorator to add security checks to functions"""
+    """Decorador para agregar verificaciones de seguridad a funciones"""
     def wrapper(*args, **kwargs):
         try:
-            # Seguridad - Agregar Verificaciones de Seguridad Adicionales
+            # Seguridad - Agregar verificaciones de seguridad adicionales
             return func(*args, **kwargs)
         except Exception as e:
             logger.error(f"Function {func.__name__} error: {str(e)}")
@@ -295,8 +315,9 @@ def secure_function(func):
             return None
     return wrapper
 
+# Decorador - Requerir Autenticación
 def require_authentication(func):
-    """Decorator to require authentication for functions"""
+    """Decorador para requerir autenticación en funciones"""
     def wrapper(*args, **kwargs):
         if not st.session_state.get('authentication_status'):
             st.error("Authentication required")

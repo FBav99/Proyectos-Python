@@ -1,3 +1,8 @@
+# Nombre del Archivo: filters.py
+# Descripción: Filtros de datos - Funciones para aplicar filtros por fecha, categoría, región y valores numéricos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import pandas as pd
 import streamlit as st
 

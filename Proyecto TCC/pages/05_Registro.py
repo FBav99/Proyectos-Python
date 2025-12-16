@@ -1,17 +1,22 @@
+# Nombre del Archivo: 05_Registro.py
+# Descripción: Página de registro de nuevos usuarios
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import re
 from core.auth_service import auth_service, login_user
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 from utils.ui.icon_system import get_icon, replace_emojis
-# Import init_sidebar - using absolute import path
+# Importacion - Importar init_sidebar usando ruta de importación absoluta
 from utils.ui import auth_ui
 init_sidebar = auth_ui.init_sidebar
 
-# Configure error handling
+# Configuracion - Configurar manejo de errores
 configure_streamlit_error_handling()
 
-# Ensure database is initialized before using it
+# Inicializacion - Asegurar que la base de datos esté inicializada antes de usarla
 from core.database import ensure_database_initialized
 try:
     ensure_database_initialized()
@@ -21,13 +26,13 @@ except Exception as e:
 
 # Validacion - Formato de Email
 def validate_email(email):
-    """Validate email format"""
+    """Validar formato de email"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
 # Validacion - Fortaleza de Contraseña
 def validate_password(password):
-    """Validate password strength"""
+    """Validar fortaleza de contraseña"""
     if len(password) < 8:
         return False, "La contraseña debe tener al menos 8 caracteres"
     

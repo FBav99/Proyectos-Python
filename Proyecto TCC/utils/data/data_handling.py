@@ -1,3 +1,8 @@
+# Nombre del Archivo: data_handling.py
+# Descripción: Manejo de carga de archivos CSV y Excel con detección automática de delimitadores y selección de hojas
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 import csv
@@ -263,7 +268,7 @@ def show_upload_section():
     
     if uploaded_file is not None:
         try:
-            # Load data
+            # Datos - Cargar datos
             if uploaded_file.name.endswith('.csv'):
                 df = load_csv_with_delimiter_selection(uploaded_file, key_prefix="upload_section")
                 if df is None:
@@ -276,11 +281,11 @@ def show_upload_section():
             st.markdown(f"{get_icon("✅", 20)} Archivo cargado exitosamente: {uploaded_file.name}", unsafe_allow_html=True)
             st.markdown(f"{get_icon("📊", 20)} {len(df)} filas, {len(df.columns)} columnas", unsafe_allow_html=True)
             
-            # Show data preview
+            # UI - Mostrar vista previa de datos
             with st.expander("👀 Vista previa de datos"):
                 st.dataframe(df.head(10), use_container_width=True)
             
-            # Action buttons for loaded data
+            # UI - Botones de acción para datos cargados
             col1, col2, col3 = st.columns(3)
             with col1:
                 if st.button("🧹 Analizar Calidad de Datos", type="primary", use_container_width=True):
@@ -313,7 +318,7 @@ def show_upload_section():
     # UI - Mostrar Boton de Volver
     if st.button("⬅️ Volver", key="back_from_upload"):
         st.session_state.show_upload_section = False
-        # Clear selected_template to avoid redirect loops
+        # Estado - Limpiar selected_template para evitar loops de redirección
         if 'selected_template' in st.session_state:
             del st.session_state.selected_template
         st.rerun()
@@ -342,11 +347,11 @@ def show_examples_section():
                 
                 if st.button(f"📥 Usar {name}", key=f"sample_{name}", use_container_width=True):
                     dataset_df = info['data']
-                    # Set as sample_data for dashboard compatibility
+                    # Estado - Establecer como sample_data para compatibilidad con dashboard
                     st.session_state.sample_data = dataset_df
-                    # Also set as uploaded_data for data cleaning page compatibility
+                    # Estado - También establecer como uploaded_data para compatibilidad con página de limpieza
                     st.session_state.uploaded_data = dataset_df
-                    # Store dataset name and type
+                    # Estado - Almacenar nombre y tipo del dataset
                     st.session_state.current_data_name = name
                     st.session_state.current_data_type = "sample_dataset"
                     st.session_state.data_quality_completed = True
@@ -357,7 +362,7 @@ def show_examples_section():
     # UI - Mostrar Boton de Volver
     if st.button("⬅️ Volver", key="back_from_examples"):
         st.session_state.show_examples_section = False
-        # Clear selected_template to avoid redirect loops
+        # Estado - Limpiar selected_template para evitar loops de redirección
         if 'selected_template' in st.session_state:
             del st.session_state.selected_template
         st.rerun()

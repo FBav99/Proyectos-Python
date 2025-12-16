@@ -1,7 +1,7 @@
-"""
-Security features service for TCC Data Analysis Platform
-Handles rate limiting, input sanitization, and security validations
-"""
+# Nombre del Archivo: security_features.py
+# Descripción: Servicio de características de seguridad para la plataforma de análisis de datos TCC - Maneja rate limiting, sanitización de entrada y validaciones de seguridad
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
 
 import streamlit as st
 import logging
@@ -19,16 +19,18 @@ try:
 except Exception as e:
     logger.warning(f"Could not ensure database initialization in security_features: {e}")
 
+# Clase - Características de Seguridad
 class SecurityFeatures:
-    """Handles security features like rate limiting and input sanitization"""
+    """Maneja características de seguridad como rate limiting y sanitización de entrada"""
     
     def __init__(self):
         self.max_attempts = 5
-        self.lockout_duration = 15  # minutes
-        self.rate_limit_window = 15  # minutes
+        self.lockout_duration = 15  # Configuracion - minutos
+        self.rate_limit_window = 15  # Configuracion - minutos
     
+    # Validacion - Verificar Rate Limit
     def check_rate_limit(self, identifier: str) -> Tuple[bool, str]:
-        """Database-based rate limiting"""
+        """Rate limiting basado en base de datos"""
         try:
             current_time = datetime.now()
             
@@ -75,8 +77,9 @@ class SecurityFeatures:
             logger.error(f"Rate limit check error: {e}")
             return True, "Rate limit check passed"  # Fail open for now
     
+    # Registro - Registrar Intento
     def record_attempt(self, identifier: str, success: bool):
-        """Record login attempt in database"""
+        """Registrar intento de login en la base de datos"""
         try:
             current_time = datetime.now()
             
@@ -112,13 +115,14 @@ class SecurityFeatures:
         except Exception as e:
             logger.error(f"Record attempt error: {e}")
     
+    # Seguridad - Sanitizar Entrada
     def sanitize_input(self, input_string: str) -> str:
-        """Sanitize user input to prevent XSS and injection attacks"""
+        """Sanitizar entrada del usuario para prevenir ataques XSS e inyección"""
         try:
             if not input_string:
                 return ""
             
-            # Convert to string if needed
+            # Conversion - Convertir a string si es necesario
             sanitized = str(input_string).strip()
             
             # Seguridad - Codificar Caracteres Especiales en HTML
@@ -136,8 +140,9 @@ class SecurityFeatures:
             logger.error(f"Input sanitization error: {e}")
             return ""
     
+    # Seguridad - Sanitizar Entrada para Base de Datos
     def sanitize_input_for_db(self, input_string: str) -> str:
-        """Sanitize user input for database storage (no HTML encoding)"""
+        """Sanitizar entrada del usuario para almacenamiento en base de datos (sin codificación HTML)"""
         try:
             if not input_string:
                 return ""
@@ -159,8 +164,9 @@ class SecurityFeatures:
             logger.error(f"Database input sanitization error: {e}")
             return ""
     
+    # Seguridad - Sanitizar Mensaje de Error
     def sanitize_error_message(self, error: Exception) -> str:
-        """Enhanced error message sanitization"""
+        """Sanitización mejorada de mensajes de error"""
         try:
             error_type = type(error).__name__
             
@@ -185,8 +191,9 @@ class SecurityFeatures:
             logger.error(f"Error message sanitization error: {e}")
             return "An error occurred. Please try again."
     
+    # Validacion - Validar Contraseña en Servidor
     def validate_password_server_side(self, password: str) -> Tuple[bool, str]:
-        """Server-side password validation"""
+        """Validación de contraseña en el servidor"""
         try:
             if not password:
                 return False, "Password is required"
@@ -227,8 +234,9 @@ class SecurityFeatures:
             logger.error(f"Password validation error: {e}")
             return False, "Password validation failed"
     
+    # Validacion - Validar Nombre de Usuario
     def validate_username(self, username: str) -> Tuple[bool, str]:
-        """Validate username format and security"""
+        """Validar formato y seguridad del nombre de usuario"""
         try:
             if not username:
                 return False, "Username is required"
@@ -254,8 +262,9 @@ class SecurityFeatures:
             logger.error(f"Username validation error: {e}")
             return False, "Username validation failed"
     
+    # Validacion - Validar Email
     def validate_email(self, email: str) -> Tuple[bool, str]:
-        """Validate email format and security"""
+        """Validar formato y seguridad del email"""
         try:
             if not email:
                 return False, "Email is required"
@@ -288,8 +297,9 @@ class SecurityFeatures:
             logger.error(f"Email validation error: {e}")
             return False, "Email validation failed"
     
+    # Base de Datos - Crear Tabla de Rate Limiting
     def create_rate_limit_table(self):
-        """Create rate limiting table if it doesn't exist"""
+        """Crear tabla de rate limiting si no existe"""
         try:
             with db_manager.get_connection() as conn:
                 conn.execute("""

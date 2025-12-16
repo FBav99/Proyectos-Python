@@ -1,3 +1,8 @@
+# Nombre del Archivo: dashboard_renderer.py
+# Descripción: Renderizador de dashboard - Funciones para mostrar componentes de dashboard (métricas, gráficos, etc.)
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,7 +13,7 @@ from utils.ui import display_error
 from utils.ui.icon_system import get_icon, replace_emojis
 # UI - Mostrar Metrica
 def display_metric(config, df):
-    """Display a metric component"""
+    """Mostrar un componente de métrica"""
     metric_type = config.get('metric_type', 'count')
     column = config.get('column')
     

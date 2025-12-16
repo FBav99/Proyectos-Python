@@ -1,3 +1,8 @@
+# Nombre del Archivo: 10_Limpieza_Datos.py
+# Descripción: Página de limpieza automática de datos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 from utils.data import create_data_cleaning_interface, show_upload_section, show_examples_section
@@ -7,7 +12,7 @@ init_sidebar = auth_ui.init_sidebar
 from core.config import setup_page_config, apply_custom_css
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
-# Configure error handling
+# Configuracion - Configurar manejo de errores
 configure_streamlit_error_handling()
 
 # Principal - Limpieza de Datos

@@ -1,10 +1,15 @@
+# Nombre del Archivo: 08_Dashboard_Blanco.py
+# Descripción: Página de Dashboard en Blanco - Creación y personalización de dashboards interactivos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
 
 from utils.ui.icon_system import get_icon, replace_emojis
-# Importar módulos personalizados
+# Importacion - Importar módulos personalizados
 from core.config import setup_page_config, apply_custom_css
 from core.auth_service import get_current_user, require_auth
 from data.sample_datasets import get_sample_datasets
@@ -31,7 +36,7 @@ from utils.ui import (
     safe_execute
 )
 
-# Import new dashboard modules
+# Importacion - Importar nuevos módulos de dashboard
 from utils.dashboard import (
     configure_component,
     render_dashboard,
@@ -45,7 +50,7 @@ from utils.ui import auth_ui
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
-# Configure error handling
+# Configuracion - Configurar manejo de errores
 configure_streamlit_error_handling()
 
 DASHBOARD_CUSTOM_CSS = """

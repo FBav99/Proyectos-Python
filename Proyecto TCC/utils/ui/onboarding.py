@@ -1,7 +1,7 @@
-"""
-Onboarding/Guided Tour System for Streamlit
-Provides a step-by-step guided experience for new users
-"""
+# Nombre del Archivo: onboarding.py
+# Descripción: Sistema de Onboarding/Tour Guiado para Streamlit - Proporciona una experiencia guiada paso a paso para nuevos usuarios
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
 
 import streamlit as st
 from typing import List, Dict, Optional
@@ -11,14 +11,14 @@ from utils.ui.icon_system import get_icon, replace_emojis
 @st.cache_data(show_spinner=False, ttl=300)
 def check_onboarding_status(user_id: int, _db_manager) -> bool:
     """
-    Check if user has completed onboarding from database
-    Returns True if onboarding completed, False otherwise
+    Verificar si el usuario ha completado el onboarding desde la base de datos
+    Retorna True si el onboarding está completado, False en caso contrario
     
-    Cached for 5 minutes to reduce database queries during page loads.
-    Cache is invalidated when onboarding is marked as complete.
+    Cacheado por 5 minutos para reducir consultas a la base de datos durante la carga de páginas.
+    El caché se invalida cuando el onboarding se marca como completado.
     
-    Note: _db_manager has leading underscore to tell Streamlit not to hash it
-    (DatabaseManager objects are not hashable).
+    Nota: _db_manager tiene guión bajo inicial para indicarle a Streamlit que no lo hashee
+    (los objetos DatabaseManager no son hasheables).
     """
     try:
         with _db_manager.get_connection() as conn:
@@ -45,7 +45,7 @@ def check_onboarding_status(user_id: int, _db_manager) -> bool:
 
 
 def mark_onboarding_complete(user_id: int, db_manager):
-    """Mark onboarding as complete in database"""
+    """Marcar onboarding como completado en la base de datos"""
     try:
         with db_manager.get_connection() as conn:
             cursor = conn.cursor()
@@ -130,7 +130,7 @@ def create_simple_onboarding_step(
     return st.button(f"Continuar al Paso {step_number + 1}", key=f"onboarding_step_{step_number}")
 
 
-# Predefined onboarding steps for the platform
+# Configuracion - Pasos de onboarding predefinidos para la plataforma
 ONBOARDING_STEPS = [
     {
         "title": replace_emojis("👋 ¡Bienvenido a la Plataforma!"),
@@ -159,8 +159,8 @@ ONBOARDING_STEPS = [
 
 def show_onboarding_tour(user_id: Optional[int] = None, db_manager=None):
     """
-    Main function to show the onboarding tour
-    Manages the step-by-step flow using session state
+    Función principal para mostrar el tour de onboarding
+    Gestiona el flujo paso a paso usando el estado de sesión
     """
     # Initialize onboarding state
     if 'onboarding_step' not in st.session_state:

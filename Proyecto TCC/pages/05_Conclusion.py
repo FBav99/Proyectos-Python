@@ -1,3 +1,8 @@
+# Nombre del Archivo: 05_Conclusion.py
+# Descripción: Página de Conclusión - Resumen de la jornada de aprendizaje del usuario
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 from utils.learning import load_level_styles, get_level_progress
 from utils.learning.learning_progress import save_level_progress
@@ -7,20 +12,20 @@ from utils.learning.level_components import create_info_box, create_step_card
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
-# Configure error handling
+# Configuracion - Configurar manejo de errores
 configure_streamlit_error_handling()
 
-# Page config
+# Configuracion - Configurar página
 st.set_page_config(
     page_title="Conclusión - Tu Jornada de Aprendizaje",
     page_icon=get_icon("🎓", 20),
     layout="wide"
 )
 
-# Load CSS styling for level pages
+# Estilo - Cargar estilos CSS para páginas de nivel
 st.markdown(load_level_styles(), unsafe_allow_html=True)
 
-# BI Tools Recommendations based on preferences
+# Configuracion - Recomendaciones de Herramientas BI basadas en preferencias
 BI_TOOLS = {
     'tableau': {
         'name': 'Tableau',

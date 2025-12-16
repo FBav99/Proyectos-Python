@@ -1,15 +1,21 @@
+# Nombre del Archivo: main_ui.py
+# Descripción: Componentes principales de UI para la página de inicio
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 
 from utils.ui.icon_system import get_icon, replace_emojis
+
 # UI - Mostrar Encabezado Principal
 def show_header(name):
-    """Show the main header with welcome message"""
+    """Mostrar el encabezado principal con mensaje de bienvenida"""
     st.markdown('<h1 class="main-header">Inicio</h1>', unsafe_allow_html=True)
     st.markdown(f'<p style="text-align: center; color: #666; font-size: 1.2rem;">Bienvenido, <strong>{name}</strong>! 👋</p>', unsafe_allow_html=True)
 
 # UI - Mostrar Seccion de Inicio Rapido
 def show_quick_start_section():
-    """Show the quick start section with main action buttons"""
+    """Mostrar la sección de inicio rápido con botones de acción principales"""
     st.markdown(f"""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 15px; margin: 2rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         <h2 style="color: white; text-align: center; margin-bottom: 1.5rem; font-size: 1.8rem;">{get_icon("🚀", 28)} ¿Qué quieres hacer hoy?</h2>
@@ -66,7 +72,7 @@ def show_quick_start_section():
 
 # Validacion - Verificar Mostrar Contenido Principal
 def should_show_main_content():
-    """Check if we should show the main content (not in any specific section)"""
+    """Verificar si debemos mostrar el contenido principal (no en ninguna sección específica)"""
     return not any([
         st.session_state.get('show_upload_section', False), 
         st.session_state.get('show_examples_section', False),
@@ -77,6 +83,6 @@ def should_show_main_content():
 
 # Estado - Limpiar Plantilla Seleccionada
 def clear_selected_template():
-    """Clear selected_template when showing main page to avoid redirect loops"""
+    """Limpiar selected_template al mostrar página principal para evitar loops de redirección"""
     if 'selected_template' in st.session_state:
         del st.session_state.selected_template

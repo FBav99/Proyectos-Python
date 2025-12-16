@@ -1,3 +1,8 @@
+# Nombre del Archivo: 06_Recuperar_Password.py
+# Descripción: Página para recuperar contraseña de usuario
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 from core.auth_service import auth_service
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
@@ -6,23 +11,23 @@ from utils.ui import auth_ui
 import re
 
 from utils.ui.icon_system import get_icon, replace_emojis
-# Import init_sidebar - using module import for better compatibility
+# Importacion - Importar init_sidebar usando importación de módulo para mejor compatibilidad
 init_sidebar = auth_ui.init_sidebar
 
-# Configure error handling at module level
+# Configuracion - Configurar manejo de errores a nivel de módulo
 configure_streamlit_error_handling()
 
-# Ensure database is initialized before using it
+# Inicializacion - Asegurar que la base de datos esté inicializada antes de usarla
 from core.database import ensure_database_initialized
 try:
     ensure_database_initialized()
 except Exception as e:
-    # Error - Se mostrara cuando la pagina cargue
+    # Manejo de Errores - Se mostrará cuando la página cargue
     pass
 
 # Validacion - Formato de Email
 def validate_email(email):
-    """Validate email format"""
+    """Validar formato de email"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 

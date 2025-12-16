@@ -20,8 +20,13 @@ from utils.ui import (
     display_export_section
 )
 
+# Nombre del Archivo: dashboard_templates.py
+# Descripción: Plantillas de dashboard - Plantillas predefinidas para diferentes tipos de dashboards
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 def show_kpi_template(df, username):
-    """Show KPI template - Macro level dashboard"""
+    """Mostrar plantilla KPI - Dashboard de nivel macro"""
     
     st.markdown(replace_emojis("### 🎯 Plantilla KPI - Nivel Macro"), unsafe_allow_html=True)
     st.markdown("*Dashboard ejecutivo con indicadores clave de rendimiento*")

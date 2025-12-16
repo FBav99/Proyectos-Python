@@ -1,3 +1,8 @@
+# Nombre del Archivo: dashboard_repository.py
+# Descripción: Repositorio de dashboards - Operaciones CRUD para dashboards persistentes en base de datos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import json
 import logging
 import streamlit as st
@@ -8,10 +13,9 @@ from core.database import db_manager
 
 logger = logging.getLogger(__name__)
 
-
 # Utilidad - Convertir Fila a Diccionario
 def _row_to_dict(row: Any) -> Dict[str, Any]:
-    """Convert SQLite Row or psycopg2 row to plain dict."""
+    """Convertir fila de SQLite Row o psycopg2 a diccionario plano."""
     if row is None:
         return {}
     if isinstance(row, dict):
@@ -32,17 +36,17 @@ def upsert_dashboard(
     dataset_info: Optional[Dict[str, Any]] = None,
 ) -> int:
     """
-    Create or update a dashboard record in the persistent database.
+    Crear o actualizar un registro de dashboard en la base de datos persistente.
 
     Args:
-        user_id: Owner of the dashboard.
-        dashboard_name: Human friendly name.
-        components: Dashboard component list (session-state serialization).
-        dashboard_id: Existing dashboard id (updates when provided).
-        is_public: Visibility flag (future use).
+        user_id: Propietario del dashboard.
+        dashboard_name: Nombre amigable para humanos.
+        components: Lista de componentes del dashboard (serialización de session-state).
+        dashboard_id: ID de dashboard existente (actualiza cuando se proporciona).
+        is_public: Bandera de visibilidad (uso futuro).
 
     Returns:
-        The id of the persisted dashboard.
+        El ID del dashboard persistido.
     """
     if not user_id:
         raise ValueError("user_id is required to persist a dashboard.")
@@ -50,6 +54,7 @@ def upsert_dashboard(
     if not components:
         raise ValueError("Cannot persist an empty dashboard.")
 
+    # Timestamp - Obtener timestamp actual
     now = datetime.utcnow().isoformat()
     config_payload = {
         "version": "1.0",
@@ -58,10 +63,12 @@ def upsert_dashboard(
     }
     if dataset_info:
         config_payload["dataset_info"] = dataset_info
+    # Conversion - Convertir configuración a JSON
     dashboard_config = json.dumps(config_payload, ensure_ascii=False)
 
     with db_manager.get_connection() as conn:
         if dashboard_id:
+            # Actualizacion - Actualizar dashboard existente
             logger.debug("Updating dashboard id %s for user %s", dashboard_id, user_id)
             conn.execute(
                 """
@@ -74,11 +81,12 @@ def upsert_dashboard(
             )
             conn.commit()
             
-            # Invalidate cache to ensure fresh data on next call
+            # Cache - Invalidar caché para asegurar datos frescos en la próxima llamada
             list_user_dashboards.clear()
             
             return dashboard_id
 
+        # Creacion - Crear nuevo dashboard
         logger.debug("Creating new dashboard for user %s", user_id)
         if db_manager.db_type == "supabase":
             cursor = conn.cursor()
@@ -96,7 +104,7 @@ def upsert_dashboard(
             record = cursor.fetchone()
             conn.commit()
             
-            # Invalidate cache to ensure fresh data on next call
+            # Cache - Invalidar caché para asegurar datos frescos en la próxima llamada
             list_user_dashboards.clear()
             
             return record["id"] if record else dashboard_id or 0
@@ -113,7 +121,7 @@ def upsert_dashboard(
         )
         conn.commit()
         
-        # Invalidate cache to ensure fresh data on next call
+        # Cache - Invalidar caché para asegurar datos frescos en la próxima llamada
         list_user_dashboards.clear()
         
         return int(cursor.lastrowid)
@@ -122,10 +130,10 @@ def upsert_dashboard(
 # Consulta - Listar Dashboards del Usuario
 @st.cache_data(show_spinner=False, ttl=30)
 def list_user_dashboards(user_id: int) -> List[Dict[str, Any]]:
-    """Retrieve all dashboards for a user ordered by last update.
+    """Recuperar todos los dashboards de un usuario ordenados por última actualización.
     
-    Cached for 30 seconds to reduce database queries while allowing
-    real-time updates when dashboards are created/modified.
+    Cacheados por 30 segundos para reducir consultas a la base de datos mientras se permiten
+    actualizaciones en tiempo real cuando se crean/modifican dashboards.
     """
     if not user_id:
         return []
@@ -148,8 +156,10 @@ def list_user_dashboards(user_id: int) -> List[Dict[str, Any]]:
         record = _row_to_dict(row)
         config_raw = record.get("dashboard_config", "{}")
         try:
+            # Conversion - Parsear configuración JSON
             parsed_config = json.loads(config_raw) if isinstance(config_raw, str) else config_raw
         except json.JSONDecodeError:
+            # Manejo de Errores - Usar configuración por defecto si falla el parseo
             parsed_config = {"components": []}
 
         dashboards.append(
@@ -169,7 +179,7 @@ def list_user_dashboards(user_id: int) -> List[Dict[str, Any]]:
 
 # Base de Datos - Eliminar Dashboard
 def delete_dashboard(dashboard_id: int, user_id: int) -> None:
-    """Delete a dashboard that belongs to the provided user."""
+    """Eliminar un dashboard que pertenece al usuario proporcionado."""
     if not dashboard_id or not user_id:
         return
 

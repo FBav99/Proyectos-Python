@@ -1,3 +1,8 @@
+# Nombre del Archivo: data_quality_analyzer.py
+# Descripción: Análisis completo de calidad de datos y generación de reportes
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,16 +11,17 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from utils.ui.icon_system import get_icon, replace_emojis
+
 # Analisis - Analizar Calidad de Datos
 @st.cache_data(show_spinner=False, ttl=600)
 def analyze_data_quality(df):
-    """Comprehensive data quality analysis"""
+    """Análisis completo de calidad de datos"""
     
     analysis = {
         'basic_info': {
             'rows': len(df),
             'columns': len(df.columns),
-            'memory_usage': df.memory_usage(deep=True).sum() / 1024 / 1024,  # MB
+            'memory_usage': df.memory_usage(deep=True).sum() / 1024 / 1024,  # Calculo - Memoria en MB
             'duplicates': df.duplicated().sum()
         },
         'missing_data': {
@@ -44,7 +50,7 @@ def analyze_data_quality(df):
             'negatives': int((df[col] < 0).sum())
         }
         
-        # Detect outliers using IQR method
+        # Analisis - Detectar outliers usando método IQR
         Q1 = df[col].quantile(0.25)
         Q3 = df[col].quantile(0.75)
         IQR = Q3 - Q1
@@ -84,7 +90,7 @@ def analyze_data_quality(df):
 
 # Reporte - Crear Reporte de Calidad
 def create_quality_report(df, analysis):
-    """Create comprehensive quality report"""
+    """Crear reporte completo de calidad"""
     
     st.markdown(replace_emojis("## 📊 Reporte de Calidad de Datos"), unsafe_allow_html=True)
     
@@ -126,7 +132,7 @@ def create_quality_report(df, analysis):
 
 # Calculo - Calcular Puntuacion de Calidad
 def calculate_quality_score(analysis):
-    """Calculate overall data quality score"""
+    """Calcular puntuación general de calidad de datos"""
     score = 100
     
     # Calculo - Penalizar Datos Faltantes
@@ -159,7 +165,7 @@ def calculate_quality_score(analysis):
 
 # UI - Mostrar Analisis General
 def show_general_analysis(df, analysis):
-    """Show general data analysis"""
+    """Mostrar análisis general de datos"""
     st.markdown(replace_emojis("### 📊 Información General"), unsafe_allow_html=True)
     
     # UI - Mostrar Resumen de Tipos de Datos
@@ -181,11 +187,11 @@ def show_general_analysis(df, analysis):
 
 # UI - Mostrar Analisis de Datos Faltantes
 def show_missing_data_analysis(analysis):
-    """Show missing data analysis"""
+    """Mostrar análisis de datos faltantes"""
     st.markdown(replace_emojis("### ❌ Análisis de Valores Faltantes"), unsafe_allow_html=True)
     
     if analysis['missing_data']['columns_with_missing']:
-        # Missing data chart
+        # Visualizacion - Gráfico de datos faltantes
         missing_df = pd.DataFrame({
             'Columna': list(analysis['missing_data']['missing_percentages'].keys()),
             'Porcentaje': list(analysis['missing_data']['missing_percentages'].values())
@@ -195,7 +201,7 @@ def show_missing_data_analysis(analysis):
                     title="Porcentaje de Valores Faltantes por Columna")
         st.plotly_chart(fig, use_container_width=True)
         
-        # Recommendations
+        # UI - Mostrar recomendaciones
         st.markdown(replace_emojis("#### 💡 Recomendaciones:"), unsafe_allow_html=True)
         for col, percentage in analysis['missing_data']['missing_percentages'].items():
             if percentage > 50:
@@ -209,15 +215,15 @@ def show_missing_data_analysis(analysis):
 
 # UI - Mostrar Analisis de Columnas Numericas
 def show_numeric_analysis(analysis):
-    """Show numeric columns analysis"""
+    """Mostrar análisis de columnas numéricas"""
     st.markdown(replace_emojis("### 🔢 Análisis de Columnas Numéricas"), unsafe_allow_html=True)
     
     if analysis['numeric_analysis']:
-        # Summary statistics
+        # Estadisticas - Resumen de estadísticas
         numeric_summary = pd.DataFrame(analysis['numeric_analysis']).T
         st.dataframe(numeric_summary, use_container_width=True)
         
-        # Outliers analysis
+        # Analisis - Análisis de outliers
         st.markdown(replace_emojis("#### 📊 Análisis de Outliers:"), unsafe_allow_html=True)
         outliers_df = pd.DataFrame({
             'Columna': list(analysis['outliers'].keys()),
@@ -234,15 +240,15 @@ def show_numeric_analysis(analysis):
 
 # UI - Mostrar Analisis de Columnas Categoricas
 def show_categorical_analysis(analysis):
-    """Show categorical columns analysis"""
+    """Mostrar análisis de columnas categóricas"""
     st.markdown(replace_emojis("### 📝 Análisis de Columnas Categóricas"), unsafe_allow_html=True)
     
     if analysis['categorical_analysis']:
-        # Categorical summary
+        # Resumen - Resumen categórico
         cat_summary = pd.DataFrame(analysis['categorical_analysis']).T
         st.dataframe(cat_summary, use_container_width=True)
         
-        # Inconsistencies
+        # Validacion - Inconsistencias
         st.markdown(replace_emojis("#### 🔍 Posibles Inconsistencias:"), unsafe_allow_html=True)
         for col, info in analysis['categorical_analysis'].items():
             if info['empty_strings'] > 0:
@@ -254,15 +260,15 @@ def show_categorical_analysis(analysis):
 
 # UI - Mostrar Analisis de Columnas de Fecha
 def show_date_analysis(analysis):
-    """Show date columns analysis"""
+    """Mostrar análisis de columnas de fecha"""
     st.markdown(replace_emojis("### 📅 Análisis de Columnas de Fecha"), unsafe_allow_html=True)
     
     if analysis['date_analysis']:
-        # Date summary
+        # Resumen - Resumen de fechas
         date_summary = pd.DataFrame(analysis['date_analysis']).T
         st.dataframe(date_summary, use_container_width=True)
         
-        # Future dates warning
+        # Validacion - Advertencia de fechas futuras
         for col, info in analysis['date_analysis'].items():
             if info['future_dates'] > 0:
                 st.warning(f"⚠️ **{col}**: {info['future_dates']} fechas futuras detectadas")
@@ -271,7 +277,7 @@ def show_date_analysis(analysis):
 
 # UI - Crear Opciones de Limpieza
 def create_data_cleaning_options(df, analysis):
-    """Create data cleaning options"""
+    """Crear opciones de limpieza de datos"""
     st.markdown("## 🧹 Opciones de Limpieza de Datos")
     
     cleaned_df = df.copy()
@@ -349,7 +355,7 @@ def create_data_cleaning_options(df, analysis):
 
 # Principal - Pagina de Calidad de Datos
 def data_quality_page(df):
-    """Main data quality analysis page"""
+    """Página principal de análisis de calidad de datos"""
     st.markdown("# 🧹 Análisis y Limpieza de Datos")
     st.markdown("### Paso 2: Revisa la calidad de tus datos antes de continuar")
     

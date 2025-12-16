@@ -1,7 +1,7 @@
-"""
-Data validation and quality checks for TCC Data Analysis Platform
-Handles missing values, duplicates, data types, and quality analysis
-"""
+# Nombre del Archivo: data_validation.py
+# Descripción: Validación de datos y verificaciones de calidad para la plataforma de análisis de datos TCC - Maneja valores faltantes, duplicados, tipos de datos y análisis de calidad
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
 
 import streamlit as st
 import pandas as pd
@@ -9,7 +9,7 @@ import numpy as np
 from typing import Dict, List, Any, Optional, Union
 
 class DataValidation:
-    """Data validation and quality checks"""
+    """Validación de datos y verificaciones de calidad"""
     
     # Inicializacion - Inicializar Validacion de Datos
     def __init__(self, df: pd.DataFrame):
@@ -17,7 +17,7 @@ class DataValidation:
     
     # Analisis - Analizar Valores Faltantes
     def analyze_missing_values(self) -> Dict[str, Any]:
-        """Analyze missing values in the dataset"""
+        """Analizar valores faltantes en el conjunto de datos"""
         missing_info = {}
         
         for col in self.df.columns:
@@ -38,12 +38,12 @@ class DataValidation:
                            columns: Optional[List[str]] = None,
                            custom_values: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
         """
-        Fill missing values using various methods
+        Llenar valores faltantes usando varios métodos
         
         Args:
             method: 'auto', 'mean', 'median', 'mode', 'forward', 'backward', 'custom'
-            columns: List of columns to process
-            custom_values: Dictionary of column: value pairs for custom filling
+            columns: Lista de columnas a procesar
+            custom_values: Diccionario de pares columna: valor para llenado personalizado
         """
         if columns is None:
             columns = self.df.columns.tolist()

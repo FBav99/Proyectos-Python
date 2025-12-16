@@ -1,8 +1,9 @@
+# Nombre del Archivo: data_cleaner.py
+# Descripción: Servicio de limpieza de datos para la plataforma de análisis de datos TCC - Orquestador principal para operaciones de limpieza, validación y calidad de datos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 from utils.ui.icon_system import get_icon, replace_emojis
-"""
-Data cleaning service for TCC Data Analysis Platform
-Main orchestrator for data cleaning, validation, and quality operations
-"""
 
 import streamlit as st
 import pandas as pd
@@ -12,7 +13,7 @@ from .data_cleaning_ops import DataCleaningOperations
 from .data_validation import DataValidation
 
 class DataCleaner:
-    """Main data cleaning orchestrator"""
+    """Orquestador principal de limpieza de datos"""
     
     def __init__(self, df: pd.DataFrame):
         self.original_df = df.copy()
@@ -23,7 +24,7 @@ class DataCleaner:
     
     # Historial - Agregar Operacion al Historial
     def add_to_history(self, operation: str, details: str):
-        """Add operation to cleaning history"""
+        """Agregar operación al historial de limpieza"""
         self.cleaning_history.append({
             'operation': operation,
             'details': details,
@@ -32,7 +33,7 @@ class DataCleaner:
     
     # Consulta - Obtener Resumen de Limpieza
     def get_cleaning_summary(self) -> Dict[str, Any]:
-        """Get summary of cleaning operations performed"""
+        """Obtener resumen de operaciones de limpieza realizadas"""
         return {
             'total_operations': len(self.cleaning_history),
             'operations': self.cleaning_history,
@@ -45,10 +46,10 @@ class DataCleaner:
     # Limpieza - Aplicar Limpieza Automatica
     def apply_auto_cleaning(self, cleaning_options: Dict[str, bool] = None) -> pd.DataFrame:
         """
-        Apply automatic cleaning based on predefined options
+        Aplicar limpieza automática basada en opciones predefinidas
         
         Args:
-            cleaning_options: Dictionary with cleaning options
+            cleaning_options: Diccionario con opciones de limpieza
         """
         if cleaning_options is None:
             cleaning_options = {

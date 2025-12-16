@@ -1,3 +1,8 @@
+# Nombre del Archivo: metrics.py
+# Descripción: Métricas de análisis - Funciones para calcular métricas clave, crecimiento y perspectivas de rendimiento
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import pandas as pd
 import numpy as np
 

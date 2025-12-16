@@ -1,3 +1,8 @@
+# Nombre del Archivo: calculations.py
+# Descripción: Cálculos personalizados - Funciones para aplicar operaciones matemáticas, cálculos temporales y agregaciones
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import pandas as pd
 import numpy as np
 import streamlit as st

@@ -1,9 +1,15 @@
+# Nombre del Archivo: data_loader.py
+# Descripción: Carga y gestión de datos de muestra y archivos subidos por usuarios
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import pandas as pd
 import numpy as np
 import streamlit as st
 
 from utils.ui.icon_system import get_icon, replace_emojis
 from utils.data.data_handling import load_excel_with_sheet_selection, load_csv_with_delimiter_selection
+
 # Datos - Cargar Datos de Muestra
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_sample_data():
@@ -43,17 +49,20 @@ def load_uploaded_file(uploaded_file):
             if df is None:
                 return None
         
-        # Intentar convertir columnas de fecha
+        # Conversion - Intentar convertir columnas de fecha
         for col in df.columns:
             if 'date' in col.lower() or 'time' in col.lower():
                 try:
                     df[col] = pd.to_datetime(df[col])
                 except:
+                    # Manejo de Errores - Si falla la conversión, continuar sin convertir
                     pass
                     
+        # UI - Mostrar mensaje de éxito
         st.sidebar.success(f"{get_icon("✅", 20)} Cargadas {len(df)} filas de datos")
         return df
     except Exception as e:
+        # Manejo de Errores - Mostrar error al cargar archivo
         st.sidebar.error(f"Error al cargar archivo: {str(e)}")
         return None
 
@@ -65,5 +74,6 @@ def get_data(uploaded_file):
         if df is not None:
             return df
     
+    # UI - Informar que se usan datos de muestra
     st.sidebar.info("Usando datos de muestra para demostración")
     return load_sample_data() 

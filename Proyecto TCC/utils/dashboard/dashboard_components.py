@@ -6,10 +6,15 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 
+# Nombre del Archivo: dashboard_components.py
+# Descripción: Componentes de dashboard - Funciones para crear y configurar componentes de dashboard
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 from utils.ui.icon_system import get_icon, replace_emojis
 # Configuracion - Obtener Configuracion por Defecto
 def get_default_config(component_type, df):
-    """Get default configuration for a component type"""
+    """Obtener configuración por defecto para un tipo de componente"""
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
     categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
     

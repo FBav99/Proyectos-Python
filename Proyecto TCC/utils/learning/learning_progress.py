@@ -1,3 +1,8 @@
+# Nombre del Archivo: learning_progress.py
+# Descripción: Progreso de aprendizaje - Funciones para obtener y mostrar el progreso del usuario a través de los niveles
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 from core.progress_tracker import progress_tracker
 from utils.ui.icon_system import get_icon, replace_emojis
@@ -5,10 +10,10 @@ from utils.ui.icon_system import get_icon, replace_emojis
 # Progreso - Obtener Progreso de Niveles
 @st.cache_data(show_spinner=False, ttl=60)
 def get_level_progress(user_id):
-    """Get current progress across all levels from database
+    """Obtener progreso actual a través de todos los niveles desde la base de datos
     
-    Cached for 60 seconds to reduce database queries while allowing
-    real-time updates when progress changes.
+    Cacheado por 60 segundos para reducir consultas a la base de datos mientras permite
+    actualizaciones en tiempo real cuando el progreso cambia.
     """
     try:
         progress = progress_tracker.get_user_progress(user_id)

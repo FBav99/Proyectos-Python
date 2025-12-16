@@ -1,3 +1,8 @@
+# Nombre del Archivo: dashboard_sidebar.py
+# Descripción: Sidebar de dashboard - Funciones para crear y gestionar el sidebar del dashboard con controles y configuración
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import io
 import json
 import textwrap
@@ -22,7 +27,7 @@ except ImportError:
 
 # Consulta - Obtener DataFrame Activo
 def _get_active_dataframe():
-    """Return the DataFrame currently used in the dashboard context."""
+    """Retornar el DataFrame actualmente usado en el contexto del dashboard."""
     for key in ("cleaned_data", "uploaded_data", "sample_data"):
         df = st.session_state.get(key)
         if df is not None:

@@ -1,3 +1,8 @@
+# Nombre del Archivo: quiz_system.py
+# Descripción: Sistema de quiz para evaluar conocimientos en cada nivel de aprendizaje
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import random
 from datetime import datetime
@@ -5,8 +10,10 @@ from core.auth_config import update_user_progress, check_achievement
 from core.database import db_manager
 
 from utils.ui.icon_system import get_icon, replace_emojis
-# Quiz questions for each level
+
+# Banco de Preguntas - Preguntas de Quiz para cada Nivel
 QUIZ_QUESTIONS = {
+    # Preguntas - Nivel 0
     'nivel0': [
         {
             'question': '¿Qué son los datos?',
@@ -81,6 +88,7 @@ QUIZ_QUESTIONS = {
             'explanation': 'Los datos ayudan a tomar decisiones informadas, identificar problemas, encontrar oportunidades y mejorar el negocio.'
         }
     ],
+    # Preguntas - Nivel 1
     'nivel1': [
         {
             'question': '¿Cuál es el formato más común para archivos de datos?',
@@ -155,6 +163,7 @@ QUIZ_QUESTIONS = {
             'explanation': 'Si encuentras errores, debes corregirlos o eliminarlos antes de continuar para asegurar la calidad del análisis.'
         }
     ],
+    # Preguntas - Nivel 2
     'nivel2': [
         {
             'question': '¿Qué es un filtro en análisis de datos?',
@@ -229,6 +238,7 @@ QUIZ_QUESTIONS = {
             'explanation': 'Depende de tu necesidad: filtros simples para análisis generales, filtros combinados para análisis más específicos y detallados.'
         }
     ],
+    # Preguntas - Nivel 3
     'nivel3': [
         {
             'question': '¿Qué es una métrica en análisis de datos?',
@@ -303,6 +313,7 @@ QUIZ_QUESTIONS = {
             'explanation': 'Comparar métricas permite entender tendencias, identificar problemas, ver mejoras y tomar decisiones basadas en datos.'
         }
     ],
+    # Preguntas - Nivel 4
     'nivel4': [
         {
             'question': '¿Qué es un análisis de tendencias?',
@@ -379,6 +390,7 @@ QUIZ_QUESTIONS = {
     ]
 }
 
+# Configuracion - Encabezados de Niveles para Quiz
 LEVEL_HEADERS = {
     'nivel0': 'Nivel 0: Introducción',
     'nivel1': 'Nivel 1: Básico',
@@ -387,6 +399,7 @@ LEVEL_HEADERS = {
     'nivel4': 'Nivel 4: Avanzado',
 }
 
+# Configuracion - Destinos de Navegación después de Completar Quiz
 NEXT_LEVEL_DESTINATIONS = {
     'nivel0': ("pages/01_Nivel_1_Basico.py", "Nivel 1: Básico"),
     'nivel1': ("pages/02_Nivel_2_Filtros.py", "Nivel 2: Filtros"),
@@ -398,7 +411,7 @@ NEXT_LEVEL_DESTINATIONS = {
 
 # Estado - Reiniciar Estado de Quiz
 def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
-    """Clear quiz-related session state values."""
+    """Reinicia los valores del estado de sesión relacionados con el quiz."""
     prefix = f'quiz_{level}'
     keys_to_clear = [
         f'{prefix}_started',
@@ -414,14 +427,14 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
     for key in keys_to_clear:
         st.session_state.pop(key, None)
 
-    # Limpieza - Remover Flags y Claves de Seleccion Legacy
+    # Limpieza - Remover Flags y Claves de Selección Legacy
     for idx in range(total_questions):
         st.session_state.pop(f'{prefix}_answered_{idx}', None)
         st.session_state.pop(f'{prefix}_q{idx}', None)
         st.session_state.pop(f'{prefix}_q_{idx}', None)
         st.session_state.pop(f'{prefix}_submit_{idx}', None)
     
-    # Clear selected questions so new ones are chosen on next start
+    # Limpieza - Limpiar preguntas seleccionadas para que se elijan nuevas en el próximo inicio
     st.session_state.pop(f'{prefix}_selected_questions', None)
 
     if keep_expanded:
@@ -430,16 +443,16 @@ def _reset_quiz_state(level, total_questions, *, keep_expanded=False):
         st.session_state.pop(f'{prefix}_expanded', None)
 # Quiz - Crear y Mostrar Quiz
 def create_quiz(level, username):
-    """Create and display a quiz for a specific level."""
+    """Crea y muestra un quiz para un nivel específico."""
 
-    # Get all questions from the question bank
+    # Banco de Preguntas - Obtener todas las preguntas del banco
     question_bank = QUIZ_QUESTIONS.get(level, [])
 
     if not question_bank:
         st.error("No hay preguntas disponibles para este nivel.")
         return
 
-    # Ensure we have at least 5 questions in the bank
+    # Validacion - Verificar que haya al menos 5 preguntas en el banco
     if len(question_bank) < 5:
         st.error(f"Se necesitan al menos 5 preguntas en el banco. Actualmente hay {len(question_bank)}.")
         return
@@ -456,7 +469,7 @@ def create_quiz(level, username):
     if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
         st.session_state[expander_key] = True
 
-    # UI - Forzar Expander Abierto si Quiz Completado
+    # UI - Forzar Expander Abierto si Quiz Está Completado
     if st.session_state.get(f'{prefix}_completed', False):
         expanded = True
         st.session_state[expander_key] = True
@@ -468,8 +481,8 @@ def create_quiz(level, username):
     with st.expander(f"🧠 Quiz - {header_text}", expanded=expanded):
         st.markdown("### Pon a prueba tus conocimientos")
 
-        # Only initialize quiz state if quiz hasn't been started or completed yet
-        # This prevents resetting the state when returning to the page after completing the quiz
+        # Estado - Inicializar estado del quiz solo si no ha sido iniciado o completado
+        # Esto previene resetear el estado al regresar a la página después de completar el quiz
         if f'{prefix}_started' not in st.session_state and f'{prefix}_completed' not in st.session_state:
             st.session_state[f'{prefix}_started'] = False
             st.session_state[f'{prefix}_current_question'] = 0
@@ -479,14 +492,14 @@ def create_quiz(level, username):
             st.session_state[f'{prefix}_question_order'] = []
             st.session_state[selected_questions_key] = []
         
-        # Ensure answers are preserved if quiz is completed
+        # Estado - Asegurar que las respuestas se preserven si el quiz está completado
         if st.session_state.get(f'{prefix}_completed', False) and f'{prefix}_answers' not in st.session_state:
             st.session_state[f'{prefix}_answers'] = []
 
-        # Get selected questions (5 random questions from the bank)
+        # Seleccion - Obtener preguntas seleccionadas (5 preguntas aleatorias del banco)
         selected_questions = st.session_state.get(selected_questions_key, [])
         if not selected_questions:
-            # Select 5 random questions from the bank
+            # Seleccion - Seleccionar 5 preguntas aleatorias del banco
             selected_questions = random.sample(question_bank, 5)
             st.session_state[selected_questions_key] = selected_questions
         
@@ -505,10 +518,10 @@ def create_quiz(level, username):
             col_start, col_skip = st.columns([2, 1])
             with col_start:
                 if st.button("🚀 Comenzar Quiz", type="primary", use_container_width=True, key=f"{prefix}_start"):
-                    # Select 5 random questions from the bank
+                    # Seleccion - Seleccionar 5 preguntas aleatorias del banco
                     selected_questions = random.sample(question_bank, 5)
                     st.session_state[selected_questions_key] = selected_questions
-                    # Create order for the 5 selected questions
+                    # Estado - Crear orden para las 5 preguntas seleccionadas
                     st.session_state[f'{prefix}_question_order'] = list(range(5))
                     st.session_state[f'{prefix}_current_question'] = 0
                     st.session_state[f'{prefix}_score'] = 0
@@ -525,7 +538,7 @@ def create_quiz(level, username):
                     st.rerun()
             return
 
-        # Ensure selected questions and question order exist
+        # Validacion - Asegurar que las preguntas seleccionadas y el orden existan
         if not st.session_state.get(selected_questions_key):
             selected_questions = random.sample(question_bank, 5)
             st.session_state[selected_questions_key] = selected_questions
@@ -534,7 +547,7 @@ def create_quiz(level, username):
         if not st.session_state.get(f'{prefix}_question_order'):
             st.session_state[f'{prefix}_question_order'] = list(range(5))
 
-        # Always keep expander open during quiz or when completed
+        # UI - Mantener expander abierto durante el quiz o cuando está completado
         if st.session_state.get(f'{prefix}_started') or st.session_state.get(f'{prefix}_completed'):
             st.session_state[expander_key] = True
 
@@ -553,7 +566,7 @@ def create_quiz(level, username):
 
             if current_index >= len(order):
                 st.session_state[f'{prefix}_completed'] = True
-                st.session_state[expander_key] = True  # Ensure expander stays open
+                st.session_state[expander_key] = True  # UI - Asegurar que el expander permanezca abierto
                 st.rerun()
 
             question = questions[order[current_index]]
@@ -568,7 +581,7 @@ def create_quiz(level, username):
                 index=None
             )
             
-            # Validacion - Verificar que se haya seleccionado una opcion
+            # Validacion - Verificar que se haya seleccionado una opción
             if selected_option is None:
                 st.warning("Por favor selecciona una respuesta antes de continuar.")
 
@@ -576,10 +589,11 @@ def create_quiz(level, username):
             with col_answer:
                 submit_disabled = selected_option is None
                 if st.button("✅ Enviar y continuar", type="primary", use_container_width=True, key=f"{prefix}_submit_{current_index}", disabled=submit_disabled):
-                    # This check is redundant but serves as a safety measure
+                    # Validacion - Esta verificación es redundante pero sirve como medida de seguridad
                     if selected_option is None:
                         st.stop()
                     
+                    # Evaluacion - Verificar si la respuesta es correcta
                     correct = question['options'].index(selected_option) == question['correct']
 
                     if correct:
@@ -602,7 +616,7 @@ def create_quiz(level, username):
                     st.session_state[f'{prefix}_current_question'] += 1
                     if st.session_state[f'{prefix}_current_question'] >= len(order):
                         st.session_state[f'{prefix}_completed'] = True
-                        st.session_state[expander_key] = True  # Ensure expander stays open
+                        st.session_state[expander_key] = True  # UI - Asegurar que el expander permanezca abierto
                     st.rerun()
 
             with col_restart:
@@ -610,19 +624,19 @@ def create_quiz(level, username):
                     _reset_quiz_state(level, total_questions, keep_expanded=True)
                     st.rerun()
         else:
-            # Use selected questions for results display
+            # Resultados - Usar preguntas seleccionadas para mostrar resultados
             selected_questions = st.session_state.get(selected_questions_key, questions)
             show_quiz_results(level, username, selected_questions, expander_key)
 
 
 # Quiz - Mostrar Resultados de Quiz
 def show_quiz_results(level, username, questions, expander_key):
-    """Show quiz results and achievements."""
+    """Muestra los resultados del quiz y logros desbloqueados."""
 
     prefix = f'quiz_{level}'
-    st.session_state[expander_key] = True  # Force expander to stay open
+    st.session_state[expander_key] = True  # UI - Forzar que el expander permanezca abierto
 
-    # Validacion - Verificar que Datos de Quiz Existen
+    # Validacion - Verificar que los Datos del Quiz Existan
     if f'{prefix}_score' not in st.session_state or f'{prefix}_answers' not in st.session_state:
         st.error("Error: Los datos del quiz no están disponibles. Por favor, intenta el quiz nuevamente.")
         return
@@ -697,8 +711,10 @@ def show_quiz_results(level, username, questions, expander_key):
         st.session_state[f'{prefix}_saved'] = True
         
         if passed:
+            # Progreso - Actualizar progreso del usuario
             update_user_progress(username, quiz_scores={level: percentage})
 
+            # Logros - Verificar logro de primer nivel completado
             if level == 'nivel1' and not st.session_state.get('nivel1_completed', False):
                 new_achievements = check_achievement(username, 'level_completion')
                 if new_achievements:
@@ -706,9 +722,9 @@ def show_quiz_results(level, username, questions, expander_key):
 
 # Base de Datos - Guardar Intento de Quiz
 def save_quiz_attempt(level, username, score, total_questions, percentage, passed, answers_list):
-    """Save quiz attempt and answers to database"""
+    """Guarda el intento del quiz y las respuestas en la base de datos"""
     try:
-        # Get user_id from username - query database directly
+        # Base de Datos - Obtener user_id desde username - consultar base de datos directamente
         with db_manager.get_connection() as conn:
             if db_manager.db_type == "sqlite":
                 cursor = conn.execute("SELECT id FROM users WHERE username = ?", (username,))
@@ -726,9 +742,9 @@ def save_quiz_attempt(level, username, score, total_questions, percentage, passe
             
             user_id = user_result[0] if isinstance(user_result, tuple) else user_result['id']
         
-        # Now insert quiz attempt with the user_id
+        # Base de Datos - Insertar intento de quiz con el user_id
         with db_manager.get_connection() as conn:
-            # Insert quiz attempt
+            # Base de Datos - Insertar intento de quiz
             if db_manager.db_type == "sqlite":
                 cursor = conn.execute("""
                     INSERT INTO quiz_attempts (user_id, level, score, total_questions, percentage, passed, completed_at)
@@ -744,7 +760,7 @@ def save_quiz_attempt(level, username, score, total_questions, percentage, passe
                 """, (user_id, level, score, total_questions, percentage, passed))
                 quiz_attempt_id = cursor.fetchone()[0]
             
-            # Insert each answer
+            # Base de Datos - Insertar cada respuesta
             for answer in answers_list:
                 if db_manager.db_type == "sqlite":
                     conn.execute("""
@@ -764,12 +780,12 @@ def save_quiz_attempt(level, username, score, total_questions, percentage, passe
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f"Error saving quiz attempt: {e}")
-        # Don't show error to user, just log it
+        # Manejo de Errores - No mostrar error al usuario, solo registrarlo
         return False
 
 # UI - Mostrar Logros de Usuario
 def show_achievements(username):
-    """Display user achievements"""
+    """Muestra los logros del usuario"""
     from core.auth_config import get_user_progress
     
     progress = get_user_progress(username)
@@ -814,7 +830,7 @@ def show_achievements(username):
             </div>
             """, unsafe_allow_html=True)
     
-    # UI - Mostrar Progreso hacia Proximos Logros
+    # UI - Mostrar Progreso hacia Próximos Logros
     st.markdown(replace_emojis("### 🎯 Próximos Logros"), unsafe_allow_html=True)
     
     if 'first_level' not in achievements:

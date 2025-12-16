@@ -1,7 +1,7 @@
-"""
-Survey System for TCC Data Analysis Platform
-Handles initial, level-specific, and final surveys for user feedback
-"""
+# Nombre del Archivo: survey_system.py
+# Descripción: Sistema de encuestas para la plataforma de análisis de datos TCC - Maneja encuestas iniciales, por nivel y finales
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
 
 import streamlit as st
 import json
@@ -12,16 +12,17 @@ from core.database import db_manager
 
 logger = logging.getLogger(__name__)
 
-
+# Utilidad - Adaptar Consulta según Backend
 def _adapt_query(query: str) -> str:
-    """Adjust placeholder style depending on database backend."""
+    """Ajustar estilo de placeholders según el backend de base de datos."""
     if db_manager.db_type == "supabase":
         return query.replace("?", "%s")
     return query
 
 
+# Clase - Sistema de Encuestas
 class SurveySystem:
-    """Handles survey management and responses"""
+    """Maneja la gestión de encuestas y respuestas"""
     
     def __init__(self):
         self.survey_types = {
@@ -34,24 +35,27 @@ class SurveySystem:
     
     @staticmethod
     def _cache_key(user_id: int, survey_type: str, level: Optional[str]) -> tuple:
-        """Create a hashable cache key for survey lookups."""
+        """Crear una clave de caché hashable para búsquedas de encuestas."""
         return (user_id, survey_type, level or "__NO_LEVEL__")
     
+    # Cache - Invalidar Caché
     def _invalidate_cache(self, user_id: int, survey_type: str, level: Optional[str]):
-        """Invalidate cached data for a specific survey combination."""
+        """Invalidar datos en caché para una combinación específica de encuesta."""
         key = self._cache_key(user_id, survey_type, level)
         self._completion_cache.pop(key, None)
         self._response_cache.pop(key, None)
     
+    # Base de Datos - Asegurar que Tabla Existe
     def _ensure_table_exists(self):
-        """Ensure survey_responses table exists"""
+        """Asegurar que la tabla survey_responses existe"""
         try:
             db_manager.create_survey_responses_table()
         except Exception as e:
             logger.warning(f"Could not create survey_responses table (may already exist): {e}")
     
+    # Base de Datos - Guardar Respuesta de Encuesta
     def save_survey_response(self, user_id: int, survey_type: str, responses: Dict[str, Any], level: Optional[str] = None) -> bool:
-        """Save survey response to database"""
+        """Guardar respuesta de encuesta en la base de datos"""
         cache_payload = None
         try:
             # Inicializacion - Asegurar que Tabla de Respuestas Existe
@@ -144,8 +148,9 @@ class SurveySystem:
                 self._response_cache.pop(key, None)
             return True
     
+    # Validacion - Verificar Completación de Encuesta
     def has_completed_survey(self, user_id: int, survey_type: str, level: Optional[str] = None) -> bool:
-        """Check if user has completed a specific survey"""
+        """Verificar si el usuario ha completado una encuesta específica"""
         try:
             # Inicializacion - Asegurar que Tabla de Respuestas Existe
             self._ensure_table_exists()
@@ -192,8 +197,9 @@ class SurveySystem:
             logger.error(traceback.format_exc())
             return False
     
+    # Consulta - Obtener Respuesta de Encuesta
     def get_survey_response(self, user_id: int, survey_type: str, level: Optional[str] = None) -> Optional[Dict[str, Any]]:
-        """Get user's survey response"""
+        """Obtener respuesta de encuesta del usuario"""
         try:
             key = self._cache_key(user_id, survey_type, level)
             if key in self._response_cache:
@@ -229,8 +235,9 @@ class SurveySystem:
             logger.error(f"Error getting survey response: {e}")
             return None
     
+    # Consulta - Obtener Todas las Respuestas de Encuestas
     def get_all_survey_responses(self, survey_type: Optional[str] = None) -> list:
-        """Get all survey responses (for admin/analytics)"""
+        """Obtener todas las respuestas de encuestas (para admin/analytics)"""
         try:
             with db_manager.get_connection() as conn:
                 cursor = conn.cursor()
@@ -254,7 +261,7 @@ class SurveySystem:
                     if isinstance(row, dict):
                         row_dict = dict(row)
                     else:
-                        # Convert to dict for SQLite Row objects
+                        # Conversion - Convertir a diccionario para objetos Row de SQLite
                         row_dict = dict(zip([col[0] for col in cursor.description], row))
                     
                     # Conversion - Parsear Respuestas JSON

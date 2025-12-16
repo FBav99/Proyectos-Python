@@ -1,3 +1,8 @@
+# Nombre del Archivo: 01_Nivel_1_Basico.py
+# Descripción: Página del Nivel 1 - Básico - Preparación de datos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,20 +17,20 @@ from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
-# Configure error handling
+# Configuracion - Configurar manejo de errores
 configure_streamlit_error_handling()
 
-# Page config
+# Configuracion - Configurar página
 st.set_page_config(
     page_title="Nivel 1: Básico - Preparación de Datos",
     page_icon=get_icon("📚", 20),
     layout="wide"
 )
 
-# Load CSS styling for level pages
+# Estilo - Cargar estilos CSS para páginas de nivel
 st.markdown(load_level_styles(), unsafe_allow_html=True)
 
-# Helper functions are now imported from utils.level_components and utils.level_data
+# Nota - Las funciones helper ahora se importan desde utils.level_components y utils.level_data
 
 # Principal - Nivel 1 Basico
 @safe_main

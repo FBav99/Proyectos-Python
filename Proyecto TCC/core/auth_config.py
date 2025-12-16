@@ -1,12 +1,18 @@
+# Nombre del Archivo: auth_config.py
+# Descripción: Configuración y gestión de autenticación de usuarios
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 import os
 
+# Configuracion - Cargar Configuración de Autenticación
 @st.cache_data(show_spinner=False, ttl=300)
 def load_auth_config():
-    """Load authentication configuration from YAML file with short-lived caching"""
+    """Cargar configuración de autenticación desde archivo YAML con caché de corta duración"""
     config_path = 'config/config.yaml'
     
     # Configuracion - Estructura de Configuracion por Defecto
@@ -19,7 +25,7 @@ def load_auth_config():
                     'first_name': 'Demo',
                     'last_name': 'User',
                     'logged_in': False,
-                    'password': 'demo123'  # Plain text password - will be hashed
+                    'password': 'demo123'  # Seguridad - Contraseña en texto plano - será hasheada
                 }
             }
         },
@@ -41,43 +47,45 @@ def load_auth_config():
                 if config:
                     return config
         except Exception:
-            # If reading fails, use default config
-            # Don't expose error details to user
+            # Manejo de Errores - Si falla la lectura, usar configuración por defecto
+            # Manejo de Errores - No exponer detalles del error al usuario
             return default_config
     
     # Archivo - Intentar Crear Archivo si No Existe
     try:
-        # Try to create directory if it doesn't exist
+        # Archivo - Intentar crear directorio si no existe
         os.makedirs(os.path.dirname(config_path), exist_ok=True)
         with open(config_path, 'w') as file:
             yaml.dump(default_config, file, default_flow_style=False)
     except (OSError, PermissionError, IOError):
-        # On Streamlit Cloud, we can't write to the file system
-        # This is expected behavior - we'll use the default config in memory
+        # Manejo de Errores - En Streamlit Cloud, no podemos escribir al sistema de archivos
+        # Manejo de Errores - Este es comportamiento esperado - usaremos la configuración por defecto en memoria
         pass
     
     return default_config
 
+# Autenticacion - Inicializar Sistema de Autenticación
 def init_authentication():
-    """Initialize authentication system"""
+    """Inicializar sistema de autenticación"""
     config = load_auth_config()
     
-    # Seguridad - Hashear Contraseñas usando API Correcta
+    # Seguridad - Hashear contraseñas usando API correcta
     hashed_credentials = stauth.Hasher.hash_passwords(config['credentials'])
     
-    # Inicializacion - Inicializar Clase Authenticate con Parametros Correctos
+    # Inicializacion - Inicializar clase Authenticate con parámetros correctos
     authenticator = stauth.Authenticate(
         credentials=hashed_credentials,
         cookie_name=config['cookie']['name'],
         cookie_key=config['cookie']['key'],
         cookie_expiry_days=config['cookie']['expiry_days'],
-        auto_hash=False  # Disable automatic hashing since passwords are pre-hashed
+        auto_hash=False  # Seguridad - Deshabilitar hashing automático ya que las contraseñas están pre-hasheadas
     )
     
     return authenticator
 
+# Progreso - Obtener Progreso del Usuario
 def get_user_progress(username):
-    """Get user's learning progress"""
+    """Obtener progreso de aprendizaje del usuario"""
     if 'user_progress' not in st.session_state:
         st.session_state.user_progress = {}
     
@@ -95,20 +103,22 @@ def get_user_progress(username):
     
     return st.session_state.user_progress[username]
 
+# Progreso - Actualizar Progreso del Usuario
 def update_user_progress(username, **updates):
-    """Update user's learning progress"""
+    """Actualizar progreso de aprendizaje del usuario"""
     progress = get_user_progress(username)
     progress.update(updates)
     st.session_state.user_progress[username] = progress
 
+# Logros - Verificar y Otorgar Logros
 def check_achievement(username, achievement_type):
-    """Check and award achievements"""
+    """Verificar y otorgar logros"""
     progress = get_user_progress(username)
     achievements = progress.get('achievements', [])
     
     new_achievements = []
     
-    # Logros - Logros de Completacion de Niveles
+    # Logros - Logros de completación de niveles
     if achievement_type == 'level_completion':
         completed_levels = sum([
             progress.get('nivel1_completed', False),
@@ -122,18 +132,18 @@ def check_achievement(username, achievement_type):
         elif completed_levels == 4 and 'all_levels' not in achievements:
             new_achievements.append('all_levels')
     
-    # Logros - Logros de Quiz
+    # Logros - Logros de quiz
     elif achievement_type == 'quiz_perfect':
         if 'quiz_master' not in achievements:
             new_achievements.append('quiz_master')
     
-    # Logros - Logros de Analisis de Datos
+    # Logros - Logros de análisis de datos
     elif achievement_type == 'analysis_created':
         analyses_count = progress.get('data_analyses_created', 0)
         if analyses_count >= 5 and 'data_analyst' not in achievements:
             new_achievements.append('data_analyst')
     
-    # Actualizacion - Actualizar Logros
+    # Actualizacion - Actualizar logros
     if new_achievements:
         progress['achievements'].extend(new_achievements)
         update_user_progress(username, achievements=progress['achievements'])

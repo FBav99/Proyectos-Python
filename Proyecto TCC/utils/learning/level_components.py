@@ -1,10 +1,15 @@
+# Nombre del Archivo: level_components.py
+# Descripción: Componentes de nivel - Funciones para crear componentes UI para las páginas de nivel (tarjetas de paso, cajas de información, etc.)
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 from core.progress_tracker import progress_tracker
 from .progression_tracker import get_level_achievements, get_progression_summary, get_achievement_badge, get_data_quality_insights
 
 from utils.ui.icon_system import get_icon, replace_emojis
 def create_step_card(step_number, title, description, sections=None):
-    """Create a step card with proper HTML structure"""
+    """Crear una tarjeta de paso con estructura HTML apropiada"""
     html_content = f"""
     <div class="step-card">
         <div class="step-number">{step_number}</div>
@@ -30,7 +35,7 @@ def create_step_card(step_number, title, description, sections=None):
     st.markdown(html_content, unsafe_allow_html=True)
 
 def create_info_box(box_type, title, content):
-    """Create info boxes with different styles"""
+    """Crear cajas de información con diferentes estilos"""
     # Convert markdown lists to HTML if content contains list markers
     if isinstance(content, str) and ('\n-' in content or '\n*' in content):
         # Convert markdown lists to HTML

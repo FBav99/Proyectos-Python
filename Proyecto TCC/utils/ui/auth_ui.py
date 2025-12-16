@@ -1,3 +1,8 @@
+# Nombre del Archivo: auth_ui.py
+# Descripción: UI de autenticación - Componentes de interfaz de usuario para autenticación, sidebar y navegación
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 from core.auth_service import login_user, logout_user, get_current_user as db_get_current_user
 
@@ -14,7 +19,7 @@ HIDDEN_NAVIGATION_PATTERNS = [
 
 # UI - Ocultar Entradas Restringidas del Sidebar
 def hide_restricted_sidebar_entries():
-    """Inject CSS rules to hide restricted pages from the sidebar navigation."""
+    """Inyectar reglas CSS para ocultar páginas restringidas de la navegación del sidebar."""
     if not HIDDEN_NAVIGATION_PATTERNS:
         return
 

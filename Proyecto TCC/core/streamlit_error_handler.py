@@ -1,8 +1,9 @@
+# Nombre del Archivo: streamlit_error_handler.py
+# Descripción: Manejador global de errores para Streamlit que previene exponer rutas de archivos en tracebacks
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 from utils.ui.icon_system import get_icon, replace_emojis
-"""
-Global error handler for Streamlit to prevent exposing file paths in tracebacks
-This wraps all page functions to catch and sanitize errors before Streamlit displays them
-"""
 
 import streamlit as st
 import traceback
@@ -12,32 +13,33 @@ from functools import wraps
 from typing import Callable, Any
 
 
+# Limpieza - Sanitizar Traceback
 def sanitize_traceback(tb_lines: list) -> list:
-    """Sanitize traceback lines to remove file paths"""
+    """Sanitiza las líneas del traceback para remover rutas de archivos"""
     sanitized = []
     
     for line in tb_lines:
-        # Remove Streamlit Cloud paths
+        # Limpieza - Remover rutas de Streamlit Cloud
         line = re.sub(r'/mount/src/[^/]+/', '[APP]/', line)
         line = re.sub(r'/mount/src/', '[APP]/', line)
         
-        # Remove Windows paths
+        # Limpieza - Remover rutas de Windows
         line = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[APP]', line)
         line = re.sub(r'C:\\Users\\[^\\]*\\', '[USER]', line)
         
-        # Remove Linux/Mac paths
+        # Limpieza - Remover rutas de Linux/Mac
         line = re.sub(r'/home/[^/]+/', '[HOME]/', line)
         line = re.sub(r'/Users/[^/]+/', '[USER]/', line)
         
-        # Remove project-specific paths
+        # Limpieza - Remover rutas específicas del proyecto
         line = re.sub(r'Proyecto TCC', '[PROJECT]', line)
         line = re.sub(r'Proyectos Python', '[PROJECT]', line)
         line = re.sub(r'OneDrive', '[DRIVE]', line)
         
-        # Remove specific file names but keep structure
+        # Limpieza - Remover nombres de archivos específicos pero mantener estructura
         line = re.sub(r'([^/]+)\.py', '[FILE].py', line)
         
-        # Keep line numbers but make them generic
+        # Limpieza - Mantener números de línea pero hacerlos genéricos
         line = re.sub(r'line \d+', 'line [N]', line)
         
         sanitized.append(line)
@@ -45,12 +47,13 @@ def sanitize_traceback(tb_lines: list) -> list:
     return sanitized
 
 
+# Limpieza - Sanitizar Mensaje de Error
 def sanitize_error_message(error_msg: str) -> str:
-    """Sanitize error messages to remove sensitive paths"""
+    """Sanitiza mensajes de error para remover rutas sensibles"""
     if not error_msg:
-        return "An error occurred"
+        return "Ocurrió un error"
     
-    # Limpieza - Remover Rutas de Mensajes de Error
+    # Limpieza - Remover rutas de mensajes de error
     error_msg = re.sub(r'/mount/src/[^/]+/', '[APP]/', error_msg)
     error_msg = re.sub(r'[A-Za-z]:\\[^\\]*\\', '[PATH]', error_msg)
     error_msg = re.sub(r'/home/[^/]+/', '[HOME]/', error_msg)
@@ -59,27 +62,28 @@ def sanitize_error_message(error_msg: str) -> str:
     return error_msg
 
 
+# Decorador - Wrapper Seguro para Páginas de Streamlit
 def safe_streamlit_page(func: Callable) -> Callable:
     """
-    Decorator to wrap Streamlit page functions and catch all exceptions
-    This prevents Streamlit from showing full tracebacks with file paths
+    Decorador para envolver funciones de página de Streamlit y capturar todas las excepciones
+    Esto previene que Streamlit muestre tracebacks completos con rutas de archivos
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            # Get the traceback
+            # Manejo de Errores - Obtener el traceback
             exc_type, exc_value, exc_traceback = sys.exc_info()
             
-            # Get error type and message
+            # Manejo de Errores - Obtener tipo y mensaje de error
             error_type = type(e).__name__
             error_message = str(e)
             
-            # Sanitize error message
+            # Limpieza - Sanitizar mensaje de error
             sanitized_msg = sanitize_error_message(error_message)
             
-            # Determine user-friendly message based on error type
+            # UI - Determinar mensaje amigable para el usuario basado en el tipo de error
             if error_type == "FileNotFoundError":
                 user_msg = replace_emojis("❌ **Archivo no encontrado**\n\nEl archivo o recurso solicitado no está disponible.")
             elif error_type == "PermissionError":
@@ -97,57 +101,58 @@ def safe_streamlit_page(func: Callable) -> Callable:
             else:
                 user_msg = f"{get_icon("❌", 20)} **Error inesperado**\n\nOcurrió un error al procesar tu solicitud. Por favor, intenta nuevamente."
             
-            # Display user-friendly error
+            # UI - Mostrar error amigable para el usuario
             st.error(user_msg)
             
-            # Optionally show a generic technical message (without paths)
-            # Temporarily enable debug mode for troubleshooting
-            if st.session_state.get('debug_mode', False) or True:  # Temporarily always True for debugging
+            # Debug - Opcionalmente mostrar mensaje técnico genérico (sin rutas)
+            # Debug - Temporalmente habilitar modo debug para troubleshooting
+            if st.session_state.get('debug_mode', False) or True:  # Debug - Temporalmente siempre True para debugging
                 with st.expander(replace_emojis("🔧 Detalles técnicos (modo debug)")):
                     st.code(f"Tipo: {error_type}\nMensaje: {sanitized_msg}\nError original: {error_message}", language=None)
                     import traceback
                     st.code(traceback.format_exc(), language='python')
             
-            # Log the full error for debugging (server-side only)
+            # Logging - Registrar el error completo para debugging (solo servidor)
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Error in {func.__name__}: {error_type}: {error_message}")
             logger.error(traceback.format_exc())
             
-            # Stop execution to prevent further errors
+            # Control de Flujo - Detener ejecución para prevenir más errores
             st.stop()
             
     return wrapper
 
 
+# Configuracion - Configurar Manejo de Errores de Streamlit
 def configure_streamlit_error_handling():
     """
-    Configure Streamlit to suppress default error tracebacks
-    This should be called at the start of your main page
+    Configura Streamlit para suprimir tracebacks de error por defecto
+    Esto debe ser llamado al inicio de tu página principal
     """
-    # Configuracion - Configurar Streamlit para Mostrar Errores Minimos
-    # Nota: Esto es un workaround ya que Streamlit no tiene una configuracion directa para esto
+    # Configuracion - Configurar Streamlit para mostrar errores mínimos
+    # Nota: Esto es un workaround ya que Streamlit no tiene una configuración directa para esto
     
-    # Configuracion - Sobrescribir sys.excepthook para Capturar Excepciones No Manejadas
+    # Configuracion - Sobrescribir sys.excepthook para capturar excepciones no manejadas
     original_excepthook = sys.excepthook
     
     def custom_excepthook(exc_type, exc_value, exc_traceback):
-        # Don't show traceback in console if running in Streamlit
+        # Logging - No mostrar traceback en consola si se ejecuta en Streamlit
         if 'streamlit' in sys.modules:
-            # Just log it
+            # Logging - Solo registrarlo
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Unhandled exception: {exc_type.__name__}: {exc_value}")
             logger.error(''.join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
         else:
-            # Show normal traceback if not in Streamlit
+            # Debug - Mostrar traceback normal si no está en Streamlit
             original_excepthook(exc_type, exc_value, exc_traceback)
     
     sys.excepthook = custom_excepthook
 
 
-# Convenience function for wrapping main functions
+# Decorador - Función Conveniente para Envolver Funciones Main
 def safe_main(func: Callable) -> Callable:
-    """Decorator specifically for main() functions in Streamlit pages"""
+    """Decorador específicamente para funciones main() en páginas de Streamlit"""
     return safe_streamlit_page(func)
 

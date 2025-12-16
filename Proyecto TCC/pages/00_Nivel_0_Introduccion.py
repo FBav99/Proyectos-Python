@@ -1,3 +1,8 @@
+# Nombre del Archivo: 00_Nivel_0_Introduccion.py
+# Descripción: Página del Nivel 0 - Introducción a conceptos de datos
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,17 +17,17 @@ from utils.ui.icon_system import get_icon, replace_emojis
 init_sidebar = auth_ui.init_sidebar
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
-# Configure error handling
+# Configuracion - Configurar manejo de errores
 configure_streamlit_error_handling()
 
-# Page config
+# Configuracion - Configurar página
 st.set_page_config(
     page_title="Nivel 0: Introducción - Conceptos de Datos",
     page_icon=get_icon("🌟", 20),
     layout="wide"
 )
 
-# Load CSS styling for level pages
+# Estilo - Cargar estilos CSS para páginas de nivel
 st.markdown(load_level_styles(), unsafe_allow_html=True)
 
 # Principal - Nivel 0 Introduccion
@@ -46,11 +51,11 @@ def main():
             st.switch_page("Inicio.py")
         return
     
-    # 1. Title (level name and description)
+    # UI - Título (nombre del nivel y descripción)
     st.title(replace_emojis("🌟 Nivel 0: Introducción"))
     st.subheader("Conceptos Fundamentales de Datos")
     
-    # 2. Progress Bar (showing progress across levels)
+    # UI - Barra de Progreso (mostrando progreso a través de niveles)
     total_progress, completed_count, progress = get_level_progress(user['id'])
     
     st.markdown('<div class="progress-container">', unsafe_allow_html=True)
@@ -60,27 +65,27 @@ def main():
         st.caption(f"Progreso general: {total_progress:.1f}% ({completed_count}/5 niveles)")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # 3. Progression Summary
+    # UI - Resumen de Progresión
     create_progression_summary(progress)
     
-    # 4. Level Preview
+    # UI - Vista Previa del Nivel
     create_level_preview('nivel0')
     
-    # 5. Introduction Section (what the user will learn)
+    # UI - Sección de Introducción (qué aprenderá el usuario)
     st.header(replace_emojis("🎯 ¿Qué aprenderás en este nivel?"))
     st.markdown("En este nivel aprenderás los conceptos básicos sobre qué son los datos, qué tipos existen, y qué puedes hacer con ellos. Es la base fundamental para entender todo lo que viene después.")
     
-    # UI - Agregar Contexto Narrativo
+    # UI - Agregar contexto narrativo
     create_info_box(
         "info-box",
         "🏪 Bienvenido a TechStore",
         "<p>Durante todo el curso, trabajaremos con datos de <strong>TechStore</strong>, una tienda de tecnología que necesita analizar sus ventas para tomar mejores decisiones. En este nivel, aprenderás los conceptos básicos que necesitas para entender estos datos.</p>"
     )
     
-    # 6. Steps Section (clear, actionable instructions)
+    # UI - Sección de Pasos (instrucciones claras y accionables)
     st.header(replace_emojis("📋 Conceptos Fundamentales de Datos"))
     
-    # Step 1
+    # UI - Paso 1
     create_step_card(
         step_number="0.1",
         title="¿Qué son los datos?",
@@ -101,7 +106,7 @@ def main():
         }
     )
     
-    # Step 2
+    # UI - Paso 2
     create_step_card(
         step_number="0.2",
         title="Tipos de datos que existen",
@@ -135,7 +140,7 @@ def main():
         }
     )
     
-    # Step 3
+    # UI - Paso 3
     create_step_card(
         step_number="0.3",
         title="¿Qué puedes hacer con los datos?",
@@ -164,7 +169,7 @@ def main():
         }
     )
     
-    # Step 4
+    # UI - Paso 4
     create_step_card(
         step_number="0.4",
         title="¿Cómo se ven los datos organizados?",
@@ -191,7 +196,7 @@ def main():
         }
     )
     
-    # Step 5
+    # UI - Paso 5
     create_step_card(
         step_number="0.5",
         title="¿Qué es el análisis de datos?",
@@ -418,7 +423,7 @@ def main():
             with col3:
                 st.metric("Registros", len(df))
     
-    # 6. Quiz Section - Must complete quiz before marking level as complete
+    # Quiz - Sección de Quiz - Debe completar el quiz antes de marcar el nivel como completado
     st.header("🧠 Quiz del Nivel")
     st.markdown("### Pon a prueba tus conocimientos")
     st.info(replace_emojis("📝 **Importante:** Debes aprobar el quiz (al menos 3 de 5 preguntas correctas) antes de poder marcar el nivel como completado."))
@@ -445,7 +450,7 @@ def main():
     
     st.divider()
     
-    # 7. Navigation or next steps
+    # Navegacion - Navegación o próximos pasos
     st.header(replace_emojis("✅ Verificación del Nivel"))
     
     # Validacion - Permitir Marcar Completado solo si Quiz Aprobado

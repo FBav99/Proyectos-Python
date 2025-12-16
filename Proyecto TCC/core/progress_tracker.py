@@ -1,8 +1,9 @@
+# Nombre del Archivo: progress_tracker.py
+# Descripción: Servicio de seguimiento de progreso para la plataforma de análisis de datos TCC - Maneja progreso de aprendizaje, completación de niveles y análisis de progreso
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 from utils.ui.icon_system import get_icon, replace_emojis
-"""
-Progress tracking service for TCC Data Analysis Platform
-Handles user learning progress, level completion, and progress analytics
-"""
 
 import streamlit as st
 import logging
@@ -13,8 +14,9 @@ from core.database import db_manager
 
 logger = logging.getLogger(__name__)
 
+# Clase - Rastreador de Progreso
 class ProgressTracker:
-    """Handles user learning progress tracking"""
+    """Maneja el seguimiento del progreso de aprendizaje del usuario"""
     
     def __init__(self):
         self.levels = ['nivel0', 'nivel1', 'nivel2', 'nivel3', 'nivel4']
@@ -22,12 +24,12 @@ class ProgressTracker:
     
     # Cache - Invalidar Cache de Progreso
     def _invalidate_cache(self, user_id: int):
-        """Remove cached progress for a user."""
+        """Remover progreso en caché para un usuario."""
         self._cache.pop(user_id, None)
     
     # Consulta - Obtener Progreso de Usuario
     def get_user_progress(self, user_id: int) -> Dict[str, Any]:
-        """Get complete user progress information"""
+        """Obtener información completa del progreso del usuario"""
         try:
             if user_id in self._cache:
                 return copy.deepcopy(self._cache[user_id])
@@ -39,14 +41,14 @@ class ProgressTracker:
                 progress = cursor.fetchone()
                 
                 if not progress:
-                    # Create progress record if it doesn't exist
+                    # Base de Datos - Crear registro de progreso si no existe
                     self.create_user_progress(user_id)
                     return self.get_user_progress(user_id)
                 
-                # Convert to dictionary
+                # Conversion - Convertir a diccionario
                 progress_dict = dict(progress)
                 
-                # Add calculated fields
+                # Calculo - Agregar campos calculados
                 progress_dict['total_progress'] = self.calculate_total_progress(progress_dict)
                 progress_dict['completed_count'] = self.count_completed_levels(progress_dict)
                 progress_dict['current_level'] = self.get_current_level(progress_dict)
@@ -62,7 +64,7 @@ class ProgressTracker:
     
     # Creacion - Crear Registro de Progreso
     def create_user_progress(self, user_id: int) -> bool:
-        """Create initial progress record for new user"""
+        """Crear registro de progreso inicial para nuevo usuario"""
         try:
             with db_manager.get_connection() as conn:
                 conn.execute("""
@@ -78,14 +80,14 @@ class ProgressTracker:
     
     # Actualizacion - Actualizar Progreso de Usuario
     def update_user_progress(self, user_id: int, **kwargs) -> bool:
-        """Update user progress fields"""
+        """Actualizar campos de progreso del usuario"""
         try:
-            # Build update query dynamically
+            # Consulta - Construir consulta de actualización dinámicamente
             update_fields = []
             values = []
             
             for field, value in kwargs.items():
-                # Check if field is a level completion field or other allowed fields
+                # Validacion - Verificar si el campo es de completación de nivel u otros campos permitidos
                 is_level_field = any(field.startswith(level) for level in self.levels)
                 is_allowed_field = field in ['total_time_spent', 'data_analyses_created']
                 
@@ -96,7 +98,7 @@ class ProgressTracker:
             if not update_fields:
                 return False
             
-            # Add timestamp
+            # Timestamp - Agregar timestamp
             update_fields.append("last_updated = ?")
             values.append(datetime.now().isoformat())
             values.append(user_id)
@@ -120,23 +122,23 @@ class ProgressTracker:
     
     # Progreso - Completar Nivel
     def complete_level(self, user_id: int, level_name: str) -> bool:
-        """Mark a level as completed"""
+        """Marcar un nivel como completado"""
         try:
             if level_name not in self.levels:
                 logger.error(f"Invalid level name: {level_name}")
                 return False
             
-            # Update level completion
+            # Actualizacion - Actualizar completación de nivel
             success = self.update_user_progress(
                 user_id, 
                 **{f"{level_name}_completed": True}
             )
             
             if success:
-                # Note: Completion timestamp columns don't exist in current schema
-                # Update completion timestamp when schema is updated
+                # Nota - Las columnas de timestamp de completación no existen en el esquema actual
+                # Actualizar timestamp de completación cuando se actualice el esquema
                 
-                # Log completion
+                # Logging - Registrar completación
                 self.log_progress_activity(user_id, 'level_completed', {
                     'level': level_name,
                     'timestamp': datetime.now().isoformat()
@@ -150,23 +152,23 @@ class ProgressTracker:
     
     # Progreso - Reiniciar Progreso de Nivel
     def reset_level_progress(self, user_id: int, level_name: str) -> bool:
-        """Reset progress for a specific level"""
+        """Reiniciar progreso para un nivel específico"""
         try:
             if level_name not in self.levels:
                 logger.error(f"Invalid level name: {level_name}")
                 return False
             
-            # Reset level completion
+            # Actualizacion - Reiniciar completación de nivel
             success = self.update_user_progress(
                 user_id,
                 **{f"{level_name}_completed": False}
             )
             
             if success:
-                # Note: Completion timestamp columns don't exist in current schema
-                # Clear completion timestamp when schema is updated
+                # Nota - Las columnas de timestamp de completación no existen en el esquema actual
+                # Limpiar timestamp de completación cuando se actualice el esquema
                 
-                # Log reset
+                # Logging - Registrar reinicio
                 self.log_progress_activity(user_id, 'level_reset', {
                     'level': level_name,
                     'timestamp': datetime.now().isoformat()
@@ -180,18 +182,18 @@ class ProgressTracker:
     
     # Progreso - Reiniciar Todo el Progreso
     def reset_all_progress(self, user_id: int) -> bool:
-        """Reset all level progress for a user"""
+        """Reiniciar todo el progreso de niveles para un usuario"""
         try:
             reset_fields = {}
             for level in self.levels:
                 reset_fields[f"{level}_completed"] = False
-                # Only reset completion timestamp if the column exists
-                # Note: The database schema doesn't include *_completed_at columns yet
+                # Nota - Solo reiniciar timestamp de completación si la columna existe
+                # Nota - El esquema de base de datos aún no incluye columnas *_completed_at
             
             success = self.update_user_progress(user_id, **reset_fields)
             
             if success:
-                # Log complete reset
+                # Logging - Registrar reinicio completo
                 self.log_progress_activity(user_id, 'all_progress_reset', {
                     'timestamp': datetime.now().isoformat()
                 })
@@ -204,13 +206,13 @@ class ProgressTracker:
     
     # Actualizacion - Actualizar Tiempo de Estudio
     def update_time_spent(self, user_id: int, minutes: int) -> bool:
-        """Update total time spent learning"""
+        """Actualizar tiempo total de aprendizaje"""
         try:
-            # Get current time spent
+            # Consulta - Obtener tiempo actual gastado
             current_progress = self.get_user_progress(user_id)
             current_time = current_progress.get('total_time_spent', 0)
             
-            # Add new time
+            # Calculo - Agregar nuevo tiempo
             new_time = current_time + minutes
             
             return self.update_user_progress(user_id, total_time_spent=new_time)
@@ -221,13 +223,13 @@ class ProgressTracker:
     
     # Contador - Incrementar Analisis Creados
     def increment_analyses_created(self, user_id: int) -> bool:
-        """Increment count of data analyses created"""
+        """Incrementar contador de análisis de datos creados"""
         try:
-            # Get current count
+            # Consulta - Obtener contador actual
             current_progress = self.get_user_progress(user_id)
             current_count = current_progress.get('data_analyses_created', 0)
             
-            # Increment count
+            # Calculo - Incrementar contador
             new_count = current_count + 1
             
             return self.update_user_progress(user_id, data_analyses_created=new_count)
@@ -238,7 +240,7 @@ class ProgressTracker:
     
     # Calculo - Calcular Progreso Total
     def calculate_total_progress(self, progress_dict: Dict[str, Any]) -> float:
-        """Calculate total progress percentage"""
+        """Calcular porcentaje de progreso total"""
         try:
             completed_count = self.count_completed_levels(progress_dict)
             total_levels = len(self.levels)
@@ -249,7 +251,7 @@ class ProgressTracker:
     
     # Contador - Contar Niveles Completados
     def count_completed_levels(self, progress_dict: Dict[str, Any]) -> int:
-        """Count completed levels"""
+        """Contar niveles completados"""
         try:
             completed = 0
             for level in self.levels:
@@ -262,7 +264,7 @@ class ProgressTracker:
     
     # Consulta - Obtener Nivel Actual
     def get_current_level(self, progress_dict: Dict[str, Any]) -> str:
-        """Get the current level the user should work on"""
+        """Obtener el nivel actual en el que el usuario debe trabajar"""
         try:
             for level in self.levels:
                 if not progress_dict.get(f"{level}_completed", False):
@@ -274,7 +276,7 @@ class ProgressTracker:
     
     # Estadisticas - Obtener Estadisticas de Niveles
     def get_level_stats(self, user_id: int) -> Dict[str, Any]:
-        """Get detailed statistics for all levels"""
+        """Obtener estadísticas detalladas para todos los niveles"""
         try:
             progress = self.get_user_progress(user_id)
             stats = {}
@@ -289,7 +291,7 @@ class ProgressTracker:
                     'status': replace_emojis('✅ Completado') if completed else '⏳ Pendiente'
                 }
             
-            # Add overall stats
+            # Estadisticas - Agregar estadísticas generales
             stats['overall'] = {
                 'total_progress': progress.get('total_progress', 0),
                 'completed_count': progress.get('completed_count', 0),
@@ -306,7 +308,7 @@ class ProgressTracker:
     
     # Inicializacion - Obtener Progreso por Defecto
     def get_default_progress(self) -> Dict[str, Any]:
-        """Get default progress structure"""
+        """Obtener estructura de progreso por defecto"""
         default_progress = {
             'user_id': None,
             'last_updated': datetime.now().isoformat(),
@@ -314,7 +316,7 @@ class ProgressTracker:
             'data_analyses_created': 0
         }
         
-        # Add level fields
+        # Inicializacion - Agregar campos de nivel
         for level in self.levels:
             default_progress[f"{level}_completed"] = False
             default_progress[f"{level}_completed_at"] = None
@@ -323,12 +325,12 @@ class ProgressTracker:
     
     # Logging - Registrar Actividad de Progreso
     def log_progress_activity(self, user_id: int, activity_type: str, details: Dict[str, Any]):
-        """Log progress-related activities"""
+        """Registrar actividades relacionadas con progreso"""
         try:
-            # This could be extended to log to a separate progress_activity table
+            # Nota - Esto podría extenderse para registrar en una tabla separada progress_activity
             logger.info(f"Progress activity - User {user_id}: {activity_type} - {details}")
         except Exception as e:
             logger.error(f"Error logging progress activity: {e}")
 
-# Global progress tracker instance
+# Instancia - Instancia Global de Rastreador de Progreso
 progress_tracker = ProgressTracker()

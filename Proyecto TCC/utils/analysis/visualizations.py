@@ -1,3 +1,8 @@
+# Nombre del Archivo: visualizations.py
+# Descripción: Visualizaciones de datos - Funciones para crear gráficos de series temporales, análisis por categoría, regional y matrices de correlación
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
+
 import pandas as pd
 import numpy as np
 import plotly.express as px
