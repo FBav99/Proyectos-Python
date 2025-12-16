@@ -1,7 +1,7 @@
-"""
-Data cleaning operations for TCC Data Analysis Platform
-Handles text cleaning, normalization, and standardization
-"""
+# Nombre del Archivo: data_cleaning_ops.py
+# Descripción: Operaciones de limpieza de datos para la plataforma de análisis de datos TCC - Maneja limpieza de texto, normalización y estandarización
+# Autor: Fernando Bavera Villalba
+# Fecha: 25/10/2025
 
 import streamlit as st
 import pandas as pd
@@ -10,8 +10,12 @@ import re
 import unicodedata
 from typing import Dict, List, Any, Optional, Union
 
+# ============================================================================
+# CLASE DE OPERACIONES DE LIMPIEZA DE DATOS
+# ============================================================================
+
 class DataCleaningOperations:
-    """Core data cleaning operations"""
+    """Operaciones principales de limpieza de datos"""
     
     # Inicializacion - Inicializar Operaciones de Limpieza
     def __init__(self, df: pd.DataFrame):
@@ -21,7 +25,7 @@ class DataCleaningOperations:
     
     # Historial - Agregar Operacion al Historial
     def add_to_history(self, operation: str, details: str):
-        """Add operation to cleaning history"""
+        """Agregar operación al historial de limpieza"""
         self.cleaning_history.append({
             'operation': operation,
             'details': details,
@@ -30,7 +34,7 @@ class DataCleaningOperations:
     
     # Consulta - Obtener Resumen de Limpieza
     def get_cleaning_summary(self) -> Dict[str, Any]:
-        """Get summary of cleaning operations performed"""
+        """Obtener resumen de operaciones de limpieza realizadas"""
         return {
             'total_operations': len(self.cleaning_history),
             'operations': self.cleaning_history,
@@ -46,13 +50,13 @@ class DataCleaningOperations:
                         normalize_spaces: bool = True,
                         remove_empty_strings: bool = True) -> pd.DataFrame:
         """
-        Clean whitespace in specified columns
+        Limpiar espacios en blanco en columnas especificadas
         
         Args:
-            columns: List of columns to clean. If None, applies to all text columns
-            remove_leading_trailing: Remove leading and trailing spaces
-            normalize_spaces: Normalize multiple spaces to single space
-            remove_empty_strings: Remove empty strings
+            columns: Lista de columnas a limpiar. Si es None, aplica a todas las columnas de texto
+            remove_leading_trailing: Eliminar espacios al inicio y final
+            normalize_spaces: Normalizar múltiples espacios a un solo espacio
+            remove_empty_strings: Eliminar cadenas vacías
         """
         if columns is None:
             columns = self.cleaned_df.select_dtypes(include=['object']).columns.tolist()
@@ -63,7 +67,7 @@ class DataCleaningOperations:
             if col in self.cleaned_df.columns:
                 original_values = self.cleaned_df[col].copy()
                 
-                # Apply whitespace cleaning
+                # Limpieza - Aplicar Limpieza de Espacios en Blanco
                 if remove_leading_trailing:
                     self.cleaned_df[col] = self.cleaned_df[col].astype(str).str.strip()
                 
@@ -71,16 +75,16 @@ class DataCleaningOperations:
                     self.cleaned_df[col] = self.cleaned_df[col].astype(str).str.replace(r'\s+', ' ', regex=True)
                 
                 if remove_empty_strings:
-                    # Replace empty strings with NaN
+                    # Conversion - Reemplazar Cadenas Vacías con NaN
                     self.cleaned_df[col] = self.cleaned_df[col].replace(['', 'nan', 'None', 'null', 'N/A'], np.nan)
                 
-                # Count changes
+                # Calculo - Contar Cambios Realizados
                 changes = (original_values != self.cleaned_df[col]).sum()
                 changes_made += changes
         
         self.add_to_history(
-            "Whitespace cleaning",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            "Limpieza de espacios en blanco",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
@@ -89,10 +93,10 @@ class DataCleaningOperations:
     def normalize_text_case(self, columns: Optional[List[str]] = None,
                            case_type: str = 'lower') -> pd.DataFrame:
         """
-        Normalize text case (uppercase/lowercase)
+        Normalizar mayúsculas y minúsculas en texto
         
         Args:
-            columns: List of columns to process
+            columns: Lista de columnas a procesar
             case_type: 'lower', 'upper', 'title', 'capitalize'
         """
         if columns is None:
@@ -117,8 +121,8 @@ class DataCleaningOperations:
                 changes_made += changes
         
         self.add_to_history(
-            f"Text case normalization ({case_type})",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            f"Normalización de mayúsculas/minúsculas ({case_type})",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
@@ -129,13 +133,13 @@ class DataCleaningOperations:
                                 keep_spaces: bool = True,
                                 keep_punctuation: bool = False) -> pd.DataFrame:
         """
-        Remove special characters from text columns
+        Remover caracteres especiales de columnas de texto
         
         Args:
-            columns: List of columns to process
-            keep_alphanumeric: Keep letters and numbers
-            keep_spaces: Keep spaces
-            keep_punctuation: Keep punctuation marks
+            columns: Lista de columnas a procesar
+            keep_alphanumeric: Mantener letras y números
+            keep_spaces: Mantener espacios
+            keep_punctuation: Mantener signos de puntuación
         """
         if columns is None:
             columns = self.cleaned_df.select_dtypes(include=['object']).columns.tolist()
@@ -146,7 +150,7 @@ class DataCleaningOperations:
             if col in self.cleaned_df.columns:
                 original_values = self.cleaned_df[col].copy()
                 
-                # Build regex pattern
+                # Procesamiento - Construir Patrón de Expresión Regular
                 pattern = r'[^'
                 if keep_alphanumeric:
                     pattern += r'a-zA-Z0-9'
@@ -162,8 +166,8 @@ class DataCleaningOperations:
                 changes_made += changes
         
         self.add_to_history(
-            "Special characters removal",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            "Eliminación de caracteres especiales",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
@@ -172,11 +176,11 @@ class DataCleaningOperations:
     def normalize_accents(self, columns: Optional[List[str]] = None,
                          remove_accents: bool = True) -> pd.DataFrame:
         """
-        Normalize accents in text
+        Normalizar acentos en texto
         
         Args:
-            columns: List of columns to process
-            remove_accents: If True, removes accents. If False, normalizes them
+            columns: Lista de columnas a procesar
+            remove_accents: Si es True, elimina acentos. Si es False, los normaliza
         """
         if columns is None:
             columns = self.cleaned_df.select_dtypes(include=['object']).columns.tolist()
@@ -188,13 +192,13 @@ class DataCleaningOperations:
                 original_values = self.cleaned_df[col].copy()
                 
                 if remove_accents:
-                    # Remove accents
+                    # Limpieza - Eliminar Acentos
                     self.cleaned_df[col] = self.cleaned_df[col].astype(str).apply(
                         lambda x: ''.join(c for c in unicodedata.normalize('NFD', x)
                                          if not unicodedata.combining(c))
                     )
                 else:
-                    # Normalize accents
+                    # Limpieza - Normalizar Acentos
                     self.cleaned_df[col] = self.cleaned_df[col].astype(str).apply(
                         lambda x: unicodedata.normalize('NFC', x)
                     )
@@ -203,8 +207,8 @@ class DataCleaningOperations:
                 changes_made += changes
         
         self.add_to_history(
-            f"Accent normalization ({'removed' if remove_accents else 'normalized'})",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            f"Normalización de acentos ({'eliminados' if remove_accents else 'normalizados'})",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
@@ -213,15 +217,15 @@ class DataCleaningOperations:
     def standardize_phone_numbers(self, columns: Optional[List[str]] = None,
                                  format_type: str = 'international') -> pd.DataFrame:
         """
-        Standardize phone numbers
+        Estandarizar números de teléfono
         
         Args:
-            columns: List of phone number columns
-            format_type: 'international', 'national', 'simple'
+            columns: Lista de columnas de números de teléfono
+            format_type: 'international', 'national', 'simple', 'paraguay'
         """
         if columns is None:
-            # Try to detect columns that might contain phone numbers
-            # Use non-capturing groups to avoid warnings
+            # Consulta - Intentar Detectar Columnas que Puedan Contener Números de Teléfono
+            # Nota: Usar grupos no capturadores para evitar advertencias
             phone_pattern = r'(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
             columns = []
             for col in self.cleaned_df.select_dtypes(include=['object']).columns:
@@ -234,7 +238,7 @@ class DataCleaningOperations:
             if col in self.cleaned_df.columns:
                 original_values = self.cleaned_df[col].copy()
                 
-                # Clean and standardize phone numbers
+                # Limpieza - Limpiar y Estandarizar Números de Teléfono
                 self.cleaned_df[col] = self.cleaned_df[col].astype(str).apply(
                     lambda x: self._standardize_phone(x, format_type)
                 )
@@ -243,19 +247,19 @@ class DataCleaningOperations:
                 changes_made += changes
         
         self.add_to_history(
-            f"Phone number standardization ({format_type})",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            f"Estandarización de números de teléfono ({format_type})",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
     
     # Utilidad - Estandarizar Telefono Interno
     def _standardize_phone(self, phone: str, format_type: str) -> str:
-        """Helper function to standardize a phone number"""
+        """Función auxiliar para estandarizar un número de teléfono"""
         if pd.isna(phone) or phone == 'nan':
             return phone
         
-        # Remove all non-numeric characters
+        # Limpieza - Eliminar Todos los Caracteres No Numéricos
         digits = re.sub(r'\D', '', str(phone))
         
         if len(digits) == 0:
@@ -289,13 +293,13 @@ class DataCleaningOperations:
     # Limpieza - Estandarizar Emails
     def standardize_emails(self, columns: Optional[List[str]] = None) -> pd.DataFrame:
         """
-        Standardize email addresses
+        Estandarizar direcciones de correo electrónico
         
         Args:
-            columns: List of email columns
+            columns: Lista de columnas de correo electrónico
         """
         if columns is None:
-            # Try to detect email columns
+            # Consulta - Intentar Detectar Columnas de Correo Electrónico
             email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             columns = []
             for col in self.cleaned_df.select_dtypes(include=['object']).columns:
@@ -308,7 +312,7 @@ class DataCleaningOperations:
             if col in self.cleaned_df.columns:
                 original_values = self.cleaned_df[col].copy()
                 
-                # Clean and standardize emails
+                # Limpieza - Limpiar y Estandarizar Correos Electrónicos
                 self.cleaned_df[col] = self.cleaned_df[col].astype(str).apply(
                     lambda x: self._standardize_email(x)
                 )
@@ -317,21 +321,21 @@ class DataCleaningOperations:
                 changes_made += changes
         
         self.add_to_history(
-            "Email standardization",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            "Estandarización de correos electrónicos",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
     
     # Utilidad - Estandarizar Email Interno
     def _standardize_email(self, email: str) -> str:
-        """Helper function to standardize an email"""
+        """Función auxiliar para estandarizar un correo electrónico"""
         if pd.isna(email) or email == 'nan':
             return email
         
         email = str(email).strip().lower()
         
-        # Remove extra spaces and normalize
+        # Limpieza - Eliminar Espacios Extra y Normalizar
         email = re.sub(r'\s+', '', email)
         
         return email
@@ -340,17 +344,17 @@ class DataCleaningOperations:
     def standardize_dates(self, columns: Optional[List[str]] = None,
                          format_type: str = 'dd/mm/yyyy') -> pd.DataFrame:
         """
-        Standardize date formats
+        Estandarizar formatos de fecha
         
         Args:
-            columns: List of date columns
+            columns: Lista de columnas de fecha
             format_type: 'dd/mm/yyyy', 'yyyy-mm-dd', 'mm/dd/yyyy', 'dd-mm-yyyy'
         """
         if columns is None:
-            # Try to detect date columns
+            # Consulta - Intentar Detectar Columnas de Fecha
             columns = []
             for col in self.cleaned_df.select_dtypes(include=['object', 'datetime64']).columns:
-                # Check if column contains date-like patterns
+                # Validacion - Verificar si la Columna Contiene Patrones Similares a Fechas
                 sample_values = self.cleaned_df[col].dropna().astype(str).head(10)
                 if any(self._is_date_like(val) for val in sample_values):
                     columns.append(col)
@@ -361,12 +365,12 @@ class DataCleaningOperations:
             if col in self.cleaned_df.columns:
                 original_values = self.cleaned_df[col].copy()
                 
-                # Convert to datetime first, then format
+                # Conversion - Convertir a Fecha Primero, Luego Formatear
                 try:
-                    # Try to parse as datetime with format inference
+                    # Conversion - Intentar Parsear como Fecha con Inferencia de Formato
                     self.cleaned_df[col] = pd.to_datetime(self.cleaned_df[col], errors='coerce')
                     
-                    # Format according to specified format
+                    # Conversion - Formatear Según Formato Especificado
                     if format_type == 'dd/mm/yyyy':
                         self.cleaned_df[col] = self.cleaned_df[col].dt.strftime('%d/%m/%Y')
                     elif format_type == 'yyyy-mm-dd':
@@ -376,32 +380,32 @@ class DataCleaningOperations:
                     elif format_type == 'dd-mm-yyyy':
                         self.cleaned_df[col] = self.cleaned_df[col].dt.strftime('%d-%m-%Y')
                     
-                    # Replace NaT with original values that couldn't be parsed
+                    # Conversion - Reemplazar NaT con Valores Originales que No Pudieron Ser Parseados
                     self.cleaned_df[col] = self.cleaned_df[col].fillna(original_values)
                     
                 except Exception:
-                    # If conversion fails, keep original values
+                    # Manejo - Si la Conversión Falla, Mantener Valores Originales
                     self.cleaned_df[col] = original_values
                 
                 changes = (original_values != self.cleaned_df[col]).sum()
                 changes_made += changes
         
         self.add_to_history(
-            f"Date standardization ({format_type})",
-            f"Columns: {columns}, Changes made: {changes_made}"
+            f"Estandarización de fechas ({format_type})",
+            f"Columnas: {columns}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
     
     # Validacion - Verificar si es Fecha
     def _is_date_like(self, value: str) -> bool:
-        """Check if a string looks like a date"""
+        """Verificar si una cadena parece ser una fecha"""
         if pd.isna(value) or value == 'nan':
             return False
         
         value = str(value).strip()
         
-        # Common date patterns
+        # Procesamiento - Patrones Comunes de Fecha
         date_patterns = [
             r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}',  # dd/mm/yyyy or dd-mm-yyyy
             r'\d{4}[/-]\d{1,2}[/-]\d{1,2}',    # yyyy/mm/dd or yyyy-mm-dd
@@ -419,11 +423,11 @@ class DataCleaningOperations:
     def replace_values(self, replacements: Dict[str, str], 
                       columns: Optional[List[str]] = None) -> pd.DataFrame:
         """
-        Replace specific values in the dataset
+        Reemplazar valores específicos en el conjunto de datos
         
         Args:
-            replacements: Dictionary of old_value: new_value pairs
-            columns: List of columns to apply replacements to
+            replacements: Diccionario de pares valor_anterior: valor_nuevo
+            columns: Lista de columnas a las que aplicar los reemplazos
         """
         if columns is None:
             columns = self.cleaned_df.columns.tolist()
@@ -441,20 +445,20 @@ class DataCleaningOperations:
                 changes_made += changes
         
         self.add_to_history(
-            "Value replacements",
-            f"Columns: {columns}, Replacements: {len(replacements)}, Changes made: {changes_made}"
+            "Reemplazo de valores",
+            f"Columnas: {columns}, Reemplazos: {len(replacements)}, Cambios realizados: {changes_made}"
         )
         
         return self.cleaned_df
     
     # Limpieza - Resetear a Datos Originales
     def reset_to_original(self) -> pd.DataFrame:
-        """Reset to original data"""
+        """Resetear a datos originales"""
         self.cleaned_df = self.original_df.copy()
         self.cleaning_history = []
         return self.cleaned_df
     
     # Consulta - Obtener Datos Limpiados
     def get_cleaned_data(self) -> pd.DataFrame:
-        """Get cleaned data"""
+        """Obtener datos limpiados"""
         return self.cleaned_df.copy()

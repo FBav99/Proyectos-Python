@@ -45,7 +45,7 @@ def display_metric(config, df):
             st.error(f"Tipo de métrica no válido: {metric_type}")
             return
         
-        # Format the value based on type
+        # Formato - Formatear el Valor Según el Tipo
         if isinstance(value, (int, np.integer)):
             formatted_value = f"{value:,}"
         elif isinstance(value, (float, np.floating)):
@@ -60,7 +60,7 @@ def display_metric(config, df):
 
 # UI - Mostrar Grafico de Lineas
 def display_line_chart(config, df):
-    """Display a line chart"""
+    """Mostrar un gráfico de líneas"""
     x_col = config.get('x_column')
     y_col = config.get('y_column')
     color_col = config.get('color_column')
@@ -81,7 +81,7 @@ def display_line_chart(config, df):
 
 # UI - Mostrar Grafico de Barras
 def display_bar_chart(config, df):
-    """Display a bar chart"""
+    """Mostrar un gráfico de barras"""
     x_col = config.get('x_column')
     y_col = config.get('y_column')
     orientation = config.get('orientation', 'vertical')
@@ -102,7 +102,7 @@ def display_bar_chart(config, df):
 
 # UI - Mostrar Grafico Circular
 def display_pie_chart(config, df):
-    """Display a pie chart"""
+    """Mostrar un gráfico circular"""
     values_col = config.get('values_column')
     names_col = config.get('names_column')
     
@@ -111,7 +111,7 @@ def display_pie_chart(config, df):
         return
     
     try:
-        # Aggregate data for pie chart
+        # Procesamiento - Agregar Datos para Gráfico Circular
         pie_data = df.groupby(names_col)[values_col].sum().reset_index()
         fig = px.pie(pie_data, values=values_col, names=names_col, title=config.get('title', 'Gráfico Circular'))
         
@@ -121,7 +121,7 @@ def display_pie_chart(config, df):
 
 # UI - Mostrar Grafico de Area
 def display_area_chart(config, df):
-    """Display an area chart"""
+    """Mostrar un gráfico de área"""
     x_col = config.get('x_column')
     y_col = config.get('y_column')
     color_col = config.get('color_column')
@@ -142,7 +142,7 @@ def display_area_chart(config, df):
 
 # UI - Mostrar Grafico de Dispersión
 def display_scatter_plot(config, df):
-    """Display a scatter plot"""
+    """Mostrar un gráfico de dispersión"""
     x_col = config.get('x_column')
     y_col = config.get('y_column')
     color_col = config.get('color_column')
@@ -163,7 +163,7 @@ def display_scatter_plot(config, df):
 
 # UI - Mostrar Histograma
 def display_histogram(config, df):
-    """Display a histogram"""
+    """Mostrar un histograma"""
     column = config.get('column')
     bins = config.get('bins', 20)
     
@@ -179,7 +179,7 @@ def display_histogram(config, df):
 
 # UI - Mostrar Box Plot
 def display_box_plot(config, df):
-    """Display a box plot"""
+    """Mostrar un gráfico de caja (box plot)"""
     x_col = config.get('x_column')
     y_col = config.get('y_column')
     
@@ -195,7 +195,7 @@ def display_box_plot(config, df):
 
 # UI - Mostrar Grafico de Violin
 def display_violin_plot(config, df):
-    """Display a violin plot"""
+    """Mostrar un gráfico de violín"""
     x_col = config.get('x_column')
     y_col = config.get('y_column')
     
@@ -211,7 +211,7 @@ def display_violin_plot(config, df):
 
 # UI - Mostrar Matriz de Correlacion
 def display_correlation_matrix(config, df):
-    """Display correlation matrix"""
+    """Mostrar matriz de correlación"""
     columns = config.get('columns', [])
     
     if len(columns) < 2:
@@ -232,7 +232,7 @@ def display_correlation_matrix(config, df):
 
 # UI - Mostrar Tabla de Datos
 def display_data_table(config, df):
-    """Display a data table"""
+    """Mostrar una tabla de datos"""
     columns = config.get('columns', df.columns.tolist())
     rows = config.get('rows', min(20, len(df)))
     
@@ -241,18 +241,18 @@ def display_data_table(config, df):
         return
     
     try:
-        # Filter columns and rows
+        # Procesamiento - Filtrar Columnas y Filas
         table_df = df[columns].head(rows)
         st.dataframe(table_df, use_container_width=True)
         
-        # Show summary
+        # UI - Mostrar Resumen
         st.caption(f"Mostrando {len(table_df)} de {len(df)} filas")
     except Exception as e:
         display_error(e, "Mostrando tabla de datos")
 
 # Renderizado - Renderizar Componente
 def render_component(component, df):
-    """Render a dashboard component based on its type"""
+    """Renderizar un componente de dashboard según su tipo"""
     component_type = component['type']
     config = component['config']
     

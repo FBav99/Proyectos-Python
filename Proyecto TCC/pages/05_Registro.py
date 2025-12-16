@@ -9,14 +9,15 @@ from core.auth_service import auth_service, login_user
 from core.streamlit_error_handler import safe_main, configure_streamlit_error_handling
 
 from utils.ui.icon_system import get_icon, replace_emojis
+
 # Importacion - Importar init_sidebar usando ruta de importación absoluta
 from utils.ui import auth_ui
 init_sidebar = auth_ui.init_sidebar
 
-# Configuracion - Configurar manejo de errores
+# Configuracion - Configurar Manejo de Errores
 configure_streamlit_error_handling()
 
-# Inicializacion - Asegurar que la base de datos esté inicializada antes de usarla
+# Inicializacion - Asegurar que la Base de Datos Esté Inicializada Antes de Usarla
 from core.database import ensure_database_initialized
 try:
     ensure_database_initialized()
@@ -24,13 +25,17 @@ except Exception as e:
     st.error(f"Error initializing database: {e}")
     st.stop()
 
-# Validacion - Formato de Email
+# ============================================================================
+# FUNCIONES DE VALIDACION
+# ============================================================================
+
+# Validacion - Validar Formato de Email
 def validate_email(email):
     """Validar formato de email"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
-# Validacion - Fortaleza de Contraseña
+# Validacion - Validar Fortaleza de Contraseña
 def validate_password(password):
     """Validar fortaleza de contraseña"""
     if len(password) < 8:
@@ -47,10 +52,15 @@ def validate_password(password):
     
     return True, "Contraseña válida"
 
+# ============================================================================
+# FUNCION PRINCIPAL
+# ============================================================================
+
 # Principal - Registro de Usuarios
 @safe_main
 def main():
     """Página de registro de usuarios"""
+    # Configuracion - Configurar Página
     st.set_page_config(
         page_title="Registro - Crear Cuenta",
         page_icon=get_icon("📝", 20),
@@ -60,6 +70,7 @@ def main():
     # UI - Inicializar Sidebar con Info de Usuario
     init_sidebar()
     
+    # UI - Mostrar Encabezado de Registro
     st.markdown(f"""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
         <h1 style="color: white; margin-bottom: 1rem;">{get_icon("📝", 28)} Registro de Usuario</h1>
@@ -73,22 +84,23 @@ def main():
     # UI - Texto de Ayuda para Requisitos de Contraseña
     password_help = "La contraseña debe tener: mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
     
+    # UI - Formulario de Registro
     with st.form("registration_form", clear_on_submit=False):
-        # First row: Name fields (left to right)
+        # UI - Primera Fila: Campos de Nombre (de Izquierda a Derecha)
         col1, col2 = st.columns(2)
         with col1:
             first_name = st.text_input("Nombre", placeholder="Tu nombre", key="first_name")
         with col2:
             last_name = st.text_input("Apellido", placeholder="Tu apellido", key="last_name")
         
-        # Second row: Email and Username (left to right)
+        # UI - Segunda Fila: Email y Nombre de Usuario (de Izquierda a Derecha)
         col3, col4 = st.columns(2)
         with col3:
             email = st.text_input("Correo Electrónico", placeholder="tu@email.com", key="email")
         with col4:
             username = st.text_input("Nombre de Usuario", placeholder="usuario123", key="username")
         
-        # Third row: Password fields (left to right)
+        # UI - Tercera Fila: Campos de Contraseña (de Izquierda a Derecha)
         col5, col6 = st.columns(2)
         with col5:
             password = st.text_input(
@@ -106,14 +118,14 @@ def main():
                 key="confirm_password"
             )
         
-        # Password strength indicator (outside columns, doesn't reset)
+        # UI - Indicador de Fortaleza de Contraseña (Fuera de Columnas, No se Resetea)
         if password:
             is_valid, message = validate_password(password)
             if is_valid:
                 st.markdown(f"{get_icon('✅', 20)} {message}", unsafe_allow_html=True)
             else:
                 st.warning(f"⚠️ {message}")
-                # Show detailed requirements
+                # UI - Mostrar Requisitos Detallados
                 st.info("""
                 **Requisitos de contraseña:**
                 - Mínimo 8 caracteres
@@ -122,52 +134,60 @@ def main():
                 - Al menos un número (0-9)
                 """)
         
-        # Real-time validation messages (shown below form, don't reset)
+        # Validacion - Mensajes de Validación en Tiempo Real (Mostrados Debajo del Formulario, No se Resetean)
         validation_messages = []
         
-        # Email validation
+        # Validacion - Validar Email
         if email and not validate_email(email):
             validation_messages.append(replace_emojis("❌ Formato de email inválido"))
         
-        # Username validation
+        # Validacion - Validar Nombre de Usuario
         if username:
             if len(username) < 3:
                 validation_messages.append(replace_emojis("❌ El nombre de usuario debe tener al menos 3 caracteres"))
             elif not username.isalnum():
                 validation_messages.append(replace_emojis("❌ El nombre de usuario solo puede contener letras y números"))
         
-        # Show validation messages if any
+        # UI - Mostrar Mensajes de Validación si Existen
         if validation_messages:
             for msg in validation_messages:
                 st.warning(msg)
         
+        # UI - Botón de Envío del Formulario
         submitted = st.form_submit_button("📝 Registrarse", type="primary", use_container_width=True)
         
+        # Validacion - Validar Todos los Campos al Enviar
         if submitted:
-            # Validate all fields
             validation_error = None
             
+            # Validacion - Verificar que Todos los Campos Estén Completos
             if not all([first_name, last_name, email, username, password, confirm_password]):
                 validation_error = replace_emojis("❌ Todos los campos son obligatorios")
+            # Validacion - Verificar Formato de Email
             elif not validate_email(email):
                 validation_error = replace_emojis("❌ Formato de email inválido")
             else:
+                # Validacion - Validar Fortaleza de Contraseña
                 is_valid, message = validate_password(password)
                 if not is_valid:
                     validation_error = f"{get_icon("❌", 20)} {message}"
+                # Validacion - Verificar que las Contraseñas Coincidan
                 elif password != confirm_password:
                     validation_error = replace_emojis("❌ Las contraseñas no coinciden")
+                # Validacion - Verificar Longitud Mínima de Usuario
                 elif len(username) < 3:
                     validation_error = replace_emojis("❌ El nombre de usuario debe tener al menos 3 caracteres")
+                # Validacion - Verificar Caracteres Válidos en Usuario
                 elif not username.isalnum():
                     validation_error = replace_emojis("❌ El nombre de usuario solo puede contener letras y números")
             
+            # Manejo - Manejar Errores de Validación
             if validation_error:
-                # Store error in session state to show outside form
+                # Base de Datos - Guardar Error en Session State para Mostrar Fuera del Formulario
                 st.session_state.registration_error = validation_error
                 st.rerun()
             else:
-                # Attempt registration
+                # Autenticacion - Intentar Registro de Usuario
                 try:
                     success, message = auth_service.register_user(
                         username=username,
@@ -177,17 +197,23 @@ def main():
                         last_name=last_name
                     )
                     
+                    # Autenticacion - Manejar Resultado del Registro
                     if success:
+                        # Autenticacion - Intentar Inicio de Sesión Automático
                         login_success, login_message = login_user(username, password)
                         if login_success:
+                            # Limpieza - Limpiar Estados de Registro
                             st.session_state.pop('registration_error', None)
                             st.session_state.pop('registration_success', None)
+                            # Base de Datos - Guardar Datos de Bienvenida
                             st.session_state.registration_welcome = {
                                 'username': username,
                                 'first_name': first_name
                             }
+                            # Navegacion - Redirigir a Página de Inicio
                             st.switch_page("Inicio.py")
                         else:
+                            # Base de Datos - Guardar Estado de Registro Exitoso
                             st.session_state.registration_success = True
                             st.session_state.registered_user = {
                                 'email': email,
@@ -195,23 +221,26 @@ def main():
                                 'first_name': first_name,
                                 'last_name': last_name
                             }
+                            # Manejo - Guardar Error de Inicio de Sesión Automático
                             st.session_state.registration_error = f'{get_icon("❌", 20)} Registro exitoso pero el inicio de sesión automático falló: {login_message}'
                             st.rerun()
                     else:
+                        # Manejo - Guardar Error de Registro
                         st.session_state.registration_error = f'{get_icon("❌", 20)} Error durante el registro: {message}'
                         st.rerun()
                         
                 except Exception as e:
+                    # Manejo - Manejar Excepciones Durante el Registro
                     st.session_state.registration_error = f'{get_icon("❌", 20)} Error durante el registro: {str(e)}'
                     st.rerun()
     
-    # UI - Mostrar Mensajes de Error fuera del Formulario
+    # UI - Mostrar Mensajes de Error Fuera del Formulario
     if 'registration_error' in st.session_state and st.session_state.registration_error:
         st.error(st.session_state.registration_error)
-        # Clear error after showing
+        # Limpieza - Limpiar Error Después de Mostrarlo
         del st.session_state.registration_error
     
-    # UI - Mostrar Mensaje de Exito fuera del Formulario
+    # UI - Mostrar Mensaje de Éxito Fuera del Formulario
     if st.session_state.get('registration_success', False):
         user_info = st.session_state.get('registered_user', {})
         st.markdown(replace_emojis('✅ Usuario registrado exitosamente!'), unsafe_allow_html=True)
@@ -230,17 +259,19 @@ def main():
         - 💾 **Guardar tu progreso** automáticamente
         """)
         
+        # UI - Botón para Ir al Inicio
         col1, col2, col3 = st.columns(3)
         with col2:
             if st.button("🏠 Ir al Inicio", type="primary", use_container_width=True):
-                # Clear registration success state
+                # Limpieza - Limpiar Estado de Registro Exitoso
                 if 'registration_success' in st.session_state:
                     del st.session_state.registration_success
                 if 'registered_user' in st.session_state:
                     del st.session_state.registered_user
+                # Navegacion - Redirigir a Página de Inicio
                 st.switch_page("Inicio.py")
     
-    # Navigation
+    # UI - Sección de Navegación
     st.markdown("---")
     st.markdown("### 🔗 Navegación")
     

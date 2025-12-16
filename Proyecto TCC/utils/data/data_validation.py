@@ -90,11 +90,11 @@ class DataValidation:
     def remove_duplicates(self, subset: Optional[List[str]] = None, 
                          keep: str = 'first') -> pd.DataFrame:
         """
-        Remove duplicate rows
+        Remover filas duplicadas
         
         Args:
-            subset: List of columns to consider for duplicates
-            keep: 'first', 'last', or False (remove all duplicates)
+            subset: Lista de columnas a considerar para duplicados
+            keep: 'first', 'last', o False (eliminar todos los duplicados)
         """
         df_no_duplicates = self.df.drop_duplicates(subset=subset, keep=keep)
         
@@ -107,12 +107,12 @@ class DataValidation:
                        method: str = 'iqr', 
                        threshold: float = 1.5) -> Dict[str, Any]:
         """
-        Detect outliers in numeric columns
+        Detectar valores atípicos (outliers) en columnas numéricas
         
         Args:
-            columns: List of numeric columns to analyze
-            method: 'iqr' (Interquartile Range) or 'zscore'
-            threshold: Threshold for outlier detection
+            columns: Lista de columnas numéricas a analizar
+            method: 'iqr' (Rango Intercuartílico) o 'zscore'
+            threshold: Umbral para detección de valores atípicos
         """
         if columns is None:
             columns = self.df.select_dtypes(include=[np.number]).columns.tolist()
@@ -152,30 +152,30 @@ class DataValidation:
     
     # Analisis - Analizar Tipos de Datos
     def analyze_data_types(self) -> Dict[str, Any]:
-        """Analyze data types and suggest optimizations"""
+        """Analizar tipos de datos y sugerir optimizaciones"""
         type_info = {}
         
         for col in self.df.columns:
             current_dtype = str(self.df[col].dtype)
             memory_usage = self.df[col].memory_usage(deep=True)
             
-            # Suggest optimizations
+            # Sugerencias - Sugerir Optimizaciones
             suggestions = []
             
             if current_dtype == 'object':
                 unique_ratio = self.df[col].nunique() / len(self.df)
                 if unique_ratio < 0.5:
-                    suggestions.append("Consider converting to category type")
+                    suggestions.append("Considerar convertir a tipo categoría")
             
             elif current_dtype == 'int64':
                 if self.df[col].min() >= 0 and self.df[col].max() < 255:
-                    suggestions.append("Consider converting to uint8")
+                    suggestions.append("Considerar convertir a uint8")
                 elif self.df[col].min() >= -32768 and self.df[col].max() < 32767:
-                    suggestions.append("Consider converting to int16")
+                    suggestions.append("Considerar convertir a int16")
             
             elif current_dtype == 'float64':
                 if self.df[col].dtype == 'float64' and not self.df[col].isnull().any():
-                    suggestions.append("Consider converting to float32")
+                    suggestions.append("Considerar convertir a float32")
             
             type_info[col] = {
                 'current_dtype': current_dtype,
@@ -188,7 +188,7 @@ class DataValidation:
     
     # Validacion - Validar Calidad de Datos
     def validate_data_quality(self) -> Dict[str, Any]:
-        """Comprehensive data quality validation"""
+        """Validación exhaustiva de calidad de datos"""
         quality_report = {
             'total_rows': len(self.df),
             'total_columns': len(self.df.columns),
@@ -199,26 +199,26 @@ class DataValidation:
             'quality_score': 0
         }
         
-        # Check for duplicates
+        # Analisis - Verificar Duplicados
         _, duplicate_count = self.remove_duplicates()
         quality_report['duplicates'] = {
             'duplicate_rows': duplicate_count,
             'duplicate_percent': (duplicate_count / len(self.df)) * 100
         }
         
-        # Calculate overall quality score
+        # Calculo - Calcular Puntuación General de Calidad
         quality_score = 100
         
-        # Deduct points for missing values
+        # Calculo - Descontar Puntos por Valores Faltantes
         total_missing = sum(info['missing_count'] for info in quality_report['missing_values'].values())
         missing_penalty = min(30, (total_missing / (len(self.df) * len(self.df.columns))) * 100)
         quality_score -= missing_penalty
         
-        # Deduct points for duplicates
+        # Calculo - Descontar Puntos por Duplicados
         duplicate_penalty = min(20, quality_report['duplicates']['duplicate_percent'])
         quality_score -= duplicate_penalty
         
-        # Deduct points for outliers (if too many)
+        # Calculo - Descontar Puntos por Valores Atípicos (si hay demasiados)
         total_outliers = sum(info['outlier_count'] for info in quality_report['outliers'].values())
         outlier_penalty = min(15, (total_outliers / (len(self.df) * len(self.df.columns))) * 100)
         quality_score -= outlier_penalty
@@ -229,7 +229,7 @@ class DataValidation:
     
     # Sugerencias - Sugerir Acciones de Limpieza
     def suggest_cleaning_actions(self, quality_report: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Suggest cleaning actions based on quality report"""
+        """Sugerir acciones de limpieza basadas en el reporte de calidad"""
         suggestions = []
         
         # Missing values suggestions
@@ -278,7 +278,7 @@ class DataValidation:
     
     # Estadisticas - Obtener Estadisticas de Columnas
     def get_column_statistics(self, columns: Optional[List[str]] = None) -> Dict[str, Any]:
-        """Get detailed statistics for columns"""
+        """Obtener estadísticas detalladas para columnas"""
         if columns is None:
             columns = self.df.columns.tolist()
         
