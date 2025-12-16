@@ -57,6 +57,7 @@ def show_current_level_banner(progress):
     current_level_name = None
     current_level_subtitle = None
     learning_content = None
+    learning_points = None
     
     for level in level_order:
         if not progress.get(level, False):
