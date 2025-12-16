@@ -72,60 +72,93 @@ def show_current_level_banner(progress):
         level_icon = '🏆'
         level_color = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     else:
-        # Mapeo de niveles a nombres, subtítulos y contenido de aprendizaje
+        # Mapeo de niveles a nombres, subtítulos y puntos de aprendizaje
         level_info = {
             'nivel0': (
                 'Nivel 0', 
                 'Introducción', 
                 '🧭', 
                 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                'entender qué son los datos, sus tipos principales y cómo se organizan en tablas'
+                [
+                    'Qué son los datos y para qué sirven',
+                    'Tipos de datos (numéricos, texto, fechas, booleanos)',
+                    'Cómo se organizan los datos en tablas (filas y columnas)',
+                    'Qué es el análisis de datos y por qué es importante'
+                ]
             ),
             'nivel1': (
                 'Nivel 1', 
                 'Básico', 
                 '📚', 
                 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                'cargar y preparar datos, verificar su calidad y limpiarlos para el análisis'
+                [
+                    'Cargar datos desde diferentes formatos (CSV, Excel)',
+                    'Verificar la calidad de tus datos',
+                    'Identificar y limpiar datos problemáticos',
+                    'Preparar datos para el análisis'
+                ]
             ),
             'nivel2': (
                 'Nivel 2', 
                 'Filtros', 
                 '🔍', 
                 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                'filtrar datos por condiciones específicas, rangos de fechas y combinar múltiples filtros'
+                [
+                    'Filtrar datos por condiciones específicas',
+                    'Usar filtros por rangos de fechas',
+                    'Combinar múltiples filtros para análisis precisos',
+                    'Organizar y encontrar información específica'
+                ]
             ),
             'nivel3': (
                 'Nivel 3', 
                 'Métricas', 
                 '📊', 
                 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                'calcular métricas y KPIs, interpretar resultados y comparar datos para tomar decisiones'
+                [
+                    'Calcular métricas y KPIs importantes',
+                    'Interpretar resultados numéricos',
+                    'Comparar datos para identificar tendencias',
+                    'Tomar decisiones basadas en datos'
+                ]
             ),
             'nivel4': (
                 'Nivel 4', 
                 'Avanzado', 
                 '🚀', 
                 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                'analizar tendencias, crear visualizaciones interactivas y construir dashboards profesionales'
+                [
+                    'Analizar tendencias y patrones complejos',
+                    'Crear visualizaciones interactivas',
+                    'Construir dashboards profesionales',
+                    'Presentar información de manera efectiva'
+                ]
             )
         }
         
-        current_level_name, current_level_subtitle, level_icon, level_color, learning_content = level_info.get(
+        current_level_name, current_level_subtitle, level_icon, level_color, learning_points = level_info.get(
             current_level, 
-            ('Nivel Actual', 'Continuar aprendiendo', '🎓', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 'continuar tu aprendizaje')
+            ('Nivel Actual', 'Continuar aprendiendo', '🎓', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', ['continuar tu aprendizaje'])
         )
     
     # Mostrar el banner
-    if learning_content:
+    if learning_points:
+        # Crear lista de bullet points HTML con formato mejorado y más visible
+        learning_points_html = ''.join([f'<li style="margin: 0.8rem 0; font-size: 1.25rem; line-height: 1.7; font-weight: 700; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">{point}</li>' for point in learning_points])
+        
         banner_html = f"""
         <div style="background: {level_color}; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.3);">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                <div style="font-size: 2.5rem;">{get_icon(level_icon, 40)}</div>
-                <div style="text-align: center; flex: 1; min-width: 200px;">
-                    <h3 style="color: white; margin: 0; font-size: 1.4rem; font-weight: 600;">Tu Nivel Actual: {current_level_name}</h3>
-                    <p style="color: white; margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">{current_level_subtitle}</p>
-                    <p style="color: white; margin: 0.8rem 0 0 0; font-size: 0.95rem; opacity: 0.9; font-style: italic;">Actualmente, estás aprendiendo a {learning_content}</p>
+            <div style="display: flex; align-items: flex-start; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                <div style="font-size: 2.5rem; margin-top: 0.5rem;">{get_icon(level_icon, 40)}</div>
+                <div style="flex: 1; min-width: 200px;">
+                    <h3 style="color: white; margin: 0 0 0.5rem 0; font-size: 1.4rem; font-weight: 600;">Tu Nivel Actual: {current_level_name}</h3>
+                    <p style="color: white; margin: 0 0 1.2rem 0; font-size: 1rem; opacity: 0.95;">{current_level_subtitle}</p>
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px; margin-top: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+                        <h4 style="color: white; margin: 0 0 1.2rem 0; font-size: 1.4rem; font-weight: 800; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">📚 ¿Qué aprenderás?</h4>
+                        <ul style="color: white; margin: 0; padding-left: 2rem; text-align: left; list-style-type: disc; list-style-position: outside;">
+                            {learning_points_html}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
